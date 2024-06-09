@@ -1,0 +1,94 @@
+import React, { useState } from 'react';
+import { StyleSheet, Text, TextInput, View, Button, Alert, ImageBackground } from 'react-native';
+
+export default function App() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const resgisterImage = {uri: "https://wepa.blob.core.windows.net/assets/register.png"};
+
+  const login = async () => {
+    if (email && password) {
+      try {
+
+
+        const response = await fetch('http://192.168.0.16:5084/WeatherForecast');
+        const result = await response.json(); 
+        
+        if (response.ok) {
+          Alert.alert('Registration Successful', `Email: ${result.email}\nZip Code: ${result.zipCode}`);
+        } else {
+          Alert.alert('Registration Failed', result.message);
+        }
+      } catch (error) {
+        Alert.alert('Error', 'Something went wrong. Please try again later.');
+      }
+    } else {
+      Alert.alert('Error', 'Please fill in all fields');
+    }
+
+
+  };
+
+  return (
+
+      <ImageBackground
+        style={styles.image}
+        source={resgisterImage}>
+      <Text style={styles.title}>E-mail</Text>
+      <TextInput
+      keyboardType={'email-address'}
+      autoComplete="email"
+        style={styles.input}
+        placeholder="Email"
+        inputMode="email"
+        value={email}
+        onChangeText={setEmail}        
+      />
+      <Text style={styles.title}>Password</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        secureTextEntry
+        value={password}
+        onChangeText={setPassword}
+      /> 
+            <Button title="login" onPress={login} />
+    </ImageBackground>
+
+  );
+}
+
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  title: {
+    fontSize: 24,
+    marginBottom: 20,
+    marginLeft:20,
+    color: '#3f1651',
+    fontWeight: 'bold'
+
+  },
+  input: {
+    height: 40,
+    width:'80%',
+    borderColor: '#3f1651',
+    borderLeftWidth:3,
+    marginLeft:20,
+    borderWidth: 1,
+    marginBottom: 15,
+    paddingHorizontal: 10,
+    color: '#fff',
+    backgroundColor: 'rgba(0,0,0,0.4)'
+  },
+  image: {
+    flex: 1,
+    resizeMode: 'cover',
+    justifyContent: 'center'
+  }
+});
