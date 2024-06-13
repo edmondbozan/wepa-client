@@ -1,35 +1,11 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { TabBarIcon } from '@/components/navigation/TabBarIcon';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { Slot } from 'expo-router';
+import { SessionProvider } from '@/context/ctx';
 
-
-
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
-
-
-
-
+export default function Root() {
+  // Set up the auth context and render our layout inside of it.
   return (
-
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-      }}>
-
-          <Tabs.Screen
-          name="index"
-        options={{
-          title: 'Default',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
-          ),
-        }}
-      /> 
-      </Tabs>
+    <SessionProvider>
+      <Slot />
+    </SessionProvider>
   );
 }

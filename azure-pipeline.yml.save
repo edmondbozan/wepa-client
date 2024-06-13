@@ -1,0 +1,33 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'macOS-latest'
+
+steps:
+- task: UseRubyVersion@0
+  inputs:
+    versionSpec: '2.x'
+  displayName: 'Use Ruby 2.x'
+
+- script: |
+    sudo gem install bundler
+    bundle install
+  displayName: 'Install dependencies'
+
+- task: InstallAppleCertificate@2
+  inputs:
+    certSecureFile: 'your-cert.p12'
+    certPwd: '$(certPwd)'
+    certSigningIdentity: 'iPhone Distribution: YourCompany (XXXXXXXXXX)'
+    keychain: 'temp'
+    deleteCert: true
+
+- task: InstallAppleProvisioningProfile@1
+  inputs:
+    provisioningProfileLocation: 'secureFiles'
+    provProfileSecureFile: 'your-profile.mobileprovision'
+
+- script: |
+    bundle exec fastlane beta
+  displayName: 'Run Fastlane'

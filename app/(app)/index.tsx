@@ -3,13 +3,13 @@ import { SafeAreaView, StyleSheet, View, Text, ScrollView, ImageSourcePropType, 
 import { FontAwesome } from '@expo/vector-icons'
 import { GestureHandlerRootView, TapGestureHandler, State, TapGestureHandlerStateChangeEvent } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
-import LikeModal from '../components/LikeModal'
+import LikeModal from '../../components/LikeModal'
 import ListingDetails, { ProjectDetails } from '@/components/listingDetails';
-import normalize from '../fonts/fonts'
+import normalize from '../../fonts/fonts'
 import CheckboxList, { Item } from '@/components/test'
 import SliderModal from '@/components/Slider';
-import {BASE_URL} from '../constants/Endpoints'
-
+import {BASE_URL} from '../../constants/Endpoints'
+import { useSession } from '../../context/ctx';
 
 interface Project {
   projectId: number;
@@ -32,7 +32,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedItems, setSelectedItems] = useState<Item[]>([]);
-
+  const { signOut } = useSession();
 
 
   const images: ImageSourcePropType[] = [
@@ -43,10 +43,12 @@ export default function App() {
   const [imageIndex, setImageIndex] = useState<number>(0);
   const opacity = useSharedValue<number>(1);
 
+  // const { isAuthenticated, user, logout } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        
         Alert.alert(BASE_URL + '/Projects');
         const response = await fetch(BASE_URL + '/Projects');
         const result: Project[] = await response.json();
@@ -136,6 +138,13 @@ export default function App() {
             <TouchableOpacity onPress={handleRadiusButtonClick}>
             <FontAwesome name="bullseye" size={normalize(26)} color="#000" />
           </TouchableOpacity>
+          <Text
+        onPress={() => {
+          // The `app/(app)/_layout.tsx` will redirect to the sign-in screen.
+           signOut();
+        }}>
+        Sign Out
+      </Text>
           </View>
 
           <View style={styles.header1}>
