@@ -28,14 +28,14 @@ export default function AppLayout() {
   return  (
   <Tabs
   screenOptions={{
+    headerShown:false
 //    tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
   }}
 >
   <Tabs.Screen
-    name="index"
+    name="home"    
     options={{
-      title: "Tab One",
-      tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+            tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
     }}
   />
 </Tabs>

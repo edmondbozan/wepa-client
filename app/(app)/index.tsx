@@ -49,7 +49,6 @@ export default function App() {
     const fetchData = async () => {
       try {
         
-        Alert.alert(BASE_URL + '/Projects');
         const response = await fetch(BASE_URL + '/Projects');
         const result: Project[] = await response.json();
         if (response.ok) {

@@ -1,13 +1,19 @@
 import { router } from 'expo-router';
-import { Alert, Button, Text, TextInput, View, StyleSheet } from 'react-native';
+import { Alert, Button, Text, TextInput, View, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import { useSession } from '@/context/ctx';
 import { useState } from 'react';
 import { BASE_URL } from '@/constants/Endpoints';
+import PhotoCarousel from '@/components/PhotoCarousel';
+import normalize from '@/fonts/fonts';
 
 export default function SignIn() {
   const { signIn } = useSession();
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+
+  const handleRegister = async () => {
+    router.replace('/register');
+  };
 
   const handleLogin = async () => {
     try {
@@ -22,11 +28,8 @@ export default function SignIn() {
         }),
       });
       if (response.ok) {
-        //Alert.alert('ok');
-        const data = await response.json();        
-        //Alert.alert(JSON.stringify(data.token));
+        const data = await response.json();
         await signIn(data.token, data.token);
-        //Alert.alert('Login successful');
         router.replace('/');
       } else {
         Alert.alert('Login failed', 'Invalid credentials');
@@ -38,39 +41,105 @@ export default function SignIn() {
   };
 
   return (
-<View style={styles.container}>
-      <Text>Username:</Text>
-      <TextInput
-        value={username}
-        onChangeText={setUsername}
-        placeholder="Enter username"
-        style={styles.input}
-      />
-      <Text>Password:</Text>
-      <TextInput
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Enter password"
-        secureTextEntry
-        style={styles.input}
-      />
-      <Button title="Login" onPress={handleLogin} />
-    </View>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.photos}>
+          <PhotoCarousel />
+        </View>
+        <View style={styles.inputView}>
+          <TextInput
+            value={username}
+            onChangeText={setUsername}
+            placeholder="Enter username"
+            style={styles.input}
+          />
+          <TextInput
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Enter password"
+            secureTextEntry
+            style={styles.input}
+          />
+          <View style={styles.buttons}>
+          <View style={[styles.buttonContainer]}>
+          <TouchableOpacity  onPress={handleLogin} >
+              <Text style={styles.button} >Sign In</Text>
+            </TouchableOpacity>
+
+            </View>
+            <View style={styles.space} /> 
+            <View style={styles.buttonContainer}>
+            <TouchableOpacity  onPress={handleLogin} >
+              <Text style={styles.button}>Register</Text>
+            </TouchableOpacity>
+            </View>
+          </View>
+          <TouchableOpacity  onPress={handleLogin} >
+              <Text style={styles.button}>Forgot my Password</Text>
+            </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  buttonContainer: {
+    backgroundColor: '#e4eaf7', // Hinge-inspired pastel color
+    borderRadius: 15, // Rounded edges
+    paddingHorizontal: 20,    
+    paddingVertical:8,
+    // alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000', // Shadow for a subtle depth effect
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 0,
+    elevation: 5, // For Android shadow
+    color:'#000',
+
+
+  },
+  button:{
+    fontSize:18,
+    fontWeight: 'black',
+    color:'#000'
+  },
+  safeArea: {
     flex: 1,
+    backgroundColor: '#faf9f2',
+  },
+  buttons: {
+    flexDirection: 'row',
+     justifyContent: 'flex-start',
+    padding: 30,
+  },
+  scrollContainer: {
+    flexGrow: 1,
     justifyContent: 'center',
     padding: 20,
   },
+  photos: {
+    height: '50%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  inputView: {
+    height: '50%',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
   input: {
-    height: 40,
+    height: normalize(40),
     borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 10,
-    paddingHorizontal: 10,
+    borderWidth: normalize(1),
+    marginBottom: normalize(10),
+    paddingHorizontal: normalize(10),
+    width: '100%',
+  },
+  space: {
+    width: normalize(7), // or whatever size you need
+    height: 1,
   },
 });
 
