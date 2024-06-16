@@ -32,10 +32,19 @@ export default function AppLayout() {
 //    tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
   }}
 >
+
+<Tabs.Screen
+        name="Projects"
+        options={{
+          title: "",
+          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+        }}
+      />
   <Tabs.Screen
-    name="home"    
+    name="index"        
     options={{
-            tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+      title: "",
+            tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
     }}
   />
 </Tabs>

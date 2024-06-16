@@ -5,12 +5,7 @@ import { GestureHandlerRootView, TapGestureHandler, State, TapGestureHandlerStat
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
 import normalize from '@/fonts/fonts';
 import { isNullOrEmpty } from '../functions/stringfunctions'
-
-export interface ProjectDetails {
-    projectId: number;
-    description: string
-    afterImage: boolean;
-}
+import {ProjectDetails} from '@/interfaces/IProject'
 
 interface DetailProps {
     child: ProjectDetails;
@@ -19,8 +14,8 @@ interface DetailProps {
 // import Icon from 'react-native-vector-icons/FontAwesome';
 const ListingDetails: React.FC<DetailProps> = ({ child }) => {
 
-    const afterImage = { uri: "https://wepa.blob.core.windows.net/assets/" + child.projectId + "_after.jpg" };
-    const beforeImage = { uri: "https://wepa.blob.core.windows.net/assets/" + child.projectId + "_before.jpg" };
+    const afterImage = { uri: "https://wepa.blob.core.windows.net/assets/" + child.projectDetailId + "_after.jpg" };
+    const beforeImage = { uri: "https://wepa.blob.core.windows.net/assets/" + child.projectDetailId + "_before.jpg" };
     const [isLeftModalVisible, setLeftModalVisible] = useState(false);
     const [isRightModalVisible, setRightModalVisible] = useState(false);
     const [data, setData] = useState([]);
@@ -69,11 +64,6 @@ const ListingDetails: React.FC<DetailProps> = ({ child }) => {
 
     return (
         <View>
-
-
-
-
-
             {child.afterImage ? (
 
                 <GestureHandlerRootView>

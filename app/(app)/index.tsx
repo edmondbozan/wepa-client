@@ -4,21 +4,16 @@ import { FontAwesome } from '@expo/vector-icons'
 import { GestureHandlerRootView, TapGestureHandler, State, TapGestureHandlerStateChangeEvent } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
 import LikeModal from '../../components/LikeModal'
-import ListingDetails, { ProjectDetails } from '@/components/listingDetails';
+import ListingDetails from '@/components/listingDetails';
 import normalize from '../../fonts/fonts'
 import CheckboxList, { Item } from '@/components/test'
 import SliderModal from '@/components/Slider';
 import {BASE_URL} from '../../constants/Endpoints'
 import { useSession } from '../../context/ctx';
+import fetchWithAuth from '@/context/FetchWithAuth'
+import { Project } from '@/interfaces/IProject';
 
-interface Project {
-  projectId: number;
-  title: string;
-  cost: string;
-  categoryId: number;
-  categoryName: string;
-  details: ProjectDetails[]
-}
+
 
 
 // import Icon from 'react-native-vector-icons/FontAwesome';
@@ -32,7 +27,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedItems, setSelectedItems] = useState<Item[]>([]);
-  const { signOut } = useSession();
+  const { signOut, userId } = useSession();
 
 
   const images: ImageSourcePropType[] = [
@@ -48,8 +43,7 @@ export default function App() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        
-        const response = await fetch(BASE_URL + '/Projects');
+        const response = await fetchWithAuth(BASE_URL + '/api/Projects');
         const result: Project[] = await response.json();
         if (response.ok) {
           setData(result);
@@ -152,16 +146,16 @@ export default function App() {
           {/* Header Line 2 */}
           <View style={styles.header2}>
             <View style={styles.header2heart}>
-              <Text style={styles.category}><FontAwesome name="heart" size={normalize(20)} color="#FA9BCF" /> 18772</Text>
+              <Text style={styles.category}><FontAwesome name="heart" size={normalize(20)} color="#FA9BCF" /> {data[0].likes}</Text>
             </View>
             <View style={styles.header2like}>
-              <Text style={styles.category}><FontAwesome name="comment" size={normalize(20)} color="#000" />321321</Text>
+              <Text style={styles.category}><FontAwesome name="comment" size={normalize(20)} color="#000" />{data[0].messageCount}</Text>
             </View>
-            <Text style={styles.category}> <FontAwesome name="dollar" size={normalize(20)} color="#000" /> 123</Text>
+            <Text style={styles.category}> <FontAwesome name="dollar" size={normalize(20)} color="#000" />{data[0].cost} </Text>
           </View>
         </View>
         {data[0].details.map((child) => (
-          <ListingDetails key={child.projectId} child={child} ></ListingDetails>
+          <ListingDetails key={child.projectDetailId} child={child} ></ListingDetails>
         ))}
 
 

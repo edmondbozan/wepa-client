@@ -29,7 +29,7 @@ export default function SignIn() {
       });
       if (response.ok) {
         const data = await response.json();
-        await signIn(data.token, data.token);
+        await signIn(data.token, JSON.stringify(data.userId));
         router.replace('/');
       } else {
         Alert.alert('Login failed', 'Invalid credentials');
