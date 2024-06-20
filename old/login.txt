@@ -69,7 +69,7 @@ export default function SignIn() {
             </View>
             <View style={styles.space} /> 
             <View style={styles.buttonContainer}>
-            <TouchableOpacity  onPress={handleLogin} >
+            <TouchableOpacity  onPress={handleRegister} >
               <Text style={styles.button}>Register</Text>
             </TouchableOpacity>
             </View>

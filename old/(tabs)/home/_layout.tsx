@@ -2,13 +2,14 @@ import { useSession } from '@/context/ctx';
 import React from "react";
 import {Text} from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Link, Tabs, Redirect } from "expo-router";
+import { Link, Tabs, Redirect, Stack } from "expo-router";
 import { Pressable } from "react-native";
 import {Colors} from '@/constants/Colors'
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
+import { NavigationContainer } from '@react-navigation/native';
 
 
-export default function AppLayout() {
+const HomeLayout = () => {
   const { session, isLoading, isAuthenticated } = useSession();
 
   // You can keep the splash screen open, or render a loading screen like we do here.
@@ -25,28 +26,47 @@ export default function AppLayout() {
   }
 
   // This layout can be deferred because it's not the root layout.
-  return  (
-  <Tabs
-  screenOptions={{
-    headerShown:false
-//    tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-  }}
->
+  return (
+    <Stack>
+        <Stack.Screen
+            name="(tabs)"
+            options={{
+                headerShown: false
+            }}
+        />
+    </Stack>
+)
 
-<Tabs.Screen
-        name="Projects"
+
+//   <Tabs
+//   screenOptions={{
+//     headerShown:false
+// //    tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+//   }}
+// >
+
+//   <Tabs.Screen
+//     name="index" 
+//  //    component={ProjectStack}               
+//     options={{
+//       title: "",
+//             tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+//     }}
+//   />
+  {/* <Tabs.Screen
+        name="project"
         options={{
-          title: "",
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          href: null,
         }}
-      />
-  <Tabs.Screen
-    name="index"        
-    options={{
-      title: "",
-            tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
-    }}
-  />
-</Tabs>
-  )
+      /> */}
+  {/* <Tabs.Screen
+        name="test"
+        options={{
+          href: null,
+        }}
+      />*/}
+
+// </Tabs> 
+// )  
 }
+

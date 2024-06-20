@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, Alert, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 
@@ -11,6 +12,12 @@ const Register: React.FC = () => {
   const [displayName, setDisplayName] = useState<string>('');
   const [zipcode, setZipcode] = useState<string>('');
 
+
+  const handleLogin = async () => {
+    router.replace('/login');
+  };
+
+
   const handleRegister = async () => {
     if (password !== verifyPassword) {
       Alert.alert('Error', 'Passwords do not match');
@@ -18,12 +25,13 @@ const Register: React.FC = () => {
     }
 
     // Registration logic here...
-    Alert.alert(
-      `Registration Info`,
-      `User Type: ${userType}, Username: ${username}, Email: ${email}, Phone: ${phone}, Display Name: ${displayName}, Zipcode: ${zipcode}, License Number: ${licenseNumber}, Membership ID: ${membershipId}`
-    );
+    // Alert.alert(
+    //   `Registration Info`,
+    //   `User Type: ${userType}, Username: ${username}, Email: ${email}, Phone: ${phone}, Display Name: ${displayName}, Zipcode: ${zipcode}, License Number: ${licenseNumber}, Membership ID: ${membershipId}`
+    // );
   };
 
+  
   return (
     <ScrollView automaticallyAdjustKeyboardInsets={true}>
     <View style={styles.container}>
@@ -96,6 +104,7 @@ const Register: React.FC = () => {
       />
 
       <Button title="Register" onPress={handleRegister} />
+      <Button title="Login" onPress={handleLogin} />
     </View>
     </ScrollView>
   );

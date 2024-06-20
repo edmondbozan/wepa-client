@@ -6,11 +6,12 @@ import { BASE_URL } from '@/constants/Endpoints';
 import { Project } from '@/interfaces/IProject';
 import { FontAwesome } from '@expo/vector-icons';
 import { normalize } from 'react-native-elements';
+import { router } from 'expo-router';
 
 // Define the types for your data
 
 
-const App: React.FC = () => {
+const Projects: React.FC = () => {
   const [data, setData] = useState<Project[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -71,8 +72,8 @@ const App: React.FC = () => {
       </ImageBackground>
     </View>
     <View style={styles.buttonContainer}>
-            <TouchableOpacity  >
-              <Text style={styles.button}>Add New Project</Text>
+            <TouchableOpacity onPress={()=>{router.push('/project'); }} >
+              <Text style={styles.button}>Add New Projecto</Text>
             </TouchableOpacity>
             </View>
 
@@ -178,4 +179,4 @@ alignContent:'center'
   }
 });
 
-export default App;
+export default Projects;
