@@ -41,8 +41,8 @@ export default function SignIn() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+    <SafeAreaView style={styles.safeArea} >
+      <ScrollView contentContainerStyle={styles.scrollContainer} automaticallyAdjustKeyboardInsets={true}>
         <View style={styles.photos}>
           <PhotoCarousel />
         </View>
@@ -127,7 +127,8 @@ const styles = StyleSheet.create({
   inputView: {
     height: '50%',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    color:'#000'
   },
   input: {
     height: normalize(40),

@@ -8,7 +8,7 @@ export default function AuthLayout() {
   // Set up the auth context and render our layout inside of it.
   return (
     <Stack>
-    <Stack.Screen name="login" options={{ title: 'Login' }} />
+    <Stack.Screen name="login" options={{ title: 'Login', headerShown : false }} />
     <Stack.Screen name="register" options={{ title: 'Register' }} /> 
     {/* <Slot />  */}
   </Stack>

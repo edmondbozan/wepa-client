@@ -126,27 +126,35 @@ export default function App() {
         <View style={styles.header}>
           {/* Header Line 1 */}
           <View style={styles.header1}>
-            <TouchableOpacity onPress={handleCategoryButtonClick}   >
+<View style={[styles.buttonContainer]}>
+          <TouchableOpacity  onPress={handleCategoryButtonClick} >
+              <Text style={styles.button} >Categories</Text>
+            </TouchableOpacity>
+            </View>
+            <View style={[styles.buttonContainer]}>
+          <TouchableOpacity  onPress={handleRadiusButtonClick} >
+              <Text style={styles.button} >Radius</Text>
+            </TouchableOpacity>
+            </View>
+            <View style={[styles.buttonContainer]}>
+          <TouchableOpacity  onPress={handleRadiusButtonClick} >
+              <Text style={styles.button} >Cost</Text>
+            </TouchableOpacity>
+            </View>
+
+            {/* <TouchableOpacity onPress={handleCategoryButtonClick}   >
               <FontAwesome name="filter" size={normalize(26)} color="#000" />
             </TouchableOpacity>
             <TouchableOpacity onPress={handleRadiusButtonClick}>
             <FontAwesome name="bullseye" size={normalize(26)} color="#000" />
-          </TouchableOpacity>
-          <Text
-        onPress={() => {          
-          // The `app/(app)/_layout.tsx` will redirect to the sign-in screen.
-           signOut();
-           router.replace('/auth/login');
-        }}>
-        Sign Out
-      </Text>
+          </TouchableOpacity> */}
       {/* <Button
         title="Go to Add Item"
         onPress={() => router.replace("/Projects")}
       /> */}
           </View>
-
-          <View style={styles.header1}>
+<View style={styles.horizontalRule}></View>
+          <View style={styles.projectTitle}>
             <Text style={styles.title}>{data[0].title}</Text>
           </View>
           {/* Header Line 2 */}
@@ -155,9 +163,10 @@ export default function App() {
               <Text style={styles.category}><FontAwesome name="heart" size={normalize(20)} color="#FA9BCF" /> {data[0].likes}</Text>
             </View>
             <View style={styles.header2like}>
-              <Text style={styles.category}><FontAwesome name="comment" size={normalize(20)} color="#000" />{data[0].messageCount}</Text>
+              <Text style={styles.category}><FontAwesome name="comment" size={normalize(20)} color="#000" /> {data[0].messageCount}</Text>
             </View>
-            <Text style={styles.category}> <FontAwesome name="dollar" size={normalize(20)} color="#000" />{data[0].cost} </Text>
+            <View style={styles.dollarSpace}></View>
+            <Text style={styles.category}> <FontAwesome name="dollar" size={normalize(20)} color="#000" /> {data[0].cost} </Text>
           </View>
         </View>
         {data[0].details.map((child) => (
@@ -177,10 +186,10 @@ export default function App() {
 
 
       <TouchableOpacity style={styles.floatingButtonLeft} onPress={handleLeftButtonClick}   >
-        <FontAwesome name="heart" size={30} color="#fff" />
+        <FontAwesome name="heart" size={30} color="#FFF" />
       </TouchableOpacity>
       <TouchableOpacity style={styles.floatingButtonRight}>
-        <FontAwesome name="times" size={30} color="#fff" />
+        <FontAwesome name="times" size={40} color="#FFF" />
       </TouchableOpacity>
       <LikeModal
         visible={isLeftModalVisible}
@@ -221,8 +230,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     margin: 15,
   },
+  horizontalRule: {
+    borderBottomColor: '#ccc',
+    borderBottomWidth: 1,
+    marginVertical: 10,
+  },
+  projectTitle:{
+
+  },
   header1: {
     flexDirection: 'row',
+    justifyContent:'space-evenly'
 
   },
   header2: {
@@ -292,7 +310,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 20,
     left: 20,
-    backgroundColor: '#6200ea',
+    backgroundColor: '#c456bb',
     borderRadius: 50,
     width: 60,
     height: 60,
@@ -304,7 +322,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 20,
     right: 20,
-    backgroundColor: '#6200ea',
+    backgroundColor: '#c456bb',
     borderRadius: 50,
     width: 60,
     height: 60,
@@ -322,8 +340,31 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  }
-});
+  },
+  dollarSpace:{
+    width:20
+  },
+  buttonContainer: {
+    backgroundColor: '#e4eaf7', // Hinge-inspired pastel color
+    borderRadius: 15, // Rounded edges
+    paddingHorizontal: 20,    
+    paddingVertical:8,
+    // alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000', // Shadow for a subtle depth effect
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 0,
+    elevation: 5, // For Android shadow
+    color:'#000',
+
+
+  },
+  button:{
+    fontSize:18,
+    fontWeight: 'black',
+    color:'#000'
+  },});
 
 
 
