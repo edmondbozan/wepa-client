@@ -186,10 +186,10 @@ export default function App() {
 
 
       <TouchableOpacity style={styles.floatingButtonLeft} onPress={handleLeftButtonClick}   >
-        <FontAwesome name="heart" size={30} color="#FFF" />
+        <FontAwesome name="heart" size={30} color="#e4eaf7" />
       </TouchableOpacity>
       <TouchableOpacity style={styles.floatingButtonRight}>
-        <FontAwesome name="times" size={40} color="#FFF" />
+        <FontAwesome name="times" size={40} color="#e4eaf7" />
       </TouchableOpacity>
       <LikeModal
         visible={isLeftModalVisible}
@@ -322,7 +322,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 20,
     right: 20,
-    backgroundColor: '#c456bb',
+    backgroundColor: '#B87333',
+    borderColor:'#e4eaf7',
+    borderWidth:1,
+    // backgroundColor: '#c456bb',
     borderRadius: 50,
     width: 60,
     height: 60,
@@ -345,7 +348,9 @@ const styles = StyleSheet.create({
     width:20
   },
   buttonContainer: {
-    backgroundColor: '#e4eaf7', // Hinge-inspired pastel color
+    backgroundColor: '#e4eaf7',
+    borderColor:'#B87333',
+    borderWidth:1.5,
     borderRadius: 15, // Rounded edges
     paddingHorizontal: 20,    
     paddingVertical:8,
