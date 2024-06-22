@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Alert, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import { BASE_URL } from '@/constants/Endpoints';
 
 export interface ICategories {
     id: number;
@@ -15,7 +16,7 @@ export const Categories: React.FC = () => {
     useEffect(() => {
       const fetchCategories = async () => {
         try {
-          const response = await fetch('http://192.168.1.156:5084/Category');
+          const response = await fetch(BASE_URL + '/Category');
           const data = await response.json();
           setCategories(data);
           Alert.alert(JSON.stringify(data));

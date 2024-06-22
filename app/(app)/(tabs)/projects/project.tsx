@@ -1,97 +1,110 @@
 import { router } from 'expo-router';
-import { Alert, Button, Text, TextInput, View, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, Platform, Modal } from 'react-native';
+import { Alert, Button, Text, TextInput, View, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, Platform, Modal, FlatList, Image } from 'react-native';
 import { useSession } from '@/context/ctx';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BASE_URL } from '@/constants/Endpoints';
 import normalize from '@/fonts/fonts';
 import { Picker } from '@react-native-picker/picker';
-import { StackParamList } from '@/types/types'; 
-
+import { StackParamList } from '@/types/types';
+import Categories from '@/components/Categories';
+import { FontAwesome } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
+import DropdownInput from '@/components/DropDowmList';
+import { useLocalSearchParams } from 'expo-router';
+import { ProjectDetails } from '@/interfaces/IProject';
 
 export default function Project() {
-
-  const [selectedValue, setSelectedValue] = useState("java");
   const [modalVisible, setModalVisible] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const { data } = useLocalSearchParams();
+  const projectData = data ? JSON.parse(data as string) : null;
+  const [cost, setProjectCost] = useState('');
+  const [title, setProjectTitle] = useState('');
+  const [categoryName, setCategory] = useState('');
 
-  const openPicker = () => {
-    if (Platform.OS === 'ios') {
-      setModalVisible(true);
+
+
+  useEffect(() => {
+    if (projectData && projectData[0].cost !== undefined) {
+      setProjectCost(projectData[0].cost.toString());
     }
-  };
-  const closePicker = () => {
-    if (Platform.OS === 'ios') {
-      setModalVisible(false);
+    if (projectData) {
+      setProjectTitle(projectData[0].title);
     }
+    if (projectData) {
+      setCategory(projectData[0].categoryName);
+    }
+
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch(BASE_URL + '/Category');
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      } finally {
+      }
+    }
+    fetchCategories();
+  }, []);
+
+
+  const renderItem = ({ item }: { item: ProjectDetails }) => {
+    // Declare a variable inside the renderItem function
+    const afterImage = "https://wepa.blob.core.windows.net/assets/" + item.projectDetailId + "_after.jpg";
+    const beforeImage = "https://wepa.blob.core.windows.net/assets/" + item.projectDetailId + "_before.jpg";
+    return (
+      <View style={styles.detailContainer}>
+      {/* <Text>{afterImage}</Text> */}
+      <Image style={styles.FLImage} source={{ uri: afterImage }} />
+      <Image style={styles.FLImage} source={{ uri: beforeImage }} />
+      </View>
+  )
   };
+
   return (
     <SafeAreaView style={styles.safeArea}>
+      <Text onPress={() => { router.replace('/projects/Projects'); }}>
+        <FontAwesome name="arrow-left" /> Projects
+      </Text>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Text>Build a project.  Get Dollars.</Text>
+        <View style={styles.horizontalRule} />
+
         <View style={styles.inputView}>
-          {Platform.OS === 'ios' ? (
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity onPress={openPicker}>
-                <Text >{selectedValue}</Text>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <Picker
-              selectedValue={selectedValue}
-              style={styles.picker}
-              onValueChange={(itemValue) => setSelectedValue(itemValue)}
-            >
-              <Picker.Item label="Java" value="java" />
-              <Picker.Item label="JavaScript" value="js" />
-              <Picker.Item label="Python" value="python" />
-              <Picker.Item label="C++" value="cpp" />
-            </Picker>
-          )}
-
-          <TextInput
-            placeholder="Project Cost"
-            style={styles.input}
-          />
-
+          <DropdownInput data={categories} placeholder="Select an Category" setValue={categoryName} />
           <TextInput
             placeholder="Project Name"
             style={styles.input}
+            value={title}
+            onChangeText={text => setProjectTitle(text)}
           />
           <TextInput
             placeholder="Project Cost"
-            secureTextEntry
+            keyboardType='number-pad'
             style={styles.input}
+            value={cost}
+            onChangeText={text => setProjectCost(text)}
           />
+          <View>
+            <FlatList
+              scrollEnabled={false}
+              data={projectData[0].details}
+              keyExtractor={(item) => item.projectDetailId.toString()}
+              renderItem={renderItem} />
+          </View>
+
+          <TouchableOpacity onPress={() => {
+            router.push(
+              {
+                pathname: '/projects/test',
+                params: { data: JSON.stringify(projectData) }
+              }
+            )
+          }} >
+            <Text style={styles.button}>Add Details</Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity onPress={()=>{router.push('/projects/test'); }} >
-              <Text style={styles.button}>Add Details</Text>
-            </TouchableOpacity>
-
-        {Platform.OS === 'ios' && (
-          <Modal
-            transparent={true}
-            animationType="slide"
-            visible={modalVisible}
-            onRequestClose={closePicker}
-          >
-            <View style={styles.modalContainer}>
-              <View style={styles.pickerContainer}>
-                <Picker
-                  selectedValue={selectedValue}
-                  onValueChange={(itemValue) => {
-                    setSelectedValue(itemValue);
-                    closePicker();
-                  }}
-                >
-                  <Picker.Item label="Java" value="java" />
-                  <Picker.Item label="JavaScript" value="js" />
-                  <Picker.Item label="Python" value="python" />
-                  <Picker.Item label="C++" value="cpp" />
-                </Picker>
-                <Button title="Done" onPress={closePicker} />
-              </View>
-            </View>
-          </Modal>
-        )}
-
 
         {/* <View style={styles.buttons}>
           <View style={[styles.buttonContainer]}>
@@ -117,9 +130,34 @@ export default function Project() {
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#faf9f2',
+    margin: 20,
+  },
+  FLImage:{
+    width:100,
+    height:100,
+    
+  },
+  detailContainer:{
+    flexDirection:'row'
+  },
+  scrollContainer: {
+    //  flexGrow: 1,
+    // justifyContent: 'center',
+    padding: 20,
+  },
+  horizontalRule: {
+    borderBottomColor: '#ccc',
+    borderBottomWidth: 1,
+    marginVertical: 10,
+  },
   buttonContainer: {
-    backgroundColor: '#e4eaf7', // Hinge-inspired pastel color
-    borderRadius: 15, // Rounded edges
+    backgroundColor: '#fff',
+    borderColor: '#B87333',
+    borderWidth: 1,
+    borderRadius: 10, // Rounded edges
     paddingHorizontal: 20,
     paddingVertical: 8,
     alignItems: 'center',
@@ -130,29 +168,27 @@ const styles = StyleSheet.create({
     shadowRadius: 0,
     elevation: 5, // For Android shadow
     color: '#000',
-    width: 100
-
-
+    width: '100%'
   },
-
+  touchable: {
+    flexDirection: 'row',
+    width: '100%'
+  },
+  separator: {
+    width: '100%',
+    backgroundColor: 'black',
+    alignSelf: 'stretch', // Make the separator stretch from top to bottom
+  },
   button: {
     fontSize: 18,
     fontWeight: 'black',
     color: '#000'
   },
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#faf9f2',
-  },
+
   buttons: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
     padding: 30,
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    padding: 20,
   },
   photos: {
     height: '50%',
@@ -166,7 +202,11 @@ const styles = StyleSheet.create({
   },
   input: {
     height: normalize(40),
-    borderColor: 'gray',
+    borderColor: '#B87333',
+    borderRadius: 10,
+    shadowColor: '#000',
+    color: "#000",
+    elevation: 5,
     borderWidth: normalize(1),
     marginBottom: normalize(10),
     paddingHorizontal: normalize(10),

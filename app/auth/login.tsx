@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0)', // Semi-transparent overlay
   },
   buttonContainer: {
-    backgroundColor: '#e4eaf7', // Hinge-inspired pastel color
+    backgroundColor: '#e4eaf7',
     borderColor:'#B87333',
     borderWidth:1.5,
     borderRadius: 15, // Rounded edges
@@ -161,16 +161,12 @@ const styles = StyleSheet.create({
   input: {
     height: normalize(40),
     borderColor: '#B87333',
-    // borderTopWidth:0,
-    // borderLeftWidth:0,
-    // borderRightWidth:0,
-  backgroundColor: 'rgba(0, 0, 0, 0.7)',
     borderRadius:10,
     shadowColor:'#000',
     color: "#e4eaf7",
-elevation:5,
+    elevation:5,
     borderWidth: normalize(3),
-     marginBottom: normalize(10),
+    marginBottom: normalize(10),
     paddingHorizontal: normalize(10),
     width: '100%',
   },

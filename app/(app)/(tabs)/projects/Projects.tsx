@@ -39,14 +39,16 @@ const Projects: React.FC = () => {
     fetchData();
   }, []);
 
-
-
-
 //   const { userId } = SessionProvider(SessionProvider);
   const renderItem = ({ item }: { item: Project }) => (
     
 <SafeAreaView>
     <View style={styles.projectContainer}>
+      <TouchableOpacity onPress={() => router.push({
+          pathname: '/projects/project',
+          params: { data : JSON.stringify(data) }
+        })}
+      >
       <ImageBackground
         source={{ uri: "https://wepa.blob.core.windows.net/assets/" + item.details[0].projectDetailId + "_after.jpg" }}
         style={styles.backgroundImage}
@@ -70,13 +72,8 @@ const Projects: React.FC = () => {
             </View>
         </View>
       </ImageBackground>
+      </TouchableOpacity>
     </View>
-    <View style={styles.buttonContainer}>
-            <TouchableOpacity onPress={()=>{router.replace('/projects/project'); }} >
-              <Text style={styles.button}>Add New Project</Text>
-            </TouchableOpacity>
-            </View>
-
     </SafeAreaView>
   );
 
@@ -85,8 +82,17 @@ const Projects: React.FC = () => {
       <FlatList
         data={data}
         keyExtractor={(item) => item.projectId.toString()}
-        renderItem={renderItem}
-      />
+        renderItem={renderItem} />
+          <View style={styles.buttonContainer}>
+    <TouchableOpacity onPress={()=>{router.push(
+        {
+          pathname: '/projects/project',
+          params: { data : null }
+        }
+      )}} >
+              <Text style={styles.button}>Add New Project</Text>
+            </TouchableOpacity>
+            </View>
     </View>
   );
 };

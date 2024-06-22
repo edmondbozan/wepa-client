@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image, Alert } from 'react-native';
 import { Button, TextInput, Provider, Card, IconButton } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
 import CameraButton from '@/components/CameraButton';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { router, useLocalSearchParams } from 'expo-router';
+import { FontAwesome } from '@expo/vector-icons';
 
 interface Item {
     id: number;
@@ -18,7 +20,8 @@ const App: React.FC = () => {
     const [beforeImage, setBeforeImage] = useState<string | null>(null);
     const [afterImage, setAfterImage] = useState<string | null>(null);
     const [image, setImage] = useState<string | null>(null);
-
+    const { data } = useLocalSearchParams();
+    // const projectData = data ? JSON.parse(data as string) : null;
 
     const pickImage = async (setImage: React.Dispatch<React.SetStateAction<string | null>>) => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -51,9 +54,16 @@ const App: React.FC = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Provider>
-                <View style={styles.form}>
+         <Text onPress={()=>{
+            router.replace({   
+                 pathname: '/projects/project',
+                params: { data : data }});
+                }}>
+             <FontAwesome name="arrow-left"/> Projects
+             </Text>              
 
+            <Provider>
+                <View style={styles.form}>  
                     <View style={styles.photoBox}>
                         <Text style={{marginBottom:10}}>Show off your work with before and after pics </Text>
                         <View style={styles.photoRow}>

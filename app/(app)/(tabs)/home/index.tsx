@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, View, Text, ScrollView, ImageSourcePropType, TouchableOpacity, Alert, ActivityIndicator, TextInput, Button } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons'
+import { AntDesign, FontAwesome, FontAwesome5, FontAwesome6 } from '@expo/vector-icons'
 import { GestureHandlerRootView, TapGestureHandler, State, TapGestureHandlerStateChangeEvent } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
 import LikeModal from '@/components/LikeModal';
@@ -126,7 +126,13 @@ export default function App() {
         <View style={styles.header}>
           {/* Header Line 1 */}
           <View style={styles.header1}>
-<View style={[styles.buttonContainer]}>
+          <View style={[styles.buttonContainer]}>
+          <TouchableOpacity  onPress={handleCategoryButtonClick} >
+            <FontAwesome6 name="gear" size={20} />
+            </TouchableOpacity>
+            </View>
+
+          <View style={[styles.buttonContainer]}>
           <TouchableOpacity  onPress={handleCategoryButtonClick} >
               <Text style={styles.button} >Categories</Text>
             </TouchableOpacity>
@@ -186,12 +192,12 @@ export default function App() {
 
 
       <TouchableOpacity style={styles.floatingButtonLeft} onPress={handleLeftButtonClick}   >
-        <FontAwesome name="heart" size={30} color="#e4eaf7" />
+      <FontAwesome6 name="heart" size={30} color="black" />
       </TouchableOpacity>
-      <TouchableOpacity style={styles.floatingButtonRight}>
-        <FontAwesome name="times" size={40} color="#e4eaf7" />
+      <TouchableOpacity style={styles.floatingButtonRight} >
+        <FontAwesome name="times" size={30} color="#000" />
       </TouchableOpacity>
-      <LikeModal
+      <LikeModal  
         visible={isLeftModalVisible}
         onClose={() => setLeftModalVisible(false)}
         message="Left Button Clicked!"
@@ -308,9 +314,11 @@ const styles = StyleSheet.create({
   },
   floatingButtonLeft: {
     position: 'absolute',
+    borderWidth:3,
     bottom: 20,
     left: 20,
-    backgroundColor: '#c456bb',
+    backgroundColor: '#f0f0f0',
+    borderColor:'#B87333',
     borderRadius: 50,
     width: 60,
     height: 60,
@@ -322,9 +330,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 20,
     right: 20,
-    backgroundColor: '#B87333',
-    borderColor:'#e4eaf7',
-    borderWidth:1,
+    backgroundColor: '#f0f0f0',
+    borderColor:'#B87333',    
+    borderWidth:3,
     // backgroundColor: '#c456bb',
     borderRadius: 50,
     width: 60,
