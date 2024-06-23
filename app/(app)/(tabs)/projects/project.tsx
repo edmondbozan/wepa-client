@@ -13,7 +13,9 @@ import DropdownInput from '@/components/DropDowmList';
 import { useLocalSearchParams } from 'expo-router';
 import { ProjectDetails } from '@/interfaces/IProject';
 
+
 export default function Project() {
+
   const [modalVisible, setModalVisible] = useState(false);
   const [categories, setCategories] = useState([]);
   const { data } = useLocalSearchParams();
@@ -51,13 +53,12 @@ export default function Project() {
 
   const renderItem = ({ item }: { item: ProjectDetails }) => {
     // Declare a variable inside the renderItem function
-    const afterImage = "https://wepa.blob.core.windows.net/assets/" + item.projectDetailId + "_after.jpg";
-    const beforeImage = "https://wepa.blob.core.windows.net/assets/" + item.projectDetailId + "_before.jpg";
+
     return (
       <View style={styles.detailContainer}>
       {/* <Text>{afterImage}</Text> */}
-      <Image style={styles.FLImage} source={{ uri: afterImage }} />
-      <Image style={styles.FLImage} source={{ uri: beforeImage }} />
+      <Image style={styles.FLImage} source={{ uri: item.beforeImage }} />
+      <Image style={styles.FLImage} source={{ uri: item.afterImage }} />
       </View>
   )
   };

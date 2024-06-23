@@ -14,8 +14,8 @@ interface DetailProps {
 // import Icon from 'react-native-vector-icons/FontAwesome';
 const ListingDetails: React.FC<DetailProps> = ({ child }) => {
 
-    const afterImage = { uri: "https://wepa.blob.core.windows.net/assets/" + child.projectDetailId + "_after.jpg" };
-    const beforeImage = { uri: "https://wepa.blob.core.windows.net/assets/" + child.projectDetailId + "_before.jpg" };
+    const afterImage = { uri: child.afterImage };
+    const beforeImage = { uri: child.beforeImage };
     const [isLeftModalVisible, setLeftModalVisible] = useState(false);
     const [isRightModalVisible, setRightModalVisible] = useState(false);
     const [data, setData] = useState([]);

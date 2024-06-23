@@ -50,7 +50,7 @@ const Projects: React.FC = () => {
         })}
       >
       <ImageBackground
-        source={{ uri: "https://wepa.blob.core.windows.net/assets/" + item.details[0].projectDetailId + "_after.jpg" }}
+        source={{ uri:  item.details[0].afterImage}}
         style={styles.backgroundImage}
         imageStyle={{ borderRadius: 8 }}
       >

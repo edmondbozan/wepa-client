@@ -56,19 +56,49 @@ const App: React.FC = () => {
   }
 
     const addItem = () => {
-        projectData[0].details.push(()=>{        
-            const newItem: ProjectDetails = {
-            projectDetailId: 0,
-            description: description,
-            afterImage: true    
-        }})
-            ;
-        // setItems([...data[0].details, newItem]);
+               
+        const newItem: ProjectDetails = {
+        projectDetailId: 0,
+        description: description,
+            afterImage: afterImage,
+            beforeImage:beforeImage,
+            video:videoUri};
+
+            const updatedProjectData = [...projectData];
+            // Add the new item to the details array of the first project
+            updatedProjectData[0].details = [...updatedProjectData[0].details, newItem];
+            setItems(updatedProjectData[0].details);
+            
+            let formData = new FormData();
+
+        Alert.alert(JSON.stringify(afterImage));
+             if(afterImage != null){
+            Alert.alert("adding");
+            formData.append('files', {
+                uri: afterImage,
+                name: 'photo_after.jpg',
+                type: 'image/jpeg',
+              } as any)
+            }
+           
+
+
+
+
         // Reset form
         setDescription('');
         setBeforeImage(null);
         setAfterImage(null);
-        Alert.alert(JSON.stringify(projectData));
+
+
+
+
+
+        router.replace({   
+            pathname: '/projects/project',
+           params: { data : JSON.stringify(projectData) }});
+    
+    //    Alert.alert(JSON.stringify(projectData[0].details[2]));
     };
 
     return (
