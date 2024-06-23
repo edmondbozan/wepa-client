@@ -144,8 +144,6 @@ const styles = StyleSheet.create({
     flexDirection:'row'
   },
   scrollContainer: {
-    //  flexGrow: 1,
-    // justifyContent: 'center',
     padding: 20,
   },
   horizontalRule: {

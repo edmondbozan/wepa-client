@@ -60,7 +60,7 @@ export default function SignIn() {
             onChangeText={setUsername}
             placeholder="Enter Email"
             style={styles.input}
-            placeholderTextColor={"#e4eaf7"}
+            placeholderTextColor={"#000"}
           />
           <TextInput
             value={password}
@@ -68,7 +68,7 @@ export default function SignIn() {
             placeholder="Enter Password"
             secureTextEntry
             style={styles.input}
-            placeholderTextColor={"#e4eaf7"}
+            placeholderTextColor={"#000"}
 
           />
           <View style={styles.buttons}>
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0)', // Semi-transparent overlay
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   buttonContainer: {
     backgroundColor: '#e4eaf7',
@@ -146,18 +146,20 @@ const styles = StyleSheet.create({
     //justifyContent: 'center',
     // padding: 10,
   },
-  photos: {
-  //   height: '50%',
-    // justifyContent: 'center',
-//    alignItems: 'center',
-  },
   inputView: {
-     height: normalize(200),
+
+    backgroundColor: "#fff",
+    // height: normalize(200),
     justifyContent: 'center',
     alignItems: 'center',
     color:'#000',
-    margin:normalize(30),
+     margin:normalize(30),
+    padding:normalize(20),
+    borderRadius:20
   },
+  // inputText:{
+  //   backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  // },
   input: {
     height: normalize(40),
     borderColor: '#B87333',
@@ -169,6 +171,7 @@ const styles = StyleSheet.create({
     marginBottom: normalize(10),
     paddingHorizontal: normalize(10),
     width: '100%',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
   },
   space: {
     width: normalize(7), // or whatever size you need
@@ -177,7 +180,7 @@ const styles = StyleSheet.create({
 
   loginText:{
     // margin: 50,
-    color:'#fff',
+    color:'#000',
     fontSize:normalize(35),
     // fontWeight:'',
     fontFamily: 'Pacifico-Regular',
@@ -190,8 +193,8 @@ const styles = StyleSheet.create({
   },
   forgotText:{
 //    fontFamily: 'Pacifico-Regular',
-    color:"#B87333",
-    fontWeight:"bold",
+    color:"#000",
+    // fontWeight:"bold",
     fontSize:normalize(15)
 
   }
