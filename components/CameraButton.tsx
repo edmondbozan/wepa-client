@@ -1,3 +1,4 @@
+import normalize from '@/fonts/fonts';
 import React from 'react';
 import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
 import { IconButton } from 'react-native-paper';
@@ -18,7 +19,7 @@ const CameraButton: React.FC<CameraButtonProps> = ({ label, onPress, imageUri })
         {imageUri ? (
           <Image source={{ uri: imageUri }} style={styles.image} />
         ) : (
-          <IconButton icon="camera" size={50}  style={styles.iconButton} />
+          <IconButton icon="camera" size={normalize(50)}  style={styles.iconButton} />
         )}
       </TouchableOpacity>
     </View>
@@ -27,8 +28,8 @@ const CameraButton: React.FC<CameraButtonProps> = ({ label, onPress, imageUri })
 
 const styles = StyleSheet.create({
   buttonContainer: {
-    width: 150,
-    height: 150,
+    width: normalize(110),
+    height: normalize(110),
     borderWidth: 2,
     borderColor: 'gray',
     borderStyle: 'dashed',
@@ -48,11 +49,11 @@ const styles = StyleSheet.create({
   },
   labelContainer: {
     position: 'absolute',
-    top: 5,
-    left: 5,
+    top: normalize(5),
+    left: normalize(5),
   },
   label: {
-    fontSize: 12,
+    fontSize: normalize(12),
     color: 'gray',
   },
   image: {

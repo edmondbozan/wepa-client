@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, Alert, TouchableOpacity } from 'react-native';
-import { Button, TextInput, Provider, Card, IconButton } from 'react-native-paper';
+import { View, Text, StyleSheet, FlatList, Image, Alert, TouchableOpacity, ScrollView } from 'react-native';
+import { Button, Provider, Card, IconButton, TextInput } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
 import CameraButton from '@/components/CameraButton';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -35,16 +35,16 @@ const App: React.FC = () => {
 
     const pickImage = async (setImage: React.Dispatch<React.SetStateAction<ImagePicker.ImagePickerAsset | null>>, mediaType: ImagePicker.MediaTypeOptions) => {
         let result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: mediaType,
-          allowsEditing: true,
-          aspect: [1, 1],
-          quality: 1,
+            mediaTypes: mediaType,
+            allowsEditing: false,
+            aspect: [1, 1],
+            quality: 1,
         });
-    
+
         if (!result.canceled) {
-          setImage(result.assets[0]);
+            setImage(result.assets[0]);
         }
-      };
+    };
 
     const Cancel = () => {
 
@@ -55,34 +55,50 @@ const App: React.FC = () => {
     }
 
     const addItem = async () => {
+        //call database first then set object 
 
-        const newItem: ProjectDetails = {
-            projectDetailId: 0,
-            description: description,
-            afterImage: afterImage?.uri || null,
-            beforeImage: beforeImage?.uri || null,
-            video: videoUri?.uri || null
-        }
 
-        const updatedProjectData = [...projectData];
-        updatedProjectData[0].details = [...updatedProjectData[0].details, newItem];
-        setItems(updatedProjectData[0].details);
+
+
+
+        // const newItem: ProjectDetails = {
+        //     projectDetailId: 0,
+        //     description: description,
+        //     afterImage: afterImage?.uri || null,
+        //     beforeImage: beforeImage?.uri || null,
+        //     video: videoUri?.uri || null
+        // }
+
 
         let formData = new FormData();
 
-        if (afterImage != null) {
-            formData.append('files', {
-                uri: afterImage.uri,
-                name: afterImage.fileName || 'photo_after.jpg',
-                type: afterImage.type || 'image/jpeg',            } as any)
-        }
-        formData.append('description', description);
 
-        // for (let pair of formData.entries()) {
-        //     console.log(`${pair[0]}: ${pair[1]}`);
-        // }
-                try {
-            const response = await fetch(BASE_URL + '/api/Upload/upload', {
+        if (afterImage != null) {
+            formData.append('Files', {
+                uri: afterImage.uri,
+                name: 'after_image.' + afterImage.uri.split('.').pop(),//.uri.split('/').pop(),
+                type: afterImage.uri.split('.').pop(),
+            } as any)
+        }
+        if (beforeImage != null) {
+            formData.append('files', {
+                uri: beforeImage.uri,
+                name: 'before_image.' + beforeImage.uri.split('.').pop(),//.uri.split('/').pop(),
+                type: beforeImage.uri.split('.').pop(),
+            } as any)
+        }
+        if (videoUri != null) {
+            formData.append('files', {
+                uri: videoUri.uri,
+                name: 'video.' + videoUri.uri.split('.').pop(),
+                type: videoUri.uri.split('.').pop()
+            } as any)
+        }
+
+        formData.append('Description', description);
+
+        try {
+            const response = await fetch(BASE_URL + '/api/Upload/upload/projects/' + projectData[0].projectId, {
                 method: 'POST',
                 body: formData,
                 // headers: {
@@ -94,10 +110,16 @@ const App: React.FC = () => {
             if (!response.ok) {
                 throw new Error(`Network response was not ok: ${responseText}`);
             }
-    
+
             // Parse the response text as JSON
             const responseData = JSON.parse(responseText);
-            console.log(responseData);         
+            // console.log(responseData);
+
+            const updatedProjectData = [...projectData];
+            updatedProjectData[0].details = [...updatedProjectData[0].details, responseData];
+            setItems(updatedProjectData[0].details);
+            console.log(projectData[0].details);
+    
         } catch (error) {
             console.error('There was a problem with the fetch operation:', error);
         }
@@ -124,56 +146,58 @@ const App: React.FC = () => {
             <Text onPress={() => {
                 router.replace({
                     pathname: '/projects/project',
-                    params: { data: projectData }
+                    params: { data: JSON.stringify(projectData) }
                 });
             }}>
                 <FontAwesome name="arrow-left" /> Projects
             </Text>
 
             <Provider>
-                <View style={styles.form}>
-                    <View style={styles.photoBox}>
-                        <Text style={{ marginBottom: 10 }}>Show off your work with before and after pics </Text>
-                        <View style={styles.photoRow}>
-                        <CameraButton label="After" onPress={() => pickImage(setAfterImage, ImagePicker.MediaTypeOptions.Images)} imageUri={afterImage?.uri || null} />
-                            <View style={styles.space}></View>
-                            <CameraButton label="Before" onPress={() => pickImage(setBeforeImage, ImagePicker.MediaTypeOptions.Images)} imageUri={beforeImage?.uri || null} />                        
+                <ScrollView automaticallyAdjustKeyboardInsets={true}>
+                    <View style={styles.form}>
+                        <View style={styles.photoBox}>
+                            <Text style={{ marginBottom: 10 }}>Show off your work with before and after pics </Text>
+                            <View style={styles.photoRow}>
+                                <CameraButton label="After" onPress={() => pickImage(setAfterImage, ImagePicker.MediaTypeOptions.Images)} imageUri={afterImage?.uri || null} />
+                                {/* <View style={styles.space}></View> */}
+                                <CameraButton label="Before" onPress={() => pickImage(setBeforeImage, ImagePicker.MediaTypeOptions.Images)} imageUri={beforeImage?.uri || null} />
+                            </View>
                         </View>
-                    </View>
-                    <View style={styles.photoBox}>
-                        <Text style={{ marginBottom: 10 }}>Upload a Video </Text>
-                        <View style={styles.photoRow}>
-                            <VideoButton label="Video" onPress={() => pickImage(setVideo, ImagePicker.MediaTypeOptions.Videos)} videoUri={videoUri?.uri || null} />
+                        <View style={styles.photoBox}>
+                            <Text style={{ marginBottom: 10 }}>Upload a Video </Text>
+                            <View style={styles.photoRow}>
+                                <VideoButton label="Video" onPress={() => pickImage(setVideo, ImagePicker.MediaTypeOptions.Videos)} videoUri={videoUri?.uri || null} />
+                            </View>
                         </View>
-                    </View>
-                    <View>
-                        <TextInput
-                            label="Description"
-                            value={description}
-                            onChangeText={setDescription}
-                            style={styles.input}
-                            //                            multiline={true}
-                            maxLength={500}
-                        />
-                    </View>
-
-                    <View style={styles.buttons}>
-                        <View style={[styles.buttonContainer]}>
-                            <TouchableOpacity onPress={addItem} >
-                                <Text style={styles.button}>  Add</Text>
-                            </TouchableOpacity>
-
+                        <View>
+                            <TextInput
+                                placeholder="Give it some life..."
+                                value={description}
+                                onChangeText={setDescription}
+                                style={styles.input}
+                                multiline={true}
+                                maxLength={500}
+                            />
                         </View>
-                        <View style={styles.space} />
-                        <View style={styles.buttonContainer}>
-                            <TouchableOpacity onPress={Cancel} >
-                                <Text style={styles.button}>Cancel</Text>
-                            </TouchableOpacity>
+
+                        <View style={styles.buttons}>
+                            <View style={[styles.buttonContainer]}>
+                                <TouchableOpacity onPress={addItem} >
+                                    <Text style={styles.button}>  Add</Text>
+                                </TouchableOpacity>
+
+                            </View>
+                            <View style={styles.space} />
+                            <View style={styles.buttonContainer}>
+                                <TouchableOpacity onPress={Cancel} >
+                                    <Text style={styles.button}>Cancel</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
+
+
                     </View>
-
-
-                </View>
+                </ScrollView>
             </Provider>
         </SafeAreaView>
 
@@ -219,21 +243,22 @@ const styles = StyleSheet.create({
     photoBox: {
         //  margin: 20,
         borderWidth: .5,
-        padding: 10,
+        padding: normalize(5),
         borderRadius: 10,
-        marginBottom: 10
+        marginBottom: normalize(10)
     },
     photoRow: {
         flexDirection: 'row',
-        justifyContent: 'flex-start',
+        justifyContent: 'space-evenly',
     },
     form: {
-        marginTop: 20,
+        marginTop: normalize(20),
     },
     input: {
-        // marginBottom: 10,
-        // height: 250,
+        textAlignVertical: 'top',
+
         height: normalize(200),
+        //        flexWrap:'wrap',
         borderColor: '#B87333',
         backgroundColor: "#fff",
         borderRadius: 10,
@@ -243,7 +268,8 @@ const styles = StyleSheet.create({
         borderWidth: normalize(1),
         //        marginBottom: normalize(10),
         //      paddingHorizontal: normalize(10),
-        width: '100%',
+        // width: '100%',
+
 
     },
     card: {
@@ -255,7 +281,7 @@ const styles = StyleSheet.create({
         marginVertical: 10,
     },
     space: {
-        width: normalize(50)
+        width: normalize(40)
     }
 });
 

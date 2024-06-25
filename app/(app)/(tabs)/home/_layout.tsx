@@ -12,7 +12,7 @@ import { NavigationContainer } from '@react-navigation/native';
 const HomeLayout = () => {
   const { session, isLoading, isAuthenticated } = useSession();
 
-  return (
+  return ( 
     <Stack>
         <Stack.Screen
             name="index"

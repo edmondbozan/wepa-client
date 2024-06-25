@@ -128,7 +128,7 @@ export default function App() {
           <View style={styles.header1}>
           <View style={[styles.buttonContainer]}>
           <TouchableOpacity  onPress={handleCategoryButtonClick} >
-            <FontAwesome6 name="gear" size={20} />
+            <FontAwesome6 name="gear" size={normalize(12)} />
             </TouchableOpacity>
             </View>
 
@@ -360,8 +360,8 @@ const styles = StyleSheet.create({
     borderColor:'#B87333',
     borderWidth:1.5,
     borderRadius: 15, // Rounded edges
-    paddingHorizontal: 20,    
-    paddingVertical:8,
+    paddingHorizontal: normalize(15),    
+    paddingVertical:normalize(8),
     // alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000', // Shadow for a subtle depth effect
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
 
   },
   button:{
-    fontSize:18,
+    fontSize: normalize(12),
     fontWeight: 'black',
     color:'#000'
   },});
