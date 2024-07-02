@@ -6,6 +6,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 
 import normalize from '@/fonts/fonts';
 import { isNullOrEmpty } from '../functions/stringfunctions'
 import {ProjectDetails} from '@/interfaces/IProject'
+import { AVPlaybackStatus, ResizeMode, Video } from 'expo-av';
 
 interface DetailProps {
     child: ProjectDetails;
@@ -16,9 +17,12 @@ const ListingDetails: React.FC<DetailProps> = ({ child }) => {
 
     const afterImage = { uri: child.afterImage };
     const beforeImage = { uri: child.beforeImage };
+
     const [isLeftModalVisible, setLeftModalVisible] = useState(false);
     const [isRightModalVisible, setRightModalVisible] = useState(false);
     const [data, setData] = useState([]);
+    const video = React.useRef(null);
+    const [status, setStatus] = React.useState({});
 
     const images: ImageSourcePropType[] = [
         afterImage, // Place your first image in the assets folder
@@ -59,17 +63,29 @@ const ListingDetails: React.FC<DetailProps> = ({ child }) => {
         setRightModalVisible(true);
     };
 
+    
+  const handlePlaybackStatusUpdate = (statusUpdate: AVPlaybackStatus) => {
+    setStatus(statusUpdate);
+      console.error 
+      (statusUpdate);
+    }
+  
 
 
 
     return (
         <View>
-            {child.afterImage ? (
+
+            {(child.afterImage && child.beforeImage) ? (
 
                 <GestureHandlerRootView>
                     <View style={styles.containerImage}>
                         <TapGestureHandler onHandlerStateChange={onDoubleTap} numberOfTaps={2}>
                             <Animated.View>
+                            <View style={styles.iconBackground}>                                
+                            <FontAwesome name="hand-pointer-o" size={24} color="white" style={styles.doubleTapIcon} />
+                            </View> 
+
                                 <Animated.Image
                                     source={images[imageIndex]}
                                     style={[styles.image, animatedStyles]}
@@ -80,15 +96,37 @@ const ListingDetails: React.FC<DetailProps> = ({ child }) => {
                     </View>
                 </GestureHandlerRootView>
             ) : (
-
-                <View style={styles.containerImage}>
+                null
+            )}
+             {(child.afterImage && !child.beforeImage) ? (
+                 <View style={styles.containerImage}>
                     <Image source={images[imageIndex]}
                         style={styles.image}
                         resizeMode="cover"
                     ></Image>
                 </View>
-            )}
+             )
+             : (null)
+            } 
 
+             { (isNullOrEmpty(child.video)) ? null : (
+                <View style={styles.videoContainer}>
+                                                    <Video
+                                                    ref={video}
+                                                    style={styles.videoStyle}
+                                                    // style={styles.video}
+                                                    source={{
+                                                    uri: child.video,
+                                                    //   uri: 'https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4',//child.video?.toString(),
+                                                    }}
+                                                    useNativeControls
+                                                    resizeMode={ResizeMode.COVER}
+                                                    isLooping
+                                                    onPlaybackStatusUpdate={status => setStatus(() => status)}
+                                                 />
+                                                 </View>
+            
+            )}  
 
 
         {isNullOrEmpty(child.description) ? null : (
@@ -111,6 +149,38 @@ const styles = StyleSheet.create({
         margin: 25,
         flex: 1,
         backgroundColor: '#F0F0F0',
+    },
+    doubleTapIcon: {
+        position: 'absolute',
+        top: 10,  // Adjust top and left as necessary to position the icon correctly
+        left: 10,
+        zIndex: 1,  // Ensure the icon is above the image
+      },
+      doubleTapIcon2: {
+        position: 'absolute',
+        top: 10,  // Adjust top and left as necessary to position the icon correctly
+        left: 32,
+        zIndex: 1,  // Ensure the icon is above the image
+        fontWeight:'bold'
+      },
+      iconBackground: {
+        position: 'absolute',
+        top: 10, // Adjust top and left as necessary to position the icon correctly
+        left: 10,
+        zIndex: 1, // Ensure the icon is above the image
+        backgroundColor: '#900', // Match this to the icon's color
+        padding: 5,
+        borderRadius: 12, // Adjust the border radius for a better look
+      },
+    videoContainer :{
+        margin: 10,
+
+    },
+    videoStyle:{
+        // width:'100%',
+        height : normalize(440),
+        borderRadius: 18,
+
     },
     header: {
         // padding: 25,

@@ -46,11 +46,11 @@ const Projects: React.FC = () => {
     <View style={styles.projectContainer}>
       <TouchableOpacity onPress={() => router.push({
           pathname: '/projects/project',
-          params: { data : JSON.stringify(data) }
+          params: { data : JSON.stringify(item) }
         })}
       >
       <ImageBackground
-        source={{ uri:  item.details[0].afterImage}}
+        source={{ uri:  (item.details[0]) ? item.details[0].afterImage : null}}
         style={styles.backgroundImage}
         imageStyle={{ borderRadius: 8 }}
       >

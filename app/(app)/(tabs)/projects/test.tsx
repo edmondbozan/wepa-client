@@ -11,6 +11,7 @@ import { normalize } from 'react-native-elements';
 import VideoButton from '@/components/VideoButton';
 import { ResizeMode, Video } from 'expo-av';
 import { BASE_URL } from '@/constants/Endpoints';
+import { DropdownItem } from '@/components/DropDowmList';
 
 interface Item {
     id: number;
@@ -98,7 +99,7 @@ const App: React.FC = () => {
         formData.append('Description', description);
 
         try {
-            const response = await fetch(BASE_URL + '/api/Upload/upload/projects/' + projectData[0].projectId, {
+            const response = await fetch(BASE_URL + '/api/Upload/upload/projects/' + projectData.projectId, {
                 method: 'POST',
                 body: formData,
                 // headers: {
@@ -115,10 +116,10 @@ const App: React.FC = () => {
             const responseData = JSON.parse(responseText);
             // console.log(responseData);
 
-            const updatedProjectData = [...projectData];
-            updatedProjectData[0].details = [...updatedProjectData[0].details, responseData];
-            setItems(updatedProjectData[0].details);
-            console.log(projectData[0].details);
+            const updatedProjectData = projectData;
+            updatedProjectData.details = [...updatedProjectData.details, responseData];
+            setItems(updatedProjectData.details);
+            console.log(projectData.details);
     
         } catch (error) {
             console.error('There was a problem with the fetch operation:', error);

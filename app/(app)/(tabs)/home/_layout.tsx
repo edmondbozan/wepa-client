@@ -7,21 +7,45 @@ import { Pressable } from "react-native";
 import {Colors} from '@/constants/Colors'
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { NavigationContainer } from '@react-navigation/native';
-
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Drawer } from 'expo-router/drawer';
 
 const HomeLayout = () => {
   const { session, isLoading, isAuthenticated } = useSession();
 
   return ( 
-    <Stack>
-        <Stack.Screen
-            name="index"
-            options={{
-                headerShown: false
-            }}
+ 
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Drawer>
+        <Drawer.Screen 
+          name="index" // This is the name of the page and must match the url from root
+          options={{
+            drawerLabel: 'test',
+            title: 'title',
+          }}
         />
-    </Stack>
-)
+      <Drawer.Screen 
+          name="settings" // This is the name of the page and must match the url from root
+          options={{
+            drawerLabel: 'test',
+            title: 'title',
+          }}
+        />
+      </Drawer>
+      
+    </GestureHandlerRootView>
+  );
+ 
+ 
+//  <Stack>
+//         <Stack.Screen
+//             name="index"
+//             options={{
+//                 headerShown: false
+//             }}
+//         />
+//     </Stack>
+// )
 
 
 //   <Tabs

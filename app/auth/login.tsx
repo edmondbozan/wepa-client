@@ -37,7 +37,16 @@ export default function SignIn() {
       }
     } catch (error) {
       console.error(error);
-      Alert.alert('An error occurred', 'Please try again later');
+      // Check if the error has a response attached with more details
+      if (error.response) {
+        error.response.json().then(body => {
+          Alert.alert('An error occurred', body.message || 'Please try again later');
+        }).catch(() => {
+          Alert.alert('An error occurred', 'Please try again later');
+        });
+      } else {
+        Alert.alert('An error occurred', error.message || 'Please try again later');
+      }
     }
   };
 

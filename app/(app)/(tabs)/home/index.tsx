@@ -84,6 +84,10 @@ export default function App() {
   };
 
 
+  const handleSettingsClick = () =>{
+    signOut();
+    router.navigate("/");    
+  }
   const handleLeftButtonClick = () => {
     setLeftModalVisible(true);
   };
@@ -127,7 +131,7 @@ export default function App() {
           {/* Header Line 1 */}
           <View style={styles.header1}>
           <View style={[styles.buttonContainer]}>
-          <TouchableOpacity  onPress={handleCategoryButtonClick} >
+          <TouchableOpacity  onPress={handleSettingsClick} >
             <FontAwesome6 name="gear" size={normalize(12)} />
             </TouchableOpacity>
             </View>

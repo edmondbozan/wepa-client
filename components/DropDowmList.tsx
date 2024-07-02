@@ -7,11 +7,10 @@ import {
   Modal,
   FlatList,
   StyleSheet,
-  Alert,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 
-interface DropdownItem {
+export interface DropdownItem {
   id: string;
   description: string;
 }
@@ -19,19 +18,22 @@ interface DropdownItem {
 interface DropdownInputProps {
   data: DropdownItem[];
   placeholder: string;
-  setValue: string;
+  setValue: DropdownItem;
+  onSelect: (item: DropdownItem) => void;
 }
 
-const DropdownInput: React.FC<DropdownInputProps> = ({ data, placeholder,setValue }) => {
-   const [selectedValue, setSelectedValue] = useState<string>(setValue);
-   const [modalVisible, setModalVisible] = useState<boolean>(false);
+const DropdownInput: React.FC<DropdownInputProps> = ({ data, placeholder, setValue, onSelect }) => {
+  const [selectedValue, setSelectedValue] = useState<DropdownItem>(setValue);
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+
   useEffect(() => {
     setSelectedValue(setValue);
   }, [setValue]);
 
   const handleSelect = (item: DropdownItem) => {
-    setSelectedValue(item.description);
+    setSelectedValue(item);
     setModalVisible(false);
+    onSelect(item);  // Pass the selected item to the parent component
   };
 
   return (
@@ -42,7 +44,7 @@ const DropdownInput: React.FC<DropdownInputProps> = ({ data, placeholder,setValu
       >
         <TextInput
           style={styles.input}
-          value={selectedValue}
+          value={(selectedValue) ? selectedValue.description : ''}
           placeholder={placeholder}
           editable={false}
           pointerEvents="none"
@@ -85,19 +87,19 @@ const DropdownInput: React.FC<DropdownInputProps> = ({ data, placeholder,setValu
 
 const styles = StyleSheet.create({
   inputContainer: {
-    flexDirection: 'row',
+     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#B87333',
     borderRadius: 10,
     paddingHorizontal: 10,
-    height: 40,
-
+    marginBottom:10
+//    margin:10
+//    height: 40,
   },
   input: {
     flex: 1,
     paddingVertical: 10,
-
   },
   icon: {
     marginLeft: 5,

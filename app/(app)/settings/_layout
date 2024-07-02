@@ -1,0 +1,22 @@
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Drawer } from 'expo-router/drawer';
+import { useState } from 'react';
+import TypingText from '@/components/TypingComponent';
+
+export default function Layout() {
+  const [title, setTitle] = useState('Title');
+
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Drawer>
+        <Drawer.Screen 
+          name="settings" // This is the name of the page and must match the url from root
+          options={{
+            drawerLabel: title,
+            title: title,
+          }}
+        />
+      </Drawer>
+    </GestureHandlerRootView>
+  );
+}
