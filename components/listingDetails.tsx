@@ -7,13 +7,15 @@ import normalize from '@/fonts/fonts';
 import { isNullOrEmpty } from '../functions/stringfunctions'
 import {ProjectDetails} from '@/interfaces/IProject'
 import { AVPlaybackStatus, ResizeMode, Video } from 'expo-av';
+import { useIsFocused } from '@react-navigation/native';
 
 interface DetailProps {
     child: ProjectDetails;
+    isVisible:boolean;
 }
 
 // import Icon from 'react-native-vector-icons/FontAwesome';
-const ListingDetails: React.FC<DetailProps> = ({ child }) => {
+    const ListingDetails: React.FC<DetailProps> = ({ child,isVisible }) => {
 
     const afterImage = { uri: child.afterImage };
     const beforeImage = { uri: child.beforeImage };
@@ -21,7 +23,7 @@ const ListingDetails: React.FC<DetailProps> = ({ child }) => {
     const [isLeftModalVisible, setLeftModalVisible] = useState(false);
     const [isRightModalVisible, setRightModalVisible] = useState(false);
     const [data, setData] = useState([]);
-    const video = React.useRef(null);
+    const video = React.useRef<Video>(null);
     const [status, setStatus] = React.useState({});
 
     const images: ImageSourcePropType[] = [
@@ -30,6 +32,15 @@ const ListingDetails: React.FC<DetailProps> = ({ child }) => {
     ];
 
 
+    useEffect(() => {
+        console.log(isVisible);
+        if (isVisible) {
+            console.log("insoide");
+          video.current?.playAsync();
+        } else {
+          video.current?.pauseAsync();
+        }
+      }, [isVisible]);
 
     const [imageIndex, setImageIndex] = useState<number>(0);
     const opacity = useSharedValue<number>(1);
@@ -71,8 +82,7 @@ const ListingDetails: React.FC<DetailProps> = ({ child }) => {
     }
   
 
-
-
+      
     return (
         <View>
 
@@ -116,10 +126,11 @@ const ListingDetails: React.FC<DetailProps> = ({ child }) => {
                                                     style={styles.videoStyle}
                                                     // style={styles.video}
                                                     source={{
-                                                    uri: child.video,
+                                                    uri: child.video?.toString(),
                                                     //   uri: 'https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4',//child.video?.toString(),
                                                     }}
-                                                    useNativeControls
+                                                    useNativeControls                                                   
+                                                    playsInSilentLockedModeIOS={ true }
                                                     resizeMode={ResizeMode.COVER}
                                                     isLooping
                                                     onPlaybackStatusUpdate={status => setStatus(() => status)}

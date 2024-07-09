@@ -50,7 +50,11 @@ const Projects: React.FC = () => {
         })}
       >
       <ImageBackground
-        source={{ uri:  (item.details[0]) ? item.details[0].afterImage : null}}
+        source={
+          (item.details[0]?.afterImage != null)  
+          ? { uri:  item.details[0].afterImage}  
+          : require('../../../../assets/images/background.jpg')
+          }
         style={styles.backgroundImage}
         imageStyle={{ borderRadius: 8 }}
       >
@@ -164,10 +168,11 @@ alignContent:'center'
   },
   buttonContainer: {
     backgroundColor: '#e4eaf7', // Hinge-inspired pastel color
-    borderRadius: 15, // Rounded edges
+    borderRadius: 8, // Rounded edges
     paddingHorizontal: 20,    
     paddingVertical:8,
-    // alignItems: 'center',
+    borderWidth:2,
+    borderColor:'#B87333',
     justifyContent: 'center',
     shadowColor: '#000', // Shadow for a subtle depth effect
     shadowOffset: { width: 0, height: 2 },

@@ -6,15 +6,24 @@ import { BASE_URL } from '@/constants/Endpoints';
 
 
 interface SliderModalProps {
+    type:string;
     visible: boolean;
     userradius:number;
     onClose: () => void;
+    onValueChange: (value: number) => void;
   }
 
+  const formatNumber = (num: number) => {
+    return new Intl.NumberFormat('en-US').format(num);
+  };
   
-
-  const SliderModal: React.FC<SliderModalProps> = ({ visible, userradius, onClose }) => {
+  const SliderModal: React.FC<SliderModalProps> = ({ visible, userradius, onClose, onValueChange, type = "radius" }) => {
     const [radius, setValue] = useState(5);
+
+    const handleValueChange = (value: number) => {
+      setValue(value);
+      onValueChange(value); // Call the parent's callback function
+    };
 
     useEffect(() => {
         // This will run when the component mounts
@@ -31,17 +40,21 @@ interface SliderModalProps {
       
   >
     <View style={styles.modalContent}>
-      <Text style={styles.text}>Radius: {radius.toFixed(2)}</Text>
+      {(type=="radius") ?
+      <Text style={styles.text}>Radius: {formatNumber(radius)} Miles</Text>
+      :
+      <Text style={styles.text}>$ {formatNumber(radius)}</Text>
+      }
       <Slider
         style={styles.slider}
         minimumValue={0}
-        maximumValue={100}
-        step={1}
+        maximumValue={(type=="radius") ? 3000 : 500000}
+        step={(type=="radius") ? 1 : 5000}
         value={radius}
-        onValueChange={setValue}
-        minimumTrackTintColor="#2196F3"
+        onValueChange={handleValueChange}
+        minimumTrackTintColor="#B87333"
         maximumTrackTintColor="#000000"
-        thumbTintColor="#2196F3"
+        thumbTintColor="#B87333"
       />
     </View>
     </Modal>

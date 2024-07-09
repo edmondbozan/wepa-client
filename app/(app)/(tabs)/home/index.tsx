@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, View, Text, ScrollView, ImageSourcePropType, TouchableOpacity, Alert, ActivityIndicator, TextInput, Button } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { SafeAreaView, StyleSheet, View, Text, ScrollView, ImageSourcePropType, TouchableOpacity, Alert, ActivityIndicator, TextInput, Button, FlatList, ImageBackground } from 'react-native';
 import { AntDesign, FontAwesome, FontAwesome5, FontAwesome6 } from '@expo/vector-icons'
 import { GestureHandlerRootView, TapGestureHandler, State, TapGestureHandlerStateChangeEvent } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
@@ -13,55 +13,113 @@ import { useSession } from '@/context/ctx';
 import fetchWithAuth from '@/context/FetchWithAuth'
 import { Project } from '@/interfaces/IProject';
 import { router } from 'expo-router';
+import { useIsFocused } from '@react-navigation/native';
 
 
-
+interface QueryParams {
+  categoryIds: number[];
+}
 
 // import Icon from 'react-native-vector-icons/FontAwesome';
 export default function App() {
-  // const afterImage = { uri: "https://wepa.blob.core.windows.net/assets/after.jpg" };
-  // const beforeImage = { uri: "https://wepa.blob.core.windows.net/assets/before.jpg" };
+  const [scrollY, setScrollY] = useState(0);
   const [isLeftModalVisible, setLeftModalVisible] = useState(false);
   const [isCategoriesModalVisible, setCategoriesModalVisible] = useState(false);
   const [isRadiusModalVisible, setRadiusModalVisible] = useState(false);
+  const [isBudgetModalVisible, setBudgetModalVisible] = useState(false);
   const [data, setData] = useState<Project[]>([])
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedItems, setSelectedItems] = useState<Item[]>([]);
   const { signOut, userId } = useSession();
-
+  const scrollViewRef = useRef<ScrollView>(null);
+  const [visibleItems, setVisibleItems] = useState([]);
+  const isFocused = useIsFocused();
+  const [radius, setRadius] = useState<number>(100);
+  const [budget, setBudget] = useState<number>(50000);
+  const [bind, setBind] = useState<boolean>(false);
 
   const images: ImageSourcePropType[] = [
     // afterImage, // Place your first image in the assets folder
     // beforeImage, // Place your second image in the assets folder
   ];
 
+
   const [imageIndex, setImageIndex] = useState<number>(0);
   const opacity = useSharedValue<number>(1);
 
+
+  const buildQueryString = (params: { [key: string]: any }): string => {
+    return Object.keys(params)
+      .map(key => {              
+        const value = params[key];        
+        if (Array.isArray(value)) {
+          console.log("array");
+          return value.map(val => `${encodeURIComponent(key)}=${encodeURIComponent(val)}`).join('&');
+        }
+        return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+      })
+      .join('&');
+  };
+
+
   // const { isAuthenticated, user, logout } = useAuth();
+  const fetchData = async () => {
+    try {
+
+      const categoryIds = selectedItems.map((item: { id: number }) => item.id.toString());
+    
+      const queryParams = buildQueryString({ categoryIds, radius, budget });
+      const url = BASE_URL + '/api/Projects?' + queryParams;
+       
+      console.log(url);
+      const response = await fetchWithAuth(url);
+      const result: Project[] = await response.json();
+      if (response.ok) {        
+        setData(result);
+        scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+
+      } else {
+        Alert.alert('Page Load Error', 'Page Load');
+      }
+    } catch (err) {
+       setError(JSON.stringify(err));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetchWithAuth(BASE_URL + '/api/Projects');
-        const result: Project[] = await response.json();
-        if (response.ok) {
-          setData(result);
-        } else {
-          Alert.alert('Page Load Error', 'Page Load');
-        }
-      } catch (err) {
-        setError(JSON.stringify(err));
-      } finally {
-        setLoading(false);
-      }
-    };
 
     fetchData();
-  }, []);
+  }, [selectedItems, bind]);
+
+  // useEffect(() => {    
+  //   fetchData();
+  // }, [selectedItems]);
 
 
+  const onViewableItemsChanged = ({ viewableItems }) => {
+    console.log(data[0].details.map((item, index) => ({
+      id: `${item.projectDetailId}-${index}`, // Ensuring unique key
+      afterImage: item.afterImage,
+      video: item.video,
+      description: item.description,
+    })));
+    setVisibleItems(viewableItems.map(item => item.key));
+    console.log(viewableItems);
+  };
+
+  const viewabilityConfig = {
+    itemVisiblePercentThreshold: 50,
+  };
+
+  // const transformedData = data[0].details.map((item, index) => ({
+  //   id: `${item.projectDetailId}-${index}`, // Ensuring unique key
+  //   afterImage: item.afterImage,
+  //   video: item.video,
+  //   description: item.description,
+  // }));
 
   const animatedStyles = useAnimatedStyle(() => {
     return {
@@ -84,9 +142,36 @@ export default function App() {
   };
 
 
+
+    const likeProject =  async(comment:string | null, like:boolean ) =>{
+      const json = {
+        userId: userId,
+        projectId: data[0].projectId,
+        comment: comment ,
+        like: like,
+      };
+      try {
+        const response = await fetchWithAuth(BASE_URL + '/api/projects/' + data[0].projectId + '/like' , {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(json),
+        });
+  
+        const responseText = await response.text();
+  
+        if (!response.ok) {
+          throw new Error(`Network response was not ok: ${responseText}`);
+        }
+        fetchData();
+      } catch (error) {
+        console.error('Failed to send like:', error);
+      }
+  }
   const handleSettingsClick = () =>{
     signOut();
-    router.navigate("/");    
+    router.navigate("auth/login");    
   }
   const handleLeftButtonClick = () => {
     setLeftModalVisible(true);
@@ -95,6 +180,10 @@ export default function App() {
   const handleRadiusButtonClick = () => {
     setRadiusModalVisible(!isRadiusModalVisible);
   };
+  const handleBudgetButtonClick = () => {
+    setBudgetModalVisible(!isBudgetModalVisible);
+  };
+
   const handleCategoryButtonClick = () => {
     setCategoriesModalVisible(!isCategoriesModalVisible);
   };
@@ -106,6 +195,14 @@ export default function App() {
   const toggleModal = () => {
     setRadiusModalVisible(!isRadiusModalVisible);
   };
+
+  const handleBudgetChange = (value:number) => {
+    setBudget(value);
+  };
+  const handleRadiusChange = (value:number) => {
+    setRadius(value);
+  };
+
 
 
   if (loading) {
@@ -119,14 +216,13 @@ export default function App() {
   if (error) {
     return (
       <View style={styles.errorContainer}>
-        <Text>error</Text>
+        <Text>{JSON.stringify(error)}</Text>
       </View>
     );
   }
 
   return (
-    <SafeAreaView>
-      <ScrollView>
+    <SafeAreaView style={{flex:1}}>           
         <View style={styles.header}>
           {/* Header Line 1 */}
           <View style={styles.header1}>
@@ -147,8 +243,8 @@ export default function App() {
             </TouchableOpacity>
             </View>
             <View style={[styles.buttonContainer]}>
-          <TouchableOpacity  onPress={handleRadiusButtonClick} >
-              <Text style={styles.button} >Cost</Text>
+          <TouchableOpacity  onPress={handleBudgetButtonClick} >
+              <Text style={styles.button} >Budget</Text>
             </TouchableOpacity>
             </View>
 
@@ -163,11 +259,15 @@ export default function App() {
         onPress={() => router.replace("/Projects")}
       /> */}
           </View>
-<View style={styles.horizontalRule}></View>
+          <View style={styles.horizontalRule}></View>
+          </View>
+        {(data.length > 0)?(  
+       <View style={styles.header}>
           <View style={styles.projectTitle}>
             <Text style={styles.title}>{data[0].title}</Text>
-          </View>
-          {/* Header Line 2 */}
+          </View>          
+          
+          <View><Text>{data[0].categoryName}</Text></View>
           <View style={styles.header2}>
             <View style={styles.header2heart}>
               <Text style={styles.category}><FontAwesome name="heart" size={normalize(20)} color="#FA9BCF" /> {data[0].likes}</Text>
@@ -178,40 +278,66 @@ export default function App() {
             <View style={styles.dollarSpace}></View>
             <Text style={styles.category}> <FontAwesome name="dollar" size={normalize(20)} color="#000" /> {data[0].cost} </Text>
           </View>
+          
         </View>
-        {data[0].details.map((child) => (
-          <ListingDetails key={child.projectDetailId} child={child} ></ListingDetails>
-        ))}
+         ) : (<ImageBackground style={{flex:1}} source={require('../../../../assets/images/background.jpg')} imageStyle={{ opacity: 0.3, height:'100%' }}>
+         <View style={{padding:50}}><Text style={{color:"#000", fontSize:20, fontWeight:800}}>You have viewed all projects.  Please change your criteria or click here to review previously viewed projects</Text></View>
+         </ImageBackground>
 
+)
+        }
+        
+        {(data.length > 0)?(  
 
-        {/* <Text style={styles.description}>This is some description blah blah blah</Text>
-    <View style={styles.container}>
-    <View style={styles.imageContainer}>
-     <Image source= {afterImage} style={styles.image} />
-    </View>
-    <StatusBar />
-  </View> */}
-      </ScrollView>
-
-
-
+         <FlatList
+        data={data[0].details.map((item, index) => ({
+          id: `${item.projectDetailId}-${index}`, // Ensuring unique key
+          afterImage: item.afterImage,
+          video: item.video,
+          description: item.description,
+        }))}
+        keyExtractor={item => item.id.toString()}
+        renderItem={({item}) => <ListingDetails 
+        isVisible={isFocused && visibleItems.includes(item.id.toString())}
+        key={item.id} child={item} ></ListingDetails>}
+        onViewableItemsChanged={onViewableItemsChanged}
+        viewabilityConfig={viewabilityConfig}
+        /> )
+        : (<></>)
+        }
+                {(data.length > 0)?( <> 
       <TouchableOpacity style={styles.floatingButtonLeft} onPress={handleLeftButtonClick}   >
       <FontAwesome6 name="heart" size={30} color="black" />
       </TouchableOpacity>
-      <TouchableOpacity style={styles.floatingButtonRight} >
+      <TouchableOpacity style={styles.floatingButtonRight}  onPress={() => likeProject(null, false)} >
         <FontAwesome name="times" size={30} color="#000" />
-      </TouchableOpacity>
+      </TouchableOpacity></>
+                ):(<></>)}
+      
+     
+
+
       <LikeModal  
         visible={isLeftModalVisible}
         onClose={() => setLeftModalVisible(false)}
         message="Left Button Clicked!"
+        onSubmit={(feedback) => {
+          console.log('onSubmit called');
+          likeProject(feedback, true);
+        }}
+//        onSubmit={(feedback) => likeProject(feedback, true)} // Pass the callback function with additional parameter
+
       />
-      <SliderModal visible={isRadiusModalVisible} userradius={25} onClose={()=> setRadiusModalVisible(false)} />
+      <SliderModal type="radius" onValueChange={handleRadiusChange} visible={isRadiusModalVisible} userradius={25} onClose={()=> {setRadiusModalVisible(false);setBind(!bind);}} />
+      <SliderModal type="dollars" onValueChange={handleBudgetChange} visible={isBudgetModalVisible} userradius={100000} onClose={()=> {setBudgetModalVisible(false); setBind(!bind);}} />
       <CheckboxList
         isVisible={isCategoriesModalVisible}
         onClose={handleCategoryButtonClick}
         onSelect={handleSelect}
+        initialSelectedItems={selectedItems.map(item=>item.id)}
+        
       />      
+
     </SafeAreaView>
 
   );

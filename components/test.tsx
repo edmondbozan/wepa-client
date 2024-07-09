@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import Modal from 'react-native-modal';
-//import { CheckBox } from 'react-native-elements';
-import {Checkbox} from 'react-native-paper';
+import { Checkbox } from 'react-native-paper';
 import { BASE_URL } from '@/constants/Endpoints';
+import GlobalStyles from '@/styles/styles';
 
 export interface Item {
   id: number;
@@ -14,12 +14,14 @@ interface CheckboxListProps {
   isVisible?: boolean;
   onClose?: () => void;
   onSelect?: (selectedItems: Item[]) => void;
+  initialSelectedItems?: number[]; // Add this prop
 }
 
 const CheckboxList: React.FC<CheckboxListProps> = ({
   isVisible = false,
   onClose = () => {},
   onSelect = () => {},
+  initialSelectedItems = [], // Add this default prop
 }) => {
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [items, setItems] = useState<Item[]>([]);
@@ -27,10 +29,9 @@ const CheckboxList: React.FC<CheckboxListProps> = ({
   useEffect(() => {
     if (isVisible) {
       fetchItems();
-    } else {
-      setSelectedItems([]);
+      setSelectedItems(initialSelectedItems); // Initialize selected items when modal is opened
     }
-  }, [isVisible]);
+  }, [isVisible]); // Remove initialSelectedItems as a dependency
 
   const fetchItems = async () => {
     try {
@@ -68,12 +69,11 @@ const CheckboxList: React.FC<CheckboxListProps> = ({
       style={styles.modal}
     >
       <View style={styles.modalContent}>
-        <Text style={styles.text}>Select Items</Text>
         <ScrollView>
           {items.map((item) => (
             <View key={item.id} style={styles.item}>
               <Checkbox
-                status={selectedItems.includes(item.id) ? 'unchecked' : 'checked'}
+                status={selectedItems.includes(item.id) ? 'checked' : 'unchecked'}
                 onPress={() => toggleSelection(item.id)}
               />
               <Text>{item.description}</Text>
@@ -101,25 +101,22 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(0, 0, 0, 0.1)',
     maxHeight: '50%',
   },
-  text: {
-    fontSize: 18,
-    textAlign: 'center',
-    marginBottom: 20,
-  },
   item: {
-     marginBottom: 10,
-    flexDirection:"row",
-    alignContent:"center"
+    marginBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   button: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#e4eaf7',
+    borderColor: '#B87333',
+    borderWidth: 2,
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
     marginTop: 20,
   },
   buttonText: {
-    color: 'white',
+    color: '#B87333',
     fontSize: 16,
   },
 });

@@ -51,161 +51,94 @@ export default function SignIn() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} >
-      <ImageBackground source={require('../../assets/images/background.jpg')} style={styles.background} >
-      <View style={styles.overlay}>
-      <ScrollView contentContainerStyle={styles.scrollContainer} automaticallyAdjustKeyboardInsets={true}>
-         <View  style={styles.loginTextContainer}>
-          <TypingText text="Find Styles You Love...And Professionals You Can Trust." speed={100} />
-         {/* <Text style={styles.loginText}>Find Styles You Love</Text>
-         <View style={styles.spacerFontHeight}></View>
-         <Text style={styles.loginText}>And Professionals You Can Trust</Text> */}
-          {/* <PhotoCarousel /> */}
-        </View> 
-
-        <View style={styles.inputView}>
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <ImageBackground source={require('.././../assets/images/background.jpg')} style={styles.background} imageStyle={{ opacity: 0.9 }}>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <Text style={styles.headerText}>SIGN IN</Text>
+            <TouchableOpacity onPress={handleRegister}>
+              <Text style={styles.signUpText}>Sign Up →</Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.label}>EMAIL</Text>
           <TextInput
             value={username}
             onChangeText={setUsername}
-            placeholder="Enter Email"
+            placeholder="Email"
+            placeholderTextColor="#FFF"
             style={styles.input}
-            placeholderTextColor={"#000"}
           />
+          <Text style={styles.label}>PASSWORD</Text>
           <TextInput
             value={password}
             onChangeText={setPassword}
-            placeholder="Enter Password"
+            placeholder="Password"
+            placeholderTextColor="#FFF"
             secureTextEntry
             style={styles.input}
-            placeholderTextColor={"#000"}
-
           />
-          <View style={styles.buttons}>
-          <View style={[styles.buttonContainer]}>
-          <TouchableOpacity  onPress={handleLogin} >
-              <Text style={styles.button} >Sign In</Text>
-            </TouchableOpacity>
-
-            </View>
-            <View style={styles.space} /> 
-            <View style={styles.buttonContainer}>
-            <TouchableOpacity  onPress={handleRegister} >
-              <Text style={styles.button}>Register</Text>
-            </TouchableOpacity>
-            </View>
-          </View>
-          <TouchableOpacity  onPress={handleLogin} >
-              <Text style={styles.forgotText}>Forgot my Password</Text>
-            </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={handleLogin}>           
+            <Text style={styles.buttonText}>SIGN IN</Text>
+          </TouchableOpacity>
         </View>
-      </ScrollView>
-      </View>
-
       </ImageBackground>
-    </SafeAreaView>
+    </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    resizeMode: 'cover',
   },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  buttonContainer: {
-    backgroundColor: '#e4eaf7',
-    borderColor:'#B87333',
-    borderWidth:1.5,
-    borderRadius: 15, // Rounded edges
-    paddingHorizontal: 20,    
-    paddingVertical:8,
-    // alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000', // Shadow for a subtle depth effect
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 0,
-    elevation: 5, // For Android shadow
-    color:'#000',
-
-
-  },
-  button:{
-    fontSize:18,
-    fontWeight: 'black',
-    color:'#000'
-  },
-  safeArea: {
+  container: {
     flex: 1,
-    backgroundColor: '#faf9f2',
+    justifyContent: 'center',
+    padding: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Adds a dark overlay to the container
   },
-  buttons: {
+  header: {
     flexDirection: 'row',
-     justifyContent: 'flex-start',
-    padding: 30,
+    justifyContent: 'space-between',
+    marginBottom: 30,
   },
-  scrollContainer: {
-    flexGrow: 1,
-    //justifyContent: 'center',
-    // padding: 10,
+  headerText: {
+    color: '#FFF',
+    fontSize: 24,
+    fontWeight: 'bold',
   },
-  inputView: {
-
-    backgroundColor: "#fff",
-    // height: normalize(200),
+  signUpText: {
+    color: '#FFF',
+    fontSize: 16,
+  },
+  label: {
+    color: '#FFF',
+    marginBottom: 5,
+    marginTop: 15,
+  },
+  input: {
+    height: 50,
+    borderColor: '#FFF',    
+    borderWidth: 1,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+    color: '#FFF',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)', // White background with transparency
+    borderRadius: 5,
+  },
+  button: {
+    height: 50,
+    backgroundColor: '#FFF',
     justifyContent: 'center',
     alignItems: 'center',
-    color:'#000',
-     margin:normalize(30),
-    padding:normalize(20),
-    borderRadius:20
+    borderRadius: 8,
+    marginTop: 20,
+    borderWidth:2,
+    borderColor:'#B87333'
   },
-  // inputText:{
-  //   backgroundColor: 'rgba(0, 0, 0, 0.7)',
-  // },
-  input: {
-    height: normalize(40),
-    borderColor: '#B87333',
-    borderRadius:10,
-    shadowColor:'#000',
-    color: "#e4eaf7",
-    elevation:5,
-    borderWidth: normalize(3),
-    marginBottom: normalize(10),
-    paddingHorizontal: normalize(10),
-    width: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+  buttonText: {
+    color: '#000',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
-  space: {
-    width: normalize(7), // or whatever size you need
-    height: 1,
-  },
-
-  loginText:{
-    // margin: 50,
-    color:'#000',
-    fontSize:normalize(35),
-    // fontWeight:'',
-    fontFamily: 'Pacifico-Regular',
-//    fontWeight:'900'
-
-  },
-  loginTextContainer:{
-    margin: normalize(50),
-    height: normalize(300)
-  },
-  forgotText:{
-//    fontFamily: 'Pacifico-Regular',
-    color:"#000",
-    // fontWeight:"bold",
-    fontSize:normalize(15)
-
-  }
 });
-
