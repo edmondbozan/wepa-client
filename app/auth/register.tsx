@@ -1,13 +1,15 @@
 import { BASE_URL } from '@/constants/Endpoints';
 import { useSession } from '@/context/ctx';
 import GlobalStyles from '@/styles/styles';
+import { FontAwesome } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Alert, StyleSheet, TouchableOpacity, ScrollView, ImageBackground } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Register: React.FC = () => {
   const { signIn } = useSession();
-  const [userType, setUserType] = useState<'professional' | 'consumer' | null>(null);
+  const [userType, setUserType] = useState<'professional' | 'consumer' | null>('consumer');
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [verifyPassword, setVerifyPassword] = useState<string>('');
@@ -17,6 +19,8 @@ const Register: React.FC = () => {
   const [zipcode, setZipcode] = useState<string>('');
   const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
   const [validationErrors, setValidationErrors] = useState<{ [key: string]: boolean }>({});
+
+
 
   useEffect(() => {
     validateForm();
@@ -62,14 +66,6 @@ const Register: React.FC = () => {
     }
 
     try {
-      console.log(JSON.stringify({
-        userType: userType,
-        Username: username,
-        Email: email,
-        Password: password,
-        ZipCode: zipcode,
-        PhoneNumber: phone
-      }));
 
       const response = await fetch(BASE_URL + '/api/Auth/register', {
         method: 'POST',
@@ -100,18 +96,21 @@ const Register: React.FC = () => {
   };
 
   return (
+    <SafeAreaView>
     <ScrollView contentContainerStyle={{ flexGrow: 1 }} automaticallyAdjustKeyboardInsets={true}>
-      <ImageBackground source={require('../../assets/images/background.jpg')} style={styles.background} imageStyle={{ opacity: 0.6 }}>
+      <ImageBackground source={require('../../assets/images/register-background.jpg')} style={styles.background} imageStyle={{ opacity: .9 }}>
+      <Text style={{color:"#fff", fontWeight:500, fontSize:18, marginLeft:20, marginTop:50}} onPress={() => { router.replace('/auth/login'); }}>
+        <FontAwesome name="arrow-left" /> Login 
+      </Text>
         <View style={styles.container}>
-          <Text>Select User Type:</Text>
           <View style={styles.radioContainer}>
             <TouchableOpacity style={styles.radio} onPress={() => setUserType('professional')}>
               <View style={userType === 'professional' ? styles.radioSelected : styles.radioUnselected} />
-              <Text>Professional</Text>
+              <Text style={styles.label}>Professional</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.radio} onPress={() => setUserType('consumer')}>
               <View style={userType === 'consumer' ? styles.radioSelected : styles.radioUnselected} />
-              <Text>Consumer</Text>
+              <Text style={styles.label}>Consumer</Text>
             </TouchableOpacity>
           </View>
 
@@ -119,67 +118,73 @@ const Register: React.FC = () => {
           <TextInput
             value={username}
             onChangeText={setUsername}
-            placeholder="Enter username"
+            placeholder="Display Name"
+            placeholderTextColor="#FFF"
             style={[styles.input, validationErrors.username && styles.inputError]}
           />
-          <Text>Password:</Text>
+          <Text style={styles.label}>Password:</Text>
           <TextInput
             value={password}
             onChangeText={setPassword}
             placeholder="Enter password"
+            placeholderTextColor="#fff"
             secureTextEntry
+            
             style={[styles.input, validationErrors.password && styles.inputError]}
           />
-          <Text>Verify Password:</Text>
+          <Text style={styles.label}>Verify Password:</Text>
           <TextInput
             value={verifyPassword}
             onChangeText={setVerifyPassword}
             placeholder="Verify password"
+            placeholderTextColor="#fff"
             secureTextEntry
             style={[styles.input, validationErrors.verifyPassword && styles.inputError]}
           />
-          <Text>Phone:</Text>
+          <Text style={styles.label}>Phone:</Text>
           <TextInput
             value={phone}
             onChangeText={setPhone}
             placeholder="Enter phone number"
             keyboardType="phone-pad"
+            placeholderTextColor="#fff"
             style={[styles.input, validationErrors.phone && styles.inputError]}
             returnKeyType="done"
           />
-          <Text>Email:</Text>
+          <Text style={styles.label}>Email:</Text>
           <TextInput
             value={email}
             onChangeText={setEmail}
             placeholder="Enter email"
             keyboardType="email-address"
+            placeholderTextColor="#fff"
+
             style={[styles.input, validationErrors.email && styles.inputError]}
           />
-          <Text>Display Name:</Text>
+          <Text style={styles.label}>Display Name:</Text>
           <TextInput
             value={displayName}
             onChangeText={setDisplayName}
             placeholder="Enter display name"
+            placeholderTextColor="#fff"
             style={[styles.input, validationErrors.displayName && styles.inputError]}
           />
-          <Text>Zipcode:</Text>
+          <Text style={styles.label}>Zipcode:</Text>
           <TextInput
             value={zipcode}
             onChangeText={setZipcode}
             placeholder="Enter zipcode"
             keyboardType="number-pad"
+            placeholderTextColor="#fff"
             style={[styles.input, validationErrors.zipcode && styles.inputError]}
           />
-          <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
-            <TouchableOpacity onPress={handleRegister} disabled={isButtonDisabled}>
-              <View style={[GlobalStyles.buttonContainer, isButtonDisabled && styles.buttonDisabled]}>
-                <Text style={GlobalStyles.button}>Register</Text>
-              </View>
+            <TouchableOpacity onPress={handleRegister} disabled={isButtonDisabled} style={styles.button}>
+                <Text style={styles.buttonText}>REGISTER</Text>
             </TouchableOpacity>
           </View>
-        </View>
       </ImageBackground>
     </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -192,7 +197,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)', // Adds a white background with transparency to the container
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Adds a white background with transparency to the container
   },
   radioContainer: {
     flexDirection: 'row',
@@ -208,9 +213,10 @@ const styles = StyleSheet.create({
     width: 20,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: 'black',
-    backgroundColor: 'black',
+    borderColor: '#B87333',
+    backgroundColor: '#B87333',
     marginRight: 5,
+
   },
   radioUnselected: {
     height: 20,
@@ -227,20 +233,37 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   input: {
-    height: 50, // Increase the height of the input fields
-    borderColor: 'gray',
+    height: 50,
+    borderColor: '#FFF',    
     borderWidth: 1,
     marginBottom: 10,
     paddingHorizontal: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)', // White background with transparency
+    color: '#FFF',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)', // White background with transparency
     borderRadius: 5,
-  },
+    },
   inputError: {
-    borderColor: 'red',
+    // borderColor: 'red',
   },
   buttonDisabled: {
     backgroundColor: '#ccc', // Grey background for disabled button
   },
+  button: {
+    height: 50,
+    backgroundColor: '#FFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    marginTop: 20,
+    borderWidth:2,
+    borderColor:'#B87333'
+  },
+  buttonText: {
+    color: '#000',
+    fontSize: 18,
+    fontWeight: 'bold',
+  }
+
 });
 
 export default Register;

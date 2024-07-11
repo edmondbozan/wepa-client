@@ -55,7 +55,6 @@ export default function SignIn() {
       <ImageBackground source={require('.././../assets/images/background.jpg')} style={styles.background} imageStyle={{ opacity: 0.9 }}>
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.headerText}>SIGN IN</Text>
             <TouchableOpacity onPress={handleRegister}>
               <Text style={styles.signUpText}>Sign Up →</Text>
             </TouchableOpacity>
@@ -99,7 +98,7 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     marginBottom: 30,
   },
   headerText: {

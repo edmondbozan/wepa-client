@@ -14,6 +14,7 @@ import fetchWithAuth from '@/context/FetchWithAuth'
 import { Project } from '@/interfaces/IProject';
 import { router } from 'expo-router';
 import { useIsFocused } from '@react-navigation/native';
+import MessagesModal from '@/components/Messages';
 
 
 interface QueryParams {
@@ -38,6 +39,7 @@ export default function App() {
   const [radius, setRadius] = useState<number>(100);
   const [budget, setBudget] = useState<number>(50000);
   const [bind, setBind] = useState<boolean>(false);
+  const [modalMessageVisible, setModalMessageVisible] = useState(false);
 
   const images: ImageSourcePropType[] = [
     // afterImage, // Place your first image in the assets folder
@@ -72,7 +74,6 @@ export default function App() {
       const queryParams = buildQueryString({ categoryIds, radius, budget });
       const url = BASE_URL + '/api/Projects?' + queryParams;
        
-      console.log(url);
       const response = await fetchWithAuth(url);
       const result: Project[] = await response.json();
       if (response.ok) {        
@@ -94,9 +95,6 @@ export default function App() {
     fetchData();
   }, [selectedItems, bind]);
 
-  // useEffect(() => {    
-  //   fetchData();
-  // }, [selectedItems]);
 
 
   const onViewableItemsChanged = ({ viewableItems }) => {
@@ -273,7 +271,9 @@ export default function App() {
               <Text style={styles.category}><FontAwesome name="heart" size={normalize(20)} color="#FA9BCF" /> {data[0].likes}</Text>
             </View>
             <View style={styles.header2like}>
+              <TouchableOpacity onPress={()=>setModalMessageVisible((data[0].messageCount > 0) ? true : false)}>
               <Text style={styles.category}><FontAwesome name="comment" size={normalize(20)} color="#000" /> {data[0].messageCount}</Text>
+              </TouchableOpacity>
             </View>
             <View style={styles.dollarSpace}></View>
             <Text style={styles.category}> <FontAwesome name="dollar" size={normalize(20)} color="#000" /> {data[0].cost} </Text>
@@ -334,10 +334,9 @@ export default function App() {
         isVisible={isCategoriesModalVisible}
         onClose={handleCategoryButtonClick}
         onSelect={handleSelect}
-        initialSelectedItems={selectedItems.map(item=>item.id)}
-        
+        initialSelectedItems={selectedItems.map(item=>item.id)}        
       />      
-
+      <MessagesModal onClose={()=>setModalMessageVisible(false)} projectId={data[0].projectId.toString()} visible={modalMessageVisible} />
     </SafeAreaView>
 
   );

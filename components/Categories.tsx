@@ -19,7 +19,6 @@ export const Categories: React.FC = () => {
           const response = await fetch(BASE_URL + '/Category');
           const data = await response.json();
           setCategories(data);
-          Alert.alert(JSON.stringify(data));
         } catch (error) {
           console.error('Error fetching categories:', error);
         } finally {
