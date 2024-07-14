@@ -1,3 +1,4 @@
+import TypingText from '@/components/TypingComponent';
 import { BASE_URL } from '@/constants/Endpoints';
 import { useSession } from '@/context/ctx';
 import GlobalStyles from '@/styles/styles';
@@ -97,12 +98,15 @@ const Register: React.FC = () => {
 
   return (
     <SafeAreaView>
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }} automaticallyAdjustKeyboardInsets={true}>
-      <ImageBackground source={require('../../assets/images/register-background.jpg')} style={styles.background} imageStyle={{ opacity: .9 }}>
-      <Text style={{color:"#fff", fontWeight:500, fontSize:18, marginLeft:20, marginTop:50}} onPress={() => { router.replace('/auth/login'); }}>
+    <ScrollView contentContainerStyle={{ flexGrow:1 }} automaticallyAdjustKeyboardInsets={true}>      
+        <View style={styles.container}>
+        <Text style={{color:"#000", fontSize:16,  marginTop:10}} onPress={() => { router.replace('/auth/login'); }}>
         <FontAwesome name="arrow-left" /> Login 
       </Text>
-        <View style={styles.container}>
+      <ImageBackground source={require('.././../assets/images/register-background.jpg')} style={styles.background} imageStyle={{ opacity: 0.45, backgroundColor:"#000" }}>
+        <TypingText text={'Registering is easy.  Almost as asy as finding '}></TypingText>
+      {/* <Text style={{color:"#fff", marginLeft:20, fontWeight:'bold'}}></Text> */}
+      </ImageBackground>
           <View style={styles.radioContainer}>
             <TouchableOpacity style={styles.radio} onPress={() => setUserType('professional')}>
               <View style={userType === 'professional' ? styles.radioSelected : styles.radioUnselected} />
@@ -114,25 +118,23 @@ const Register: React.FC = () => {
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.label}>Username:</Text>
+          <Text style={styles.label}>Display Name:</Text>
           <TextInput
             value={username}
             onChangeText={setUsername}
-            placeholder="Display Name"
-            placeholderTextColor="#FFF"
+            placeholderTextColor="#000"
             style={[styles.input, validationErrors.username && styles.inputError]}
           />
           <Text style={styles.label}>Password:</Text>
           <TextInput
             value={password}
             onChangeText={setPassword}
-            placeholder="Enter password"
-            placeholderTextColor="#fff"
+            placeholderTextColor="#000"
             secureTextEntry
             
             style={[styles.input, validationErrors.password && styles.inputError]}
           />
-          <Text style={styles.label}>Verify Password:</Text>
+          {/* <Text style={styles.label}>Verify Password:</Text>
           <TextInput
             value={verifyPassword}
             onChangeText={setVerifyPassword}
@@ -140,14 +142,13 @@ const Register: React.FC = () => {
             placeholderTextColor="#fff"
             secureTextEntry
             style={[styles.input, validationErrors.verifyPassword && styles.inputError]}
-          />
+          /> */}
           <Text style={styles.label}>Phone:</Text>
           <TextInput
             value={phone}
             onChangeText={setPhone}
-            placeholder="Enter phone number"
             keyboardType="phone-pad"
-            placeholderTextColor="#fff"
+            placeholderTextColor="#000"
             style={[styles.input, validationErrors.phone && styles.inputError]}
             returnKeyType="done"
           />
@@ -155,9 +156,8 @@ const Register: React.FC = () => {
           <TextInput
             value={email}
             onChangeText={setEmail}
-            placeholder="Enter email"
             keyboardType="email-address"
-            placeholderTextColor="#fff"
+            placeholderTextColor="#000"
 
             style={[styles.input, validationErrors.email && styles.inputError]}
           />
@@ -165,24 +165,21 @@ const Register: React.FC = () => {
           <TextInput
             value={displayName}
             onChangeText={setDisplayName}
-            placeholder="Enter display name"
-            placeholderTextColor="#fff"
+            placeholderTextColor="#000"
             style={[styles.input, validationErrors.displayName && styles.inputError]}
           />
           <Text style={styles.label}>Zipcode:</Text>
           <TextInput
             value={zipcode}
             onChangeText={setZipcode}
-            placeholder="Enter zipcode"
             keyboardType="number-pad"
-            placeholderTextColor="#fff"
+            placeholderTextColor="#000"
             style={[styles.input, validationErrors.zipcode && styles.inputError]}
           />
             <TouchableOpacity onPress={handleRegister} disabled={isButtonDisabled} style={styles.button}>
                 <Text style={styles.buttonText}>REGISTER</Text>
             </TouchableOpacity>
           </View>
-      </ImageBackground>
     </ScrollView>
     </SafeAreaView>
   );
@@ -190,14 +187,18 @@ const Register: React.FC = () => {
 
 const styles = StyleSheet.create({
   background: {
-    flex: 1,
     resizeMode: 'cover',
+    height:200,
+    width:null,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    marginTop:20,
+    justifyContent:'space-evenly',
   },
   container: {
     flex: 1,
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Adds a white background with transparency to the container
+    backgroundColor: 'rgba(221, 221, 221, 0.5)', 
   },
   radioContainer: {
     flexDirection: 'row',
@@ -228,9 +229,11 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   label: {
-    color: '#FFF',
+    color: '#B87333',
     marginBottom: 5,
     marginTop: 15,
+    fontWeight:'bold'
+
   },
   input: {
     height: 50,
@@ -238,7 +241,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 10,
     paddingHorizontal: 10,
-    color: '#FFF',
+    color: '#000',
     backgroundColor: 'rgba(255, 255, 255, 0.3)', // White background with transparency
     borderRadius: 5,
     },

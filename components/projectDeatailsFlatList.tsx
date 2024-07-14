@@ -35,7 +35,7 @@ const ListItem: React.FC<ItemProps> = ({ item }) => {
     item.description ? (
        <View style={styles.textContainer}>
       <Text style={styles.text}>
-        {item.description.length > 100 ? '${item.description.substring(0, 100)}...' : item.description}
+        {item.description.length > 100 ? `${item.description.substring(0, 100)}...` : item.description}
       </Text>
        </View>
     ) : null
@@ -74,39 +74,36 @@ const ListItem: React.FC<ItemProps> = ({ item }) => {
 const styles = StyleSheet.create({
   itemContainer: {
     borderRadius: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 1 },
-    shadowRadius: 2,
-    elevation: 2,
-    // flexDirection : 'row'
-//     height:'100%'
+    //margin:10,
+    // justifyContent:''
   },
   image: {
-    width: normalize(150),
+    width: normalize(200),
     height: normalize(150),
-    borderRadius: 10,
+     borderRadius: 10,    
     margin:normalize(10)
   },
   video: {
-    width: normalize(150),
+    width: normalize(200),
     height: normalize(150),
-    borderRadius: 10,
+     borderRadius: 10,
     margin:10
 
   },
   text: {
-    fontSize: 20,
-    color: '#333',
+    fontSize: 18,
+    color: '#000',
   },
   textContainer:{
-    width: normalize(150),
+    width: normalize(200),
     height: normalize(150),
-//     margin:10,
+     margin:10,
 //     padding: 10,
-    borderColor:'black',
+    borderColor:'white',
+    backgroundColor: 'rgba(221, 221, 221, 0.5)', //
     borderRadius:10,
-    borderWidth:1
+    borderWidth:1,
+    padding:10,
   },
   deleteButton: {
     justifyContent: 'center',

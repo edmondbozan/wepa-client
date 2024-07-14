@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { SafeAreaView, StyleSheet, View, Text, ScrollView, ImageSourcePropType, TouchableOpacity, Alert, ActivityIndicator, TextInput, Button, FlatList, ImageBackground } from 'react-native';
-import { AntDesign, FontAwesome, FontAwesome5, FontAwesome6 } from '@expo/vector-icons'
+import { AntDesign, FontAwesome, FontAwesome5, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons'
 import { GestureHandlerRootView, TapGestureHandler, State, TapGestureHandlerStateChangeEvent } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
 import LikeModal from '@/components/LikeModal';
@@ -47,6 +47,8 @@ export default function App() {
   ];
 
 
+
+
   const [imageIndex, setImageIndex] = useState<number>(0);
   const opacity = useSharedValue<number>(1);
 
@@ -64,6 +66,11 @@ export default function App() {
       .join('&');
   };
 
+
+  const formatNumber = (num: number) => {
+    return new Intl.NumberFormat('en-US').format(num);
+  };
+  
 
   // const { isAuthenticated, user, logout } = useAuth();
   const fetchData = async () => {
@@ -104,7 +111,7 @@ export default function App() {
       video: item.video,
       description: item.description,
     })));
-    setVisibleItems(viewableItems.map(item => item.key));
+    setVisibleItems(viewableItems.map((item: { key: any; }) => item.key));
     console.log(viewableItems);
   };
 
@@ -226,7 +233,7 @@ export default function App() {
           <View style={styles.header1}>
           <View style={[styles.buttonContainer]}>
           <TouchableOpacity  onPress={handleSettingsClick} >
-            <FontAwesome6 name="gear" size={normalize(12)} />
+            <FontAwesome6 name="question" size={normalize(12)} />
             </TouchableOpacity>
             </View>
 
@@ -263,25 +270,41 @@ export default function App() {
        <View style={styles.header}>
           <View style={styles.projectTitle}>
             <Text style={styles.title}>{data[0].title}</Text>
-          </View>          
-          
-          <View><Text>{data[0].categoryName}</Text></View>
+          </View>     
+          <View style={{flexDirection:'row', marginTop:10, alignItems:'center'}}>     
+          <Text style={{fontSize:18,}}>By {data[0].userName}</Text> 
+          {(data[0].userType == "professional") &&
+          (
+          <MaterialCommunityIcons name="professional-hexagon" size={30} color="#D8BFD8" />
+          )
+           }
+           </View>
           <View style={styles.header2}>
             <View style={styles.header2heart}>
               <Text style={styles.category}><FontAwesome name="heart" size={normalize(20)} color="#FA9BCF" /> {data[0].likes}</Text>
             </View>
             <View style={styles.header2like}>
               <TouchableOpacity onPress={()=>setModalMessageVisible((data[0].messageCount > 0) ? true : false)}>
-              <Text style={styles.category}><FontAwesome name="comment" size={normalize(20)} color="#000" /> {data[0].messageCount}</Text>
+              <Text style={styles.category}><FontAwesome name="comment" size={normalize(20)} color="#a7abb5" /> {data[0].messageCount}</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.dollarSpace}></View>
-            <Text style={styles.category}> <FontAwesome name="dollar" size={normalize(20)} color="#000" /> {data[0].cost} </Text>
+            <Text style={styles.category}> <FontAwesome name="dollar" size={normalize(15)} color="#067d13" />{formatNumber(parseFloat(data[0].cost))} </Text>
           </View>
           
         </View>
          ) : (<ImageBackground style={{flex:1}} source={require('../../../../assets/images/background.jpg')} imageStyle={{ opacity: 0.3, height:'100%' }}>
-         <View style={{padding:50}}><Text style={{color:"#000", fontSize:20, fontWeight:800}}>You have viewed all projects.  Please change your criteria or click here to review previously viewed projects</Text></View>
+          <View style={{marginTop:100, margin:20, padding:15, borderRadius:12, backgroundColor:'rgba(211, 211, 211, .35)'}}>
+            <Text style={{color:"#654321", fontSize:20, fontWeight:'700', lineHeight:30}}>You have viewed all projects that fit your criteria.{'\n\n'}</Text>
+            <View style={{alignItems:'center'}}>
+              <Text style={{color:"#654321", fontSize:normalize(17), fontWeight:'600',fontStyle:'italic', lineHeight:30}}> Adjust your criteria above to see more.  Or click here to view unlike</Text>
+            </View>
+              <View style={{alignItems:'center'}}> 
+              <Text style={{color:"#654321", fontSize:normalize(17), fontWeight:'600',fontStyle:'italic'}}>
+              Or click here to see unliked projects.</Text>
+            </View>
+          </View>
+
          </ImageBackground>
 
 )
@@ -292,7 +315,10 @@ export default function App() {
          <FlatList
         data={data[0].details.map((item, index) => ({
           id: `${item.projectDetailId}-${index}`, // Ensuring unique key
-          afterImage: item.afterImage,
+          images: {
+            afterImage: item.afterImage,
+            beforeImage: item.beforeImage,
+          },
           video: item.video,
           description: item.description,
         }))}
@@ -310,7 +336,7 @@ export default function App() {
       <FontAwesome6 name="heart" size={30} color="black" />
       </TouchableOpacity>
       <TouchableOpacity style={styles.floatingButtonRight}  onPress={() => likeProject(null, false)} >
-        <FontAwesome name="times" size={30} color="#000" />
+        <FontAwesome5 name="heart-broken" size={30} color="#000" />
       </TouchableOpacity></>
                 ):(<></>)}
       
@@ -320,6 +346,7 @@ export default function App() {
       <LikeModal  
         visible={isLeftModalVisible}
         onClose={() => setLeftModalVisible(false)}
+        userType={data[0].userType}
         message="Left Button Clicked!"
         onSubmit={(feedback) => {
           console.log('onSubmit called');
@@ -336,7 +363,7 @@ export default function App() {
         onSelect={handleSelect}
         initialSelectedItems={selectedItems.map(item=>item.id)}        
       />      
-      <MessagesModal onClose={()=>setModalMessageVisible(false)} projectId={data[0].projectId.toString()} visible={modalMessageVisible} />
+      <MessagesModal onClose={()=>setModalMessageVisible(false)} projectId={(data.length > 0) ? data[0].projectId.toString():0} visible={modalMessageVisible} />
     </SafeAreaView>
 
   );
@@ -363,7 +390,7 @@ const styles = StyleSheet.create({
   header: {
     // padding: 25,
     justifyContent: 'space-evenly',
-    margin: 15,
+    marginLeft: 15,
   },
   horizontalRule: {
     borderBottomColor: '#ccc',
@@ -482,7 +509,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   dollarSpace:{
-    width:20
+     width:10
   },
   buttonContainer: {
     backgroundColor: '#e4eaf7',

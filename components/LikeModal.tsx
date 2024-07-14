@@ -1,22 +1,27 @@
 import React from 'react';
-import { Modal, View, Text, StyleSheet, TextInput } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
+import { Modal, View, Text, StyleSheet, TextInput, Switch } from 'react-native';
+import { FontAwesome, FontAwesome6 } from '@expo/vector-icons';
 import { GestureHandlerRootView, TouchableOpacity } from 'react-native-gesture-handler';
 import GlobalStyles from '@/styles/styles';
+import { Checkbox } from 'react-native-paper';
 
 interface LikeModalProps {
   visible: boolean;
   onClose: () => void;
   message: string;
-  onSubmit: (feedback: string) => void;
+  userType:string;
+  onSubmit: (feedback: string, share: boolean) => void;
 }
 
-const LikeModal: React.FC<LikeModalProps> = ({ visible, onClose, message, onSubmit }) => {
+const LikeModal: React.FC<LikeModalProps> = ({ visible, onClose, message, userType, onSubmit }) => {
   const [feedback, setFeedback] = React.useState('');
+  const [share, setIsEnabled] = React.useState(false);
+  const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
   const handleSubmit = () => {
     if (typeof onSubmit === 'function') {
-      onSubmit(feedback);
+      setIsEnabled(false);
+      onSubmit(feedback, share);
     } else {
       console.error('onSubmit is not a function');
     }
@@ -32,26 +37,42 @@ const LikeModal: React.FC<LikeModalProps> = ({ visible, onClose, message, onSubm
     >
       <GestureHandlerRootView style={styles.centeredView}>
         <View style={styles.modalView}>
-          <Text style={styles.modalText}>
-            <FontAwesome name="heart" size={30} color="#FA9BCF" /> Like
-          </Text>
+            {userType=="professional"  && 
+           (<View style={{flexDirection:'row', alignItems:'center', marginRight:20}}>
+        <Switch
+        trackColor={{ false: "#767577", true: "#81b0ff" }}
+         thumbColor={share ? "#f5dd4b" : "#f4f3f4"}
+         ios_backgroundColor="#a7abb5"
+         onValueChange={toggleSwitch}
+         value={share}
+      />
+      <Text> 
+            <Text style={{fontWeight:'bold', color:'#B87333'}}>{share?' Share ':' Do not share '}</Text>
+            <Text>my info with this pro.</Text>
+      </Text>
+      </View>
+            )}
           <TextInput
             style={styles.textInput}
-            placeholder="Provide some feedback"
+            placeholder="Leave a comments"
             multiline
             value={feedback}
             onChangeText={setFeedback} // Update feedback state
           />
           <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
             <TouchableOpacity onPress={handleSubmit}>
-              <View style={GlobalStyles.buttonContainer}>
+            <FontAwesome6 name="heart" size={30} color="black" />
+
+              {/* <View style={GlobalStyles.buttonContainer}>
                 <Text style={GlobalStyles.button}>Like</Text>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={onClose}>
-              <View style={GlobalStyles.buttonContainer}>
+              </View> */}
+        </TouchableOpacity>
+          <TouchableOpacity onPress={() =>{setIsEnabled(false);onClose();}}>
+            <FontAwesome name="times" size={30} color="black" />
+
+              {/* <View style={GlobalStyles.buttonContainer}>
                 <Text style={GlobalStyles.button}>Close</Text>
-              </View>
+              </View> */}
             </TouchableOpacity>
           </View>
         </View>
@@ -100,8 +121,10 @@ const styles = StyleSheet.create({
     height: 100,
     borderColor: 'gray',
     borderWidth: 1,
-    marginBottom: 20,
-    paddingLeft: 10,
+    marginLeft: 20,
+    marginTop: 10,
+    marginBottom:10
+    // paddingLeft: 0,
   },
 });
 

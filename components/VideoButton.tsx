@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import { ResizeMode, Video } from 'expo-av';
+import { normalize } from 'react-native-elements';
 
 interface VideoButtonProps {
   label: string;
@@ -42,8 +43,8 @@ const VideoButton: React.FC<VideoButtonProps> = ({ label, onPress, videoUri }) =
 
 const styles = StyleSheet.create({
   buttonContainer: {
-    width: 150,
-    height: 150,
+    width: normalize(110),
+    height: normalize(110),
     borderWidth: 2,
     borderColor: 'gray',
     borderStyle: 'dashed',

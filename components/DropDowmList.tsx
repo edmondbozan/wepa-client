@@ -49,7 +49,7 @@ const DropdownInput: React.FC<DropdownInputProps> = ({ data, placeholder, setVal
           editable={false}
           pointerEvents="none"
         />
-        <MaterialIcons name="arrow-drop-down" size={24} style={styles.icon} />
+        <MaterialIcons name="arrow-drop-down"  size={24} style={styles.icon} />
       </TouchableOpacity>
 
       <Modal
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
      flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#B87333',
+    borderColor: '#fff',
     borderRadius: 10,
     paddingHorizontal: 10,
     marginBottom:10
@@ -100,9 +100,11 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     paddingVertical: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)'
   },
   icon: {
     marginLeft: 5,
+    color:"#B87333"
   },
   modalContainer: {
     flex: 1,
@@ -111,7 +113,7 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: '80%',
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(221, 221, 221, 1)', 
     borderRadius: 10,
     padding: 20,
     shadowColor: '#000',
@@ -121,21 +123,26 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 4,
-    elevation: 5,
+    elevation: 5,    
   },
   item: {
     padding: 15,
     borderBottomWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#B87333',
   },
   closeButton: {
-    padding: 10,
-    backgroundColor: 'blue',
-    borderRadius: 5,
-    marginTop: 10,
+    height: 50,
+    backgroundColor: '#FFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    marginTop: 20,
+    borderWidth:2,
+    borderColor:'#B87333'
+
   },
   closeButtonText: {
-    color: 'white',
+    color: '#B87333',
     textAlign: 'center',
   },
 });

@@ -15,7 +15,7 @@ const Projects: React.FC = () => {
   const [data, setData] = useState<Project[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const {userId } = useSession();
+  const { userId } = useSession();
 
 
 
@@ -26,6 +26,8 @@ const Projects: React.FC = () => {
         const result: Project[] = await response.json();
         if (response.ok) {
           setData(result);
+          console.log(data);
+//          console.log(userId);
         } else {
           Alert.alert('Page Load Error', 'Page Load');
         }
@@ -39,89 +41,109 @@ const Projects: React.FC = () => {
     fetchData();
   }, []);
 
-//   const { userId } = SessionProvider(SessionProvider);
+  //   const { userId } = SessionProvider(SessionProvider);
   const renderItem = ({ item }: { item: Project }) => (
-    
-<SafeAreaView>
+
+
     <View style={styles.projectContainer}>
       <TouchableOpacity onPress={() => router.push({
-          pathname: '/projects/project',
-          params: { data : JSON.stringify(item) }
-        })}
+        pathname: '/projects/project',
+        params: { data: JSON.stringify(item) }
+      })}
       >
-      <ImageBackground
-        source={
-          (item.details[0]?.afterImage != null)  
-          ? { uri:  item.details[0].afterImage}  
-          : require('../../../../assets/images/background.jpg')
+        <ImageBackground
+          source={
+            (item.details[0]?.afterImage != null)
+              ? { uri: item.details[0].afterImage }
+              : require('../../../../assets/images/background.jpg')
           }
-        style={styles.backgroundImage}
-        imageStyle={{ borderRadius: 8 }}
-      >
-        <View style={styles.contentContainer}>
-          <Text style={styles.title}>{item.title}</Text>
-          <View style={styles.viewRow}>
-          <Text style={styles.category}>Category: {item.categoryName}</Text>
-          <View style={styles.space} /> 
-          <Text style={styles.cost}>Cost: ${item.cost}</Text>
+          style={styles.backgroundImage}
+          imageStyle={{ borderRadius: 8 }}
+        >
+          <View style={styles.contentContainer}>
+            <Text style={styles.title}>{item.title}</Text>
+            <View style={styles.viewRow}>
+              <Text style={styles.category}>Category: {item.categoryName}</Text>
+              <View style={styles.space} />
+              <Text style={styles.cost}>Cost: ${item.cost}</Text>
+            </View>
+            <View style={styles.icon}>
+              <View>
+                <Text ><FontAwesome name="heart" size={normalize(35)} color="#FA9BCF" /> {item.likes}</Text>
+              </View>
+              <View style={styles.space} />
+              <View>
+                <Text ><FontAwesome name="comment" size={normalize(35)} color="#000" />{item.messageCount}</Text>
+              </View>
+            </View>
           </View>
-         <View style={styles.icon}>
-            <View>
-              <Text ><FontAwesome name="heart" size={normalize(35)} color="#FA9BCF" /> {item.likes}</Text>
-            </View>
-            <View style={styles.space} />
-            <View>
-              <Text ><FontAwesome name="comment" size={normalize(35)} color="#000" />{item.messageCount}</Text>
-            </View>
-            </View>
-        </View>
-      </ImageBackground>
+        </ImageBackground>
       </TouchableOpacity>
     </View>
-    </SafeAreaView>
+
   );
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={data}
-        keyExtractor={(item) => item.projectId.toString()}
-        renderItem={renderItem} />
-          <View style={styles.buttonContainer}>
-    <TouchableOpacity onPress={()=>{router.push(
-        {
-          pathname: '/projects/project',
-          params: { data : null }
-        }
-      )}} >
-              <Text style={styles.button}>Add New Project</Text>
-            </TouchableOpacity>
+    <SafeAreaView style={{flex:1}}>
+      <View style={styles.container}>
+
+        {(data.length > 0) ? (
+          <FlatList
+            data={data}
+            keyExtractor={(item) => item.projectId.toString()}
+            renderItem={renderItem} />
+         ) :  
+         (
+         <ImageBackground style={{flex:1}} source={require('../../../../assets/images/background.jpg')} imageStyle={{ opacity: 0.25, height:'100%', justifyContent:'center', alignItems:'center' }}>
+          <View style={{marginTop:100, margin:20, padding:15, borderRadius:12, backgroundColor:'rgba(211, 211, 211, .35)'}}>
+            <Text style={{color:"#654321", fontSize:20, fontWeight:'700', lineHeight:30}}>Looks like you do not have any projects. Click the add new project button below to get started.{'\n\n'}</Text>
+            <View style={{alignItems:'center'}}>
+              <Text style={{color:"#654321", fontSize:normalize(17), fontWeight:'600',fontStyle:'italic', lineHeight:30}}> Go ahead and Peacock a bit.</Text>
+</View>
+              <View style={{alignItems:'center'}}> 
+              <Text style={{color:"#654321", fontSize:normalize(17), fontWeight:'600',fontStyle:'italic'}}>
+              We wont judge.</Text>
             </View>
-    </View>
+          </View>
+         </ImageBackground>)}
+
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity onPress={() => {
+            router.push(
+              {
+                pathname: '/projects/project',
+                params: { data: null }
+              }
+            )
+          }} >
+            <Text style={styles.button}>Add New Project</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
+    flex: 1,    
+    backgroundColor: 'rgba(221, 221, 221, 0.5)', // 
     padding: 10,
-    // alignContent:'center'
   },
-  viewRow:{
-flexDirection:'row',
-alignContent:'center'
+  viewRow: {
+    flexDirection: 'row',
+    alignContent: 'center'
   },
   projectContainer: {
     marginBottom: 20,
-    padding: 10,    
- //    backgroundColor: '#f8f8f8',
+    padding: 10,
     borderRadius: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
-    elevation: 5,    
+    elevation: 5,
   },
   backgroundImage: {
     width: '100%',
@@ -130,11 +152,10 @@ alignContent:'center'
   },
   contentContainer: {
     flex: 1,
-    // justifyContent: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.7)', // Optional: Add a semi-transparent background to improve text readability
     padding: 10,
     borderRadius: 8,
-    
+
   },
   title: {
     fontSize: normalize(20),
@@ -157,36 +178,29 @@ alignContent:'center'
     fontSize: 14,
     color: '#555',
   },
-  icon:{
-    //  justifyContent: 'space-',
-    margin:20,
-    flexDirection:'row'
-    // width:'50%'
+  icon: {
+    margin: 20,
+    flexDirection: 'row'
   },
-  space:{
-    width:20
+  space: {
+    width: 20
   },
   buttonContainer: {
-    backgroundColor: '#e4eaf7', // Hinge-inspired pastel color
+    backgroundColor: '#FFF', // Hinge-inspired pastel color
     borderRadius: 8, // Rounded edges
-    paddingHorizontal: 20,    
-    paddingVertical:8,
-    borderWidth:2,
-    borderColor:'#B87333',
-    justifyContent: 'center',
-    shadowColor: '#000', // Shadow for a subtle depth effect
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 0,
-    elevation: 5, // For Android shadow
-    color:'#000',
+    height: 50,
+    borderWidth: 2,
+    borderColor: '#B87333',
+    color: '#000',
+    justifyContent:'center',
+    alignItems:'center'
 
 
   },
-  button:{
-    fontSize:18,
-    fontWeight: 'black',
-    color:'#000',
+  button: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000',
   }
 });
 

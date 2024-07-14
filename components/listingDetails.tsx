@@ -5,20 +5,20 @@ import { GestureHandlerRootView, TapGestureHandler, State, TapGestureHandlerStat
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
 import normalize from '@/fonts/fonts';
 import { isNullOrEmpty } from '../functions/stringfunctions'
-import {ProjectDetails} from '@/interfaces/IProject'
+import {ProjectDetails, ProjectDisplayDetails} from '@/interfaces/IProject'
 import { AVPlaybackStatus, ResizeMode, Video } from 'expo-av';
 import { useIsFocused } from '@react-navigation/native';
 
 interface DetailProps {
-    child: ProjectDetails;
+    child: ProjectDisplayDetails;
     isVisible:boolean;
 }
 
 // import Icon from 'react-native-vector-icons/FontAwesome';
     const ListingDetails: React.FC<DetailProps> = ({ child,isVisible }) => {
 
-    const afterImage = { uri: child.afterImage };
-    const beforeImage = { uri: child.beforeImage };
+    const afterImage = { uri: child.images.afterImage };
+    const beforeImage = { uri: child.images.beforeImage };
 
     const [isLeftModalVisible, setLeftModalVisible] = useState(false);
     const [isRightModalVisible, setRightModalVisible] = useState(false);
@@ -86,7 +86,7 @@ interface DetailProps {
     return (
         <View>
 
-            {(child.afterImage && child.beforeImage) ? (
+            {(child.images.afterImage && child.images.beforeImage) ? (
 
                 <GestureHandlerRootView>
                     <View style={styles.containerImage}>
@@ -108,7 +108,7 @@ interface DetailProps {
             ) : (
                 null
             )}
-             {(child.afterImage && !child.beforeImage) ? (
+             {(child.images.afterImage && !child.images.beforeImage) ? (
                  <View style={styles.containerImage}>
                     <Image source={images[imageIndex]}
                         style={styles.image}
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     },
 
     cardDescription: {
-        fontSize: 21,
+        fontSize: 19,
         fontWeight: "500"
     },
     floatingButtonLeft: {

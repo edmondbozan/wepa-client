@@ -29,12 +29,12 @@ const TypingText: React.FC<TypingTextProps> = ({ text, speed = 100 }) => {
 
 const styles = StyleSheet.create({
   typingText:{
-    // margin: 50,
-    color: 'rgba(184, 115, 51, 1)',
-    fontSize:normalize(35),
+    margin: 10,
+    color: '#B87333',
+    fontSize:normalize(16),
     // fontWeight:'',
     fontFamily: 'Pacifico-Regular',
-//    fontWeight:'900'
+    fontWeight:'600'
 
   }
 });

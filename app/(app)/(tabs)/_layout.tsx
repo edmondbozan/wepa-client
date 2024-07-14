@@ -29,14 +29,30 @@ const TabsLayout = () => {
          <Tabs.Screen
             name="home/index"
             options={{
+              title:'home',
                 headerShown:false,
-            }}
+                tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} /> }}
         />  
             <Tabs.Screen
                 name="projects"
                 options={{
                     headerShown:false,
-                }} />
+                    tabBarIcon: ({ color }) => <FontAwesome size={28} name="briefcase" color={color} /> }}
+                 />
+            <Tabs.Screen
+            name="settings/settings"
+            options={{
+                headerShown:false,
+                title:'settings',
+                tabBarIcon: ({ color }) => <FontAwesome size={28} name="user" color={color} /> }}
+            
+        />  
+            {/* <Tabs.Screen
+                name="settings/settings"
+                options={{
+                    headerShown:false,
+                }} /> */}
+                
             {/* <Slot></Slot> */}
         </Tabs>
     )

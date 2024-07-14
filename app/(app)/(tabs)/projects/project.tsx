@@ -11,6 +11,8 @@ import fetchWithAuth from '@/context/FetchWithAuth';
 import { FontAwesome } from '@expo/vector-icons';
 import { ProjectDetails } from '@/interfaces/IProject';
 import GlobalStyles from '@/styles/styles';
+import { formatNumber } from '@/functions/stringfunctions';
+import SliderModal from '@/components/Slider';
 
 
 
@@ -21,10 +23,18 @@ export default function Project() {
   const [categories, setCategories] = useState<DropdownItem[]>([]);
   const { data } = useLocalSearchParams();
   const projectData = data ? JSON.parse(data as string) : null;
-  const [cost, setProjectCost] = useState('');
+  const [cost, setProjectCost] = useState<number>(0);
   const [title, setProjectTitle] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<DropdownItem | null>(null);
   const { userId } = useSession();
+  const [isBudgetModalVisible, setBudgetModalVisible] = useState(false);
+
+  const handleBudgetButtonClick = () => {
+    setBudgetModalVisible(!isBudgetModalVisible);
+  };
+  const handleBudgetChange = (value:number) => {
+    setProjectCost(value);
+  };
 
   useEffect(() => {
     if (projectData) {
@@ -73,10 +83,11 @@ export default function Project() {
       id: projectId,
       categoryId: selectedCategory.id,
       title: title,
-      cost: cost,
+      cost: cost.toString(),
       categoryName: selectedCategory.description,
       userId: userId
     };
+ 
 
 
     try {
@@ -95,6 +106,7 @@ export default function Project() {
       }
 
       console.log('Project added successfully:', responseText);
+      router.replace('/projects/Projects');
     } catch (error) {
       console.error('Failed to add project:', error);
     }
@@ -104,64 +116,45 @@ export default function Project() {
     throw new Error('Function not implemented.');
   } } />;
 
-  // interface Row {
-  //   items: ProjectDetails[];
-  // }
-  
-  // interface HorizontalRowProps {
-  //   row: Row;
-  // }
-  
-  // const HorizontalRow: React.FC<HorizontalRowProps> = ({ row }) => (
-  //   <View style={styles.rowContainer}>
-  //     <FlatList
-  //       data={row.items}
-  //       renderItem={({ item }) => renderItem{item} />}
-  //       keyExtractor={(item) => item.projectDetailId.toString()}
-  //       horizontal
-  //       showsHorizontalScrollIndicator={false}
-  //       contentContainerStyle={styles.horizontalFlatListContainer}
-  //     />
-  //   </View>
-  // );
-  
-
-
-
-
-
-
   return (
     <SafeAreaView style={styles.safeArea}>
-      <Text onPress={() => { router.replace('/projects/Projects'); }}>
+      <Text style={{marginLeft:20}} onPress={() => { router.replace('/projects/Projects'); }}>
         <FontAwesome name="arrow-left" /> Projects
       </Text>
       <ScrollView  style={styles.scrollContainer}>
-        <Text style={{fontWeight:'bold'}}>Build a project. Get Dollars.</Text>
+        <Text style={{fontWeight:'bold'}}>Build a project. Get Dollars. Or just show off a bit.</Text>
         <View style={styles.horizontalRule} />
 
         <View style={styles.inputView}>
+          <Text style={styles.label}>Category</Text>
           <DropdownInput
             data={categories}            
-            placeholder="Select a Category"
+            //placeholder="Select a Category"
             setValue={selectedCategory}
             onSelect={item => {
               setSelectedCategory(item);
             }}
           />
+          <Text style={styles.label}>Project Name</Text>
           <TextInput
             placeholder="Project Name"
             style={styles.input}
             value={title}
             onChangeText={setProjectTitle}
           />
+          <Text style={styles.label}>Cost</Text>
+          <TouchableOpacity
+        onPress={() => setBudgetModalVisible(true)}>
           <TextInput
             placeholder="Project Cost"
             keyboardType='number-pad'
             style={styles.input}
-            value={cost}
+            value={"$" + formatNumber(cost)}
             onChangeText={setProjectCost}
+            editable={false}
+            pointerEvents="none"            
           />
+          </TouchableOpacity>
             <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
             <TouchableOpacity onPress={AddProject}>
               <View style={GlobalStyles.buttonContainer}>
@@ -183,6 +176,10 @@ export default function Project() {
           </View>
 
           <View style={[styles.horizontalRule, {height:20}]} />
+
+          {(projectData) ? 
+          (
+          <>  
           <Text>Media</Text>
           <FlatList
               scrollEnabled={false}
@@ -192,11 +189,10 @@ export default function Project() {
                 throw new Error('Function not implemented.');
               } } 
               />}
-              contentContainerStyle={styles.verticalFlatListContainer}
-
-                  
-              />
+               contentContainerStyle={styles.verticalFlatListContainer}                  
+              /></>) : (<><Text>Give your project some details to start getting noticed. </Text></>)}
       </ScrollView>
+      <SliderModal type="dollars" onValueChange={handleBudgetChange} visible={isBudgetModalVisible} userradius={cost} onClose={()=> {setBudgetModalVisible(false);}} />
     </SafeAreaView>
   );
 }
@@ -204,8 +200,8 @@ export default function Project() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#faf9f2',
-    margin: 20,
+    backgroundColor: 'rgba(221, 221, 221, 1)', //
+//    margin: 20,
   },
   FLImage: {
     width: 100,
@@ -265,9 +261,15 @@ const styles = StyleSheet.create({
   inputView: {
     // height: '50%',
   },
-  input: {
+  label: {
+    color:'#B87333',
+    marginBottom: 5,
+    marginTop: 15,
+    fontWeight:'bold'
+  },
+  input: {    
     height: normalize(40),
-    borderColor: '#B87333',
+    borderColor: '#fff',
     borderRadius: 10,
     shadowColor: '#000',
     color: "#000",
@@ -276,6 +278,7 @@ const styles = StyleSheet.create({
     marginBottom: normalize(10),
     paddingHorizontal: normalize(10),
     width: '100%',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)'
   },
   space: {
     width: normalize(7),
@@ -306,6 +309,8 @@ const styles = StyleSheet.create({
   },
   verticalFlatListContainer: {
     paddingVertical: 10,
+    justifyContent:'flex-start',
+//    alignSelf:'center'
   },
   rowContainer: {
     marginVertical: 10,
