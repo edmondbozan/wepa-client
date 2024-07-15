@@ -12,6 +12,8 @@ const Register: React.FC = () => {
   const { signIn } = useSession();
   const [userType, setUserType] = useState<'professional' | 'consumer' | null>('consumer');
   const [username, setUsername] = useState<string>('');
+  const [isUserNameValid, setUsernameValid] = useState<boolean>(true);
+
   const [password, setPassword] = useState<string>('');
   const [verifyPassword, setVerifyPassword] = useState<string>('');
   const [phone, setPhone] = useState<string>('');
@@ -34,6 +36,7 @@ const Register: React.FC = () => {
     const isPhoneValid = phone.match(/^\d{10}$/) !== null; // Assuming phone number should be exactly 10 digits
     const isZipcodeValid = zipcode.match(/^\d{5}$/) !== null; // Zipcode should be exactly 5 digits
     const areFieldsFilled = userType && username && password && verifyPassword && phone && email && displayName && zipcode;
+    
 
     const errors: { [key: string]: boolean } = {
       userType: !userType,
@@ -54,6 +57,15 @@ const Register: React.FC = () => {
       setIsButtonDisabled(true);
     }
   };
+
+  const validateUserName = () => {
+    if (username.length > 0){
+      setUsernameValid(true);
+    }else
+    {
+      setUsernameValid(false);
+    }
+  }
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -85,7 +97,7 @@ const Register: React.FC = () => {
 
       const data = await response.json();
       if (response.ok) {
-        await signIn(data.token, JSON.stringify(data.userId));
+        await signIn(data.token, JSON.stringify(data.userId), JSON.stringify(data.userType));
         router.replace('/');
       } else {
         Alert.alert('Error', data.Message || 'Registration failed');
@@ -124,7 +136,11 @@ const Register: React.FC = () => {
             onChangeText={setUsername}
             placeholderTextColor="#000"
             style={[styles.input, validationErrors.username && styles.inputError]}
+            onBlur={validateUserName}
           />
+          {!isUserNameValid ?
+          (<Text>Display Name is required</Text>)
+          : null}
           <Text style={styles.label}>Password:</Text>
           <TextInput
             value={password}
@@ -246,7 +262,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     },
   inputError: {
-    // borderColor: 'red',
+     borderColor: 'red',
+     color:'red'
   },
   buttonDisabled: {
     backgroundColor: '#ccc', // Grey background for disabled button

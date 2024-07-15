@@ -17,8 +17,8 @@ interface DetailProps {
 // import Icon from 'react-native-vector-icons/FontAwesome';
     const ListingDetails: React.FC<DetailProps> = ({ child,isVisible }) => {
 
-    const afterImage = { uri: child.images.afterImage };
-    const beforeImage = { uri: child.images.beforeImage };
+    const afterImage = { uri: child.images?.afterImage };
+    const beforeImage = { uri: child.images?.beforeImage };
 
     const [isLeftModalVisible, setLeftModalVisible] = useState(false);
     const [isRightModalVisible, setRightModalVisible] = useState(false);
@@ -35,7 +35,6 @@ interface DetailProps {
     useEffect(() => {
         console.log(isVisible);
         if (isVisible) {
-            console.log("insoide");
           video.current?.playAsync();
         } else {
           video.current?.pauseAsync();
@@ -86,14 +85,15 @@ interface DetailProps {
     return (
         <View>
 
-            {(child.images.afterImage && child.images.beforeImage) ? (
+            {(child.images?.afterImage && child.images?.beforeImage) ? (
 
                 <GestureHandlerRootView>
                     <View style={styles.containerImage}>
                         <TapGestureHandler onHandlerStateChange={onDoubleTap} numberOfTaps={2}>
                             <Animated.View>
                             <View style={styles.iconBackground}>                                
-                            <FontAwesome name="hand-pointer-o" size={24} color="white" style={styles.doubleTapIcon} />
+                            <FontAwesome name="hand-pointer-o" size={24} color="black"/>
+                            <Text>2X</Text>
                             </View> 
 
                                 <Animated.Image
@@ -108,7 +108,7 @@ interface DetailProps {
             ) : (
                 null
             )}
-             {(child.images.afterImage && !child.images.beforeImage) ? (
+             {(child.images?.afterImage && !child.images.beforeImage) ? (
                  <View style={styles.containerImage}>
                     <Image source={images[imageIndex]}
                         style={styles.image}
@@ -161,27 +161,29 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#F0F0F0',
     },
-    doubleTapIcon: {
-        position: 'absolute',
-        top: 10,  // Adjust top and left as necessary to position the icon correctly
-        left: 10,
-        zIndex: 1,  // Ensure the icon is above the image
-      },
-      doubleTapIcon2: {
-        position: 'absolute',
-        top: 10,  // Adjust top and left as necessary to position the icon correctly
-        left: 32,
-        zIndex: 1,  // Ensure the icon is above the image
-        fontWeight:'bold'
-      },
+    // doubleTapIcon: {
+    //     position: 'absolute',
+    //     top: 8,  // Adjust top and left as necessary to position the icon correctly
+    //     left: 30,
+    //     zIndex: 1,  // Ensure the icon is above the image
+    //     // padding:5
+    //   },
+    //   doubleTapIcon2: {
+    //     position: 'absolute',
+    //     top: 10,  // Adjust top and left as necessary to position the icon correctly
+    //     left: 32,
+    //     zIndex: 1,  // Ensure the icon is above the image
+    //     fontWeight:'bold'
+    //   },
       iconBackground: {
         position: 'absolute',
-        top: 10, // Adjust top and left as necessary to position the icon correctly
-        left: 10,
+        top: normalize(10), // Adjust top and left as necessary to position the icon correctly
+        right: normalize(10),
         zIndex: 1, // Ensure the icon is above the image
-        backgroundColor: '#900', // Match this to the icon's color
+        backgroundColor: '#fff', // Match this to the icon's color
         padding: 5,
-        borderRadius: 12, // Adjust the border radius for a better look
+        borderRadius: 5, // Adjust the border radius for a better look
+        alignItems:'center'
       },
     videoContainer :{
         margin: 10,
@@ -251,8 +253,6 @@ const styles = StyleSheet.create({
         fontWeight: 900
     },
     cardImage: {
-        // width: '100%',
-        // height: 200,
         alignItems: 'center'
     },
 

@@ -6,12 +6,9 @@ import { router } from 'expo-router';
 import { useSession } from '@/context/ctx';
 import { FontAwesome } from '@expo/vector-icons';
 
-interface ItemProps {
-  item: ProjectDetails;
-}
 
 
-const Settings: React.FC<ItemProps> = ({ item }) => {
+const Settings: React.FC = () => {
   const { signOut, userId } = useSession();
   const handleSignOut = () => {
     signOut();

@@ -40,25 +40,12 @@ export default function App() {
   const [budget, setBudget] = useState<number>(50000);
   const [bind, setBind] = useState<boolean>(false);
   const [modalMessageVisible, setModalMessageVisible] = useState(false);
-
-  const images: ImageSourcePropType[] = [
-    // afterImage, // Place your first image in the assets folder
-    // beforeImage, // Place your second image in the assets folder
-  ];
-
-
-
-
-  const [imageIndex, setImageIndex] = useState<number>(0);
   const opacity = useSharedValue<number>(1);
-
-
   const buildQueryString = (params: { [key: string]: any }): string => {
     return Object.keys(params)
       .map(key => {              
         const value = params[key];        
         if (Array.isArray(value)) {
-          console.log("array");
           return value.map(val => `${encodeURIComponent(key)}=${encodeURIComponent(val)}`).join('&');
         }
         return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
@@ -132,28 +119,13 @@ export default function App() {
     };
   });
 
-
-  const updateImageIndex = () => {
-    setImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-  };
-
-  const onDoubleTap = (event: TapGestureHandlerStateChangeEvent) => {
-    if (event.nativeEvent.state === State.ACTIVE) {
-      opacity.value = withTiming(0, { duration: 500 }, () => {
-        runOnJS(updateImageIndex)();
-        opacity.value = withTiming(1, { duration: 500 });
-      });
-    }
-  };
-
-
-
-    const likeProject =  async(comment:string | null, like:boolean ) =>{
+    const likeProject =  async(comment:string | null, like:boolean, isLead:boolean ) =>{
       const json = {
         userId: userId,
         projectId: data[0].projectId,
         comment: comment ,
         like: like,
+        isLead: isLead
       };
       try {
         const response = await fetchWithAuth(BASE_URL + '/api/projects/' + data[0].projectId + '/like' , {
@@ -310,7 +282,7 @@ export default function App() {
 )
         }
         
-        {(data.length > 0)?(  
+        {(data.length > 0) &&(  
 
          <FlatList
         data={data[0].details.map((item, index) => ({
@@ -328,14 +300,12 @@ export default function App() {
         key={item.id} child={item} ></ListingDetails>}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
-        /> )
-        : (<></>)
-        }
+        /> )}
                 {(data.length > 0)?( <> 
       <TouchableOpacity style={styles.floatingButtonLeft} onPress={handleLeftButtonClick}   >
       <FontAwesome6 name="heart" size={30} color="black" />
       </TouchableOpacity>
-      <TouchableOpacity style={styles.floatingButtonRight}  onPress={() => likeProject(null, false)} >
+      <TouchableOpacity style={styles.floatingButtonRight}  onPress={() => likeProject(null, false, false)} >
         <FontAwesome5 name="heart-broken" size={30} color="#000" />
       </TouchableOpacity></>
                 ):(<></>)}
@@ -346,11 +316,10 @@ export default function App() {
       <LikeModal  
         visible={isLeftModalVisible}
         onClose={() => setLeftModalVisible(false)}
-        userType={data[0].userType}
-        message="Left Button Clicked!"
-        onSubmit={(feedback) => {
-          console.log('onSubmit called');
-          likeProject(feedback, true);
+        userType={(data.length > 0) ? data[0].userType : ''}
+         message="Left Button Clicked!"
+        onSubmit={(feedback, isLead) => {
+          likeProject(feedback,true, isLead);
         }}
 //        onSubmit={(feedback) => likeProject(feedback, true)} // Pass the callback function with additional parameter
 

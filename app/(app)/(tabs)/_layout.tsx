@@ -2,9 +2,11 @@ import { Slot, Stack, Tabs } from 'expo-router'
 import LogoutButton from '@/components/LogoutButton'
 import { FontAwesome } from '@expo/vector-icons'
 import { useColorScheme } from 'react-native';
+import { useSession } from '@/context/ctx';
 
 const TabsLayout = () => {
     const colorScheme = useColorScheme();
+    const { userType } = useSession();
 
     return (        
         <Tabs 
@@ -39,6 +41,14 @@ const TabsLayout = () => {
                     headerShown:false,
                     tabBarIcon: ({ color }) => <FontAwesome size={28} name="briefcase" color={color} /> }}
                  />
+             <Tabs.Screen
+                name="leads/leads"
+                options={{
+                    href: (userType?.toString() != '"professional"') ? null : 'leads/leads',
+                    headerShown:false,
+                    title:'leads',
+                    tabBarIcon: ({ color }) => <FontAwesome size={28} name="phone" color={color} /> }}    
+                 /> 
             <Tabs.Screen
             name="settings/settings"
             options={{
@@ -47,11 +57,6 @@ const TabsLayout = () => {
                 tabBarIcon: ({ color }) => <FontAwesome size={28} name="user" color={color} /> }}
             
         />  
-            {/* <Tabs.Screen
-                name="settings/settings"
-                options={{
-                    headerShown:false,
-                }} /> */}
                 
             {/* <Slot></Slot> */}
         </Tabs>
