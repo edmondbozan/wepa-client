@@ -25,6 +25,7 @@ const LikeModal: React.FC<LikeModalProps> = ({ visible, onClose, message, userTy
     } else {
       console.error('onSubmit is not a function');
     }
+    setFeedback('');
     onClose(); // Optionally close the modal after submitting
   };
 
@@ -67,7 +68,7 @@ const LikeModal: React.FC<LikeModalProps> = ({ visible, onClose, message, userTy
                 <Text style={GlobalStyles.button}>Like</Text>
               </View> */}
         </TouchableOpacity>
-          <TouchableOpacity onPress={() =>{setIsEnabled(false);onClose();}}>
+          <TouchableOpacity onPress={() =>{setIsEnabled(false);setFeedback('');onClose();}}>
             <FontAwesome name="times" size={30} color="black" />
 
               {/* <View style={GlobalStyles.buttonContainer}>

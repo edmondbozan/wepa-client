@@ -1,47 +1,43 @@
-// index.tsx
-import React from 'react';
-import { useNavigation, Tabs, Stack, router, Redirect } from 'expo-router';
-import { useSession } from '@/context/ctx';
-import { Alert, Text } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Redirect } from 'expo-router';
+import { Alert, Text, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import fetchWithAuth from '@/context/FetchWithAuth';
+import { BASE_URL } from '@/constants/Endpoints';
 
+export default function Index() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // null for loading state
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetchWithAuth(BASE_URL + '/api/Auth');
+        if (response.ok) {
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+        }
+      } catch (err) {
+        setIsAuthenticated(false);
+      }
+    };
 
-export default function index() {
-  const { isAuthenticated } = useSession();
+    fetchData();
+  }, []);
 
-  // Alert.alert(JSON.stringify(isAuthenticated));
-  //  if (!isAuthenticated) {
-  // //   // On web, static rendering will stop here as the user is not authenticated
-  // //   // in the headless Node process that the pages are rendered in.
-
-  //     return <Redirect href="/auth/login" />;
-  // }
-
-  // if (isAuthenticated) {
-  //   //   // On web, static rendering will stop here as the user is not authenticated
-  //   //   // in the headless Node process that the pages are rendered in.
-  
-  //       return <Redirect href="/(tabs)/home" />;
-  //   }
-
-
-
-
-
-  // React.useEffect(() => {
-  //    Alert.alert(JSON.stringify(isAuthenticated));
-  //    Alert.alert(JSON.stringify(userId));
-  //    if (isAuthenticated) {
-  //      router.replace('/(tabs)/home');
-  //    } else {
-  //      router.replace('/auth/login');
-  //    }
-  // }, [isAuthenticated]); 
+  if (isAuthenticated === null) {
+    // While loading, you can return a loading indicator or nothing
+    return <View><Text>Loading...</Text></View>;
+  }
 
   return (
-    
-    
-    <>{ isAuthenticated ? ( <Redirect href="/(tabs)/home" />) : 
-  ( <Redirect href="/auth/login" />)
-}</>
-  )};
+    <>
+      {isAuthenticated ? (
+        <Redirect href="/(tabs)/home" />
+      ) : (
+        <Redirect href="/auth/login" />
+      )}
+    </>
+  );
+}
+

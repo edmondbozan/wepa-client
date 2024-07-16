@@ -8,13 +8,14 @@ import ListingDetails from '@/components/listingDetails';
 import normalize from '@/fonts/fonts'
 import CheckboxList, { Item } from '@/components/test'
 import SliderModal from '@/components/Slider';
-import {BASE_URL} from '@/constants/Endpoints'
+import { BASE_URL } from '@/constants/Endpoints'
 import { useSession } from '@/context/ctx';
 import fetchWithAuth from '@/context/FetchWithAuth'
 import { Project } from '@/interfaces/IProject';
 import { router } from 'expo-router';
 import { useIsFocused } from '@react-navigation/native';
 import MessagesModal from '@/components/Messages';
+import EmptyHome from '@/components/EmptyHome';
 
 
 interface QueryParams {
@@ -43,8 +44,8 @@ export default function App() {
   const opacity = useSharedValue<number>(1);
   const buildQueryString = (params: { [key: string]: any }): string => {
     return Object.keys(params)
-      .map(key => {              
-        const value = params[key];        
+      .map(key => {
+        const value = params[key];
         if (Array.isArray(value)) {
           return value.map(val => `${encodeURIComponent(key)}=${encodeURIComponent(val)}`).join('&');
         }
@@ -57,20 +58,20 @@ export default function App() {
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat('en-US').format(num);
   };
-  
+
 
   // const { isAuthenticated, user, logout } = useAuth();
   const fetchData = async () => {
     try {
 
       const categoryIds = selectedItems.map((item: { id: number }) => item.id.toString());
-    
+
       const queryParams = buildQueryString({ categoryIds, radius, budget });
       const url = BASE_URL + '/api/Projects?' + queryParams;
-       
+
       const response = await fetchWithAuth(url);
       const result: Project[] = await response.json();
-      if (response.ok) {        
+      if (response.ok) {
         setData(result);
         scrollViewRef.current?.scrollTo({ y: 0, animated: true });
 
@@ -78,7 +79,7 @@ export default function App() {
         Alert.alert('Page Load Error', 'Page Load');
       }
     } catch (err) {
-       setError(JSON.stringify(err));
+      setError(JSON.stringify(err));
     } finally {
       setLoading(false);
     }
@@ -119,36 +120,36 @@ export default function App() {
     };
   });
 
-    const likeProject =  async(comment:string | null, like:boolean, isLead:boolean ) =>{
-      const json = {
-        userId: userId,
-        projectId: data[0].projectId,
-        comment: comment ,
-        like: like,
-        isLead: isLead
-      };
-      try {
-        const response = await fetchWithAuth(BASE_URL + '/api/projects/' + data[0].projectId + '/like' , {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(json),
-        });
-  
-        const responseText = await response.text();
-  
-        if (!response.ok) {
-          throw new Error(`Network response was not ok: ${responseText}`);
-        }
-        fetchData();
-      } catch (error) {
-        console.error('Failed to send like:', error);
+  const likeProject = async (comment: string | null, like: boolean, isLead: boolean) => {
+    const json = {
+      userId: userId,
+      projectId: data[0].projectId,
+      comment: comment,
+      like: like,
+      isLead: isLead
+    };
+    try {
+      const response = await fetchWithAuth(BASE_URL + '/api/projects/' + data[0].projectId + '/like', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(json),
+      });
+
+      const responseText = await response.text();
+
+      if (!response.ok) {
+        throw new Error(`Network response was not ok: ${responseText}`);
       }
+      fetchData();
+    } catch (error) {
+      console.error('Failed to send like:', error);
+    }
   }
-  const handleSettingsClick = () =>{
+  const handleSettingsClick = () => {
     signOut();
-    router.navigate("auth/login");    
+    router.navigate("auth/login");
   }
   const handleLeftButtonClick = () => {
     setLeftModalVisible(true);
@@ -173,10 +174,10 @@ export default function App() {
     setRadiusModalVisible(!isRadiusModalVisible);
   };
 
-  const handleBudgetChange = (value:number) => {
+  const handleBudgetChange = (value: number) => {
     setBudget(value);
   };
-  const handleRadiusChange = (value:number) => {
+  const handleRadiusChange = (value: number) => {
     setRadius(value);
   };
 
@@ -199,140 +200,130 @@ export default function App() {
   }
 
   return (
-    <SafeAreaView style={{flex:1}}>           
-        <View style={styles.header}>
-          {/* Header Line 1 */}
-          <View style={styles.header1}>
-          <View style={[styles.buttonContainer]}>
-          <TouchableOpacity  onPress={handleSettingsClick} >
-            <FontAwesome6 name="question" size={normalize(12)} />
-            </TouchableOpacity>
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.header}>
+        {/* Header Line 1 */}
+        <View style={styles.header1}>
+          <TouchableOpacity onPress={handleSettingsClick} >
+            <View style={[styles.buttonContainer]}>
+              <FontAwesome6 name="question" size={normalize(12)} />
             </View>
+          </TouchableOpacity>
 
-          <View style={[styles.buttonContainer]}>
-          <TouchableOpacity  onPress={handleCategoryButtonClick} >
+
+          <TouchableOpacity onPress={handleCategoryButtonClick} >
+            <View style={[styles.buttonContainer]}>
               <Text style={styles.button} >Categories</Text>
-            </TouchableOpacity>
             </View>
-            <View style={[styles.buttonContainer]}>
-          <TouchableOpacity  onPress={handleRadiusButtonClick} >
-              <Text style={styles.button} >Radius</Text>
-            </TouchableOpacity>
-            </View>
-            <View style={[styles.buttonContainer]}>
-          <TouchableOpacity  onPress={handleBudgetButtonClick} >
-              <Text style={styles.button} >Budget</Text>
-            </TouchableOpacity>
-            </View>
+          </TouchableOpacity>
 
-            {/* <TouchableOpacity onPress={handleCategoryButtonClick}   >
+            <TouchableOpacity onPress={handleRadiusButtonClick} >
+            <View style={[styles.buttonContainer]}>
+              <Text style={styles.button} >Radius</Text>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={handleBudgetButtonClick} >
+            <View style={[styles.buttonContainer]}>
+              <Text style={styles.button} >Budget</Text>
+              </View>
+            </TouchableOpacity>
+
+
+          {/* <TouchableOpacity onPress={handleCategoryButtonClick}   >
               <FontAwesome name="filter" size={normalize(26)} color="#000" />
             </TouchableOpacity>
             <TouchableOpacity onPress={handleRadiusButtonClick}>
             <FontAwesome name="bullseye" size={normalize(26)} color="#000" />
           </TouchableOpacity> */}
-      {/* <Button
+          {/* <Button
         title="Go to Add Item"
         onPress={() => router.replace("/Projects")}
       /> */}
-          </View>
-          <View style={styles.horizontalRule}></View>
-          </View>
-        {(data.length > 0)?(  
-       <View style={styles.header}>
+        </View>
+        <View style={styles.horizontalRule}></View>
+      </View>
+      {(data.length > 0) ? (
+        <View style={styles.header}>
           <View style={styles.projectTitle}>
             <Text style={styles.title}>{data[0].title}</Text>
-          </View>     
-          <View style={{flexDirection:'row', marginTop:10, alignItems:'center'}}>     
-          <Text style={{fontSize:18,}}>By {data[0].userName}</Text> 
-          {(data[0].userType == "professional") &&
-          (
-          <MaterialCommunityIcons name="professional-hexagon" size={30} color="#D8BFD8" />
-          )
-           }
-           </View>
+          </View>
+          <View style={{ flexDirection: 'row', marginTop: 10, alignItems: 'center' }}>
+            <Text style={{ fontSize: 18, }}>By {data[0].userName}</Text>
+            {(data[0].userType == "professional") &&
+              (
+                <MaterialCommunityIcons name="professional-hexagon" size={30} color="#D8BFD8" />
+              )
+            }
+          </View>
           <View style={styles.header2}>
             <View style={styles.header2heart}>
               <Text style={styles.category}><FontAwesome name="heart" size={normalize(20)} color="#FA9BCF" /> {data[0].likes}</Text>
             </View>
             <View style={styles.header2like}>
-              <TouchableOpacity onPress={()=>setModalMessageVisible((data[0].messageCount > 0) ? true : false)}>
-              <Text style={styles.category}><FontAwesome name="comment" size={normalize(20)} color="#a7abb5" /> {data[0].messageCount}</Text>
+              <TouchableOpacity onPress={() => setModalMessageVisible((data[0].messageCount > 0) ? true : false)}>
+                <Text style={styles.category}><FontAwesome name="comment" size={normalize(20)} color="#a7abb5" /> {data[0].messageCount}</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.dollarSpace}></View>
             <Text style={styles.category}> <FontAwesome name="dollar" size={normalize(15)} color="#067d13" />{formatNumber(parseFloat(data[0].cost))} </Text>
           </View>
-          
+
         </View>
-         ) : (<ImageBackground style={{flex:1}} source={require('../../../../assets/images/background.jpg')} imageStyle={{ opacity: 0.3, height:'100%' }}>
-          <View style={{marginTop:100, margin:20, padding:15, borderRadius:12, backgroundColor:'rgba(211, 211, 211, .35)'}}>
-            <Text style={{color:"#654321", fontSize:20, fontWeight:'700', lineHeight:30}}>You have viewed all projects that fit your criteria.{'\n\n'}</Text>
-            <View style={{alignItems:'center'}}>
-              <Text style={{color:"#654321", fontSize:normalize(17), fontWeight:'600',fontStyle:'italic', lineHeight:30}}> Adjust your criteria above to see more.  Or click here to view unlike</Text>
-            </View>
-              <View style={{alignItems:'center'}}> 
-              <Text style={{color:"#654321", fontSize:normalize(17), fontWeight:'600',fontStyle:'italic'}}>
-              Or click here to see unliked projects.</Text>
-            </View>
-          </View>
+      ) : (<EmptyHome onUnlike={fetchData}></EmptyHome>)
+      }
 
-         </ImageBackground>
+      {(data.length > 0) && (
 
-)
-        }
-        
-        {(data.length > 0) &&(  
-
-         <FlatList
-        data={data[0].details.map((item, index) => ({
-          id: `${item.projectDetailId}-${index}`, // Ensuring unique key
-          images: {
-            afterImage: item.afterImage,
-            beforeImage: item.beforeImage,
-          },
-          video: item.video,
-          description: item.description,
-        }))}
-        keyExtractor={item => item.id.toString()}
-        renderItem={({item}) => <ListingDetails 
-        isVisible={isFocused && visibleItems.includes(item.id.toString())}
-        key={item.id} child={item} ></ListingDetails>}
-        onViewableItemsChanged={onViewableItemsChanged}
-        viewabilityConfig={viewabilityConfig}
-        /> )}
-                {(data.length > 0)?( <> 
-      <TouchableOpacity style={styles.floatingButtonLeft} onPress={handleLeftButtonClick}   >
-      <FontAwesome6 name="heart" size={30} color="black" />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.floatingButtonRight}  onPress={() => likeProject(null, false, false)} >
-        <FontAwesome5 name="heart-broken" size={30} color="#000" />
-      </TouchableOpacity></>
-                ):(<></>)}
-      
-     
+        <FlatList
+          data={data[0].details.map((item, index) => ({
+            id: `${item.projectDetailId}-${index}`, // Ensuring unique key
+            images: {
+              afterImage: item.afterImage,
+              beforeImage: item.beforeImage,
+            },
+            video: item.video,
+            description: item.description,
+          }))}
+          keyExtractor={item => item.id.toString()}
+          renderItem={({ item }) => <ListingDetails
+            isVisible={isFocused && visibleItems.includes(item.id.toString())}
+            key={item.id} child={item} ></ListingDetails>}
+          onViewableItemsChanged={onViewableItemsChanged}
+          viewabilityConfig={viewabilityConfig}
+        />)}
+      {(data.length > 0) ? (<>
+        <TouchableOpacity style={styles.floatingButtonLeft} onPress={handleLeftButtonClick}   >
+          <FontAwesome6 name="heart" size={30} color="black" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.floatingButtonRight} onPress={() => likeProject(null, false, false)} >
+          <FontAwesome5 name="heart-broken" size={30} color="#000" />
+        </TouchableOpacity></>
+      ) : (<></>)}
 
 
-      <LikeModal  
+
+
+      <LikeModal
         visible={isLeftModalVisible}
         onClose={() => setLeftModalVisible(false)}
         userType={(data.length > 0) ? data[0].userType : ''}
-         message="Left Button Clicked!"
+        message="Left Button Clicked!"
         onSubmit={(feedback, isLead) => {
-          likeProject(feedback,true, isLead);
+          likeProject(feedback, true, isLead);
         }}
-//        onSubmit={(feedback) => likeProject(feedback, true)} // Pass the callback function with additional parameter
+      //        onSubmit={(feedback) => likeProject(feedback, true)} // Pass the callback function with additional parameter
 
       />
-      <SliderModal type="radius" onValueChange={handleRadiusChange} visible={isRadiusModalVisible} userradius={25} onClose={()=> {setRadiusModalVisible(false);setBind(!bind);}} />
-      <SliderModal type="dollars" onValueChange={handleBudgetChange} visible={isBudgetModalVisible} userradius={100000} onClose={()=> {setBudgetModalVisible(false); setBind(!bind);}} />
+      <SliderModal type="radius" onValueChange={handleRadiusChange} visible={isRadiusModalVisible} userradius={25} onClose={() => { setRadiusModalVisible(false); setBind(!bind); }} />
+      <SliderModal type="dollars" onValueChange={handleBudgetChange} visible={isBudgetModalVisible} userradius={100000} onClose={() => { setBudgetModalVisible(false); setBind(!bind); }} />
       <CheckboxList
         isVisible={isCategoriesModalVisible}
         onClose={handleCategoryButtonClick}
         onSelect={handleSelect}
-        initialSelectedItems={selectedItems.map(item=>item.id)}        
-      />      
-      <MessagesModal onClose={()=>setModalMessageVisible(false)} projectId={(data.length > 0) ? data[0].projectId.toString():0} visible={modalMessageVisible} />
+        initialSelectedItems={selectedItems.map(item => item.id)}
+      />
+      <MessagesModal onClose={() => setModalMessageVisible(false)} projectId={(data.length > 0) ? data[0].projectId.toString() : 0} visible={modalMessageVisible} />
     </SafeAreaView>
 
   );
@@ -351,10 +342,10 @@ const styles = StyleSheet.create({
     paddingBottom: 1
   },
   radiusInput: {
-    borderWidth:1,
-    borderColor:'#000',
-    width:60,
-    marginLeft:10
+    borderWidth: 1,
+    borderColor: '#000',
+    width: 60,
+    marginLeft: 10
   },
   header: {
     // padding: 25,
@@ -366,12 +357,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     marginVertical: 10,
   },
-  projectTitle:{
+  projectTitle: {
 
   },
   header1: {
     flexDirection: 'row',
-    justifyContent:'space-evenly'
+    justifyContent: 'space-evenly'
 
   },
   header2: {
@@ -439,11 +430,11 @@ const styles = StyleSheet.create({
   },
   floatingButtonLeft: {
     position: 'absolute',
-    borderWidth:3,
+    borderWidth: 3,
     bottom: 20,
     left: 20,
     backgroundColor: '#f0f0f0',
-    borderColor:'#B87333',
+    borderColor: '#B87333',
     borderRadius: 50,
     width: 60,
     height: 60,
@@ -456,8 +447,8 @@ const styles = StyleSheet.create({
     bottom: 20,
     right: 20,
     backgroundColor: '#f0f0f0',
-    borderColor:'#B87333',    
-    borderWidth:3,
+    borderColor: '#B87333',
+    borderWidth: 3,
     // backgroundColor: '#c456bb',
     borderRadius: 50,
     width: 60,
@@ -477,16 +468,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  dollarSpace:{
-     width:10
+  dollarSpace: {
+    width: 10
   },
   buttonContainer: {
     backgroundColor: '#e4eaf7',
-    borderColor:'#B87333',
-    borderWidth:1.5,
+    borderColor: '#B87333',
+    borderWidth: 1.5,
     borderRadius: 15, // Rounded edges
-    paddingHorizontal: normalize(15),    
-    paddingVertical:normalize(8),
+    paddingHorizontal: normalize(15),
+    paddingVertical: normalize(8),
     // alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000', // Shadow for a subtle depth effect
@@ -494,15 +485,17 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 0,
     elevation: 5, // For Android shadow
-    color:'#000',
+    color: '#000',
 
 
   },
-  button:{
+  button: {
     fontSize: normalize(12),
     fontWeight: 'black',
-    color:'#000'
-  },});
+    color: '#000'
+  }
+
+});
 
 
 

@@ -27,7 +27,6 @@ const Projects: React.FC = () => {
         if (response.ok) {
           setData(result);
           console.log(data);
-//          console.log(userId);
         } else {
           Alert.alert('Page Load Error', 'Page Load');
         }
@@ -41,7 +40,6 @@ const Projects: React.FC = () => {
     fetchData();
   }, []);
 
-  //   const { userId } = SessionProvider(SessionProvider);
   const renderItem = ({ item }: { item: Project }) => (
 
 
@@ -108,7 +106,7 @@ const Projects: React.FC = () => {
          </ImageBackground>)}
 
 
-        <View style={styles.buttonContainer}>
+
           <TouchableOpacity onPress={() => {
             router.push(
               {
@@ -117,9 +115,10 @@ const Projects: React.FC = () => {
               }
             )
           }} >
+            <View style={styles.buttonContainer}>
             <Text style={styles.button}>Add New Project</Text>
+            </View>
           </TouchableOpacity>
-        </View>
       </View>
     </SafeAreaView>
   );

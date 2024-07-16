@@ -13,8 +13,7 @@ import { ProjectDetails } from '@/interfaces/IProject';
 import GlobalStyles from '@/styles/styles';
 import { formatNumber } from '@/functions/stringfunctions';
 import SliderModal from '@/components/Slider';
-
-
+ 
 
 
 export default function Project() {
@@ -22,12 +21,62 @@ export default function Project() {
   const [modalVisible, setModalVisible] = useState(false);
   const [categories, setCategories] = useState<DropdownItem[]>([]);
   const { data } = useLocalSearchParams();
-  const projectData = data ? JSON.parse(data as string) : null;
+  const initialData = data ? JSON.parse(data as string) : null;
+  const [projectData, setProjectData] = useState(initialData);
   const [cost, setProjectCost] = useState<number>(0);
   const [title, setProjectTitle] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<DropdownItem | null>(null);
   const { userId } = useSession();
   const [isBudgetModalVisible, setBudgetModalVisible] = useState(false);
+  const [isCategoryValid, setCategoryValid] = useState<boolean>(true);
+  const [isProjectNameValid, setProjectNameValid] = useState<boolean>(true);
+  const [isCostValid, setCostValid] = useState<boolean>(true);
+  const [errors, setErrors] = useState<string[]>([]);
+
+
+  const validateCategory = () : boolean =>{
+    if (selectedCategory) {
+        setCategoryValid(true);
+        return true;
+    } else {
+      setCategoryValid(false);
+      return false;
+    }
+  }
+  const validateProjectName = () : boolean =>{
+    if (title.length > 0) {
+        setProjectNameValid(true);
+        return true;
+    } else {
+      setProjectNameValid(false);
+      return false;
+    }
+  }
+
+  const validateCost = () : boolean =>{
+    if (cost > 0) {
+        setCostValid(true);
+        return true;
+    } else {
+      setCostValid(false);
+      return false;
+    }
+  }
+
+  const handleValidation = (): boolean => {
+    const validationErrors: string[] = [];
+
+    if (!validateCategory()) validationErrors.push('Invalid username');
+    if (!validateProjectName()) validationErrors.push('Invalid email');
+    if (!validateCost()) validationErrors.push('Invalid password');
+
+    setErrors(validationErrors);
+
+    // Return true if there are no validation errors
+    return validationErrors.length === 0;
+  };
+
+
 
   const handleBudgetButtonClick = () => {
     setBudgetModalVisible(!isBudgetModalVisible);
@@ -74,17 +123,16 @@ export default function Project() {
   // }, [selectedCategory]);
 
   const AddProject = async () => {
-    if (!selectedCategory) {
-      console.log('No category selected');
-      return;
-    }
+    const isValid = handleValidation();
+    if (isValid) 
+    {
 
     const json = {
       id: projectId,
-      categoryId: selectedCategory.id,
+      categoryId: selectedCategory?.id,
       title: title,
       cost: cost.toString(),
-      categoryName: selectedCategory.description,
+      categoryName: selectedCategory?.description,
       userId: userId
     };
  
@@ -99,18 +147,22 @@ export default function Project() {
         body: JSON.stringify(json),
       });
 
-      const responseText = await response.text();
+      // const response = await fetchWithAuth(url);
+      // const result: Project[] = await response.json();
+
+      const responseText = await response.json();
 
       if (!response.ok) {
         throw new Error(`Network response was not ok: ${responseText}`);
       }
-
-      console.log('Project added successfully:', responseText);
-      router.replace('/projects/Projects');
+      console.log(responseText);
+      setProjectData(responseText);
+      console.log(projectData);
     } catch (error) {
       console.error('Failed to add project:', error);
     }
-  };
+  }
+};
 
   const renderItem = ({ item }: { item: any }) => <ListItem item={item} onDelete={function (id: number): void {
     throw new Error('Function not implemented.');
@@ -133,27 +185,38 @@ export default function Project() {
             setValue={selectedCategory}
             onSelect={item => {
               setSelectedCategory(item);
-            }}
+
+            }}            
           />
+           {!isCategoryValid &&
+            (<Text style={{ color: 'red' }}>Please choose a category.</Text>)}
           <Text style={styles.label}>Project Name</Text>
           <TextInput
             placeholder="Project Name"
-            style={styles.input}
             value={title}
-            onChangeText={setProjectTitle}
+            onChangeText={(text) => {setProjectTitle(text); validateProjectName();}}
+            onKeyPress={validateProjectName}
+            style={[styles.input, !isProjectNameValid && styles.inputError]}
+            // onBlur={validateProjectName}
           />
+          {!isProjectNameValid &&
+            (<Text style={{ color: 'red' }}>Project Name is required.</Text>)}
           <Text style={styles.label}>Cost</Text>
           <TouchableOpacity
         onPress={() => setBudgetModalVisible(true)}>
           <TextInput
             placeholder="Project Cost"
             keyboardType='number-pad'
-            style={styles.input}
             value={"$" + formatNumber(cost)}
             onChangeText={setProjectCost}
             editable={false}
-            pointerEvents="none"            
+            pointerEvents="none"
+            style={[styles.input, !isCostValid && styles.inputError]}
+                        
           />
+            {!isCostValid &&
+            (<Text style={{ color: 'red' }}>Project cost must be {'>'} 0.</Text>)}
+
           </TouchableOpacity>
             <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
             <TouchableOpacity onPress={AddProject}>
@@ -161,6 +224,9 @@ export default function Project() {
               <Text style={GlobalStyles.button}>Save</Text>
               </View>
             </TouchableOpacity>
+            {!projectData  && <Text>Nope</Text>}
+            {projectData  && <Text>Yup</Text>}
+
             <TouchableOpacity onPress={() => {
               router.push({
                 pathname: '/projects/test',
@@ -192,7 +258,7 @@ export default function Project() {
                contentContainerStyle={styles.verticalFlatListContainer}                  
               /></>) : (<><Text>Give your project some details to start getting noticed. </Text></>)}
       </ScrollView>
-      <SliderModal type="dollars" onValueChange={handleBudgetChange} visible={isBudgetModalVisible} userradius={cost} onClose={()=> {setBudgetModalVisible(false);}} />
+      <SliderModal type="dollars" onValueChange={handleBudgetChange} visible={isBudgetModalVisible} userradius={cost} onClose={()=> {setBudgetModalVisible(false);validateCost();}} />
     </SafeAreaView>
   );
 }
@@ -323,5 +389,9 @@ const styles = StyleSheet.create({
   },
   horizontalFlatListContainer: {
     paddingHorizontal: 10,
+  },
+  inputError: {
+    borderColor: 'red',
+    color: 'red'
   },
 });
