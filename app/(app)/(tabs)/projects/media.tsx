@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput,Image, Alert, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, Image, Alert, TouchableOpacity, ScrollView } from 'react-native';
 import { Button, Provider, Card, IconButton } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
 import CameraButton from '@/components/CameraButton';
@@ -99,7 +99,7 @@ const App: React.FC = () => {
             updatedProjectData.details = [...updatedProjectData.details, responseData];
             setItems(updatedProjectData.details);
             console.log(projectData.details);
-    
+
         } catch (error) {
             console.error('There was a problem with the fetch operation:', error);
         }
@@ -132,40 +132,45 @@ const App: React.FC = () => {
                         <View style={styles.photoBox}>
                             <Text style={{ marginBottom: normalize(10) }}>Show off your work with before and after pics </Text>
                             <View style={styles.photoRow}>
-                                <CameraButton label="After" onPress={() => pickImage(setAfterImage, ImagePicker.MediaTypeOptions.Images)} imageUri={afterImage?.uri || null} />
-                                <View style={{width:50}}></View>
-                                <CameraButton label="Before" onPress={() => pickImage(setBeforeImage, ImagePicker.MediaTypeOptions.Images)} imageUri={beforeImage?.uri || null} />
+                                <CameraButton label="Photo" onPress={() => pickImage(setAfterImage, ImagePicker.MediaTypeOptions.Images)} imageUri={afterImage?.uri || null} />
+                                <View style={{ width: 50 }}></View>
+                                {afterImage &&
+                                    <CameraButton label="Before" onPress={() => pickImage(setBeforeImage, ImagePicker.MediaTypeOptions.Images)} imageUri={beforeImage?.uri || null} />
+                                }
                             </View>
                         </View>
                         <View style={styles.videoBox}>
                             <Text style={{ marginBottom: 10 }}>Upload a Video </Text>
                             <View style={styles.photoRow}>
-                            <VideoButton label="Video" onPress={() => pickImage(setVideo, ImagePicker.MediaTypeOptions.Videos)} videoUri={videoUri?.uri || null} />
+                                <VideoButton label="Video" onPress={() => pickImage(setVideo, ImagePicker.MediaTypeOptions.Videos)} videoUri={videoUri?.uri || null} />
                             </View>
                         </View>
-                        <View style={{margin:10}}>
-                        <TextInput
-                            placeholder="Give it some life..."
-                            value={description}
-                            onChangeText={setDescription}
-                            style={styles.input}
-                            multiline={true}
-                            maxLength={500}
-                        />
+                        <View style={{ margin: 10 }}>
+                            <TextInput
+                                placeholder="Give it some life..."
+                                value={description}
+                                onChangeText={setDescription}
+                                style={styles.input}
+                                multiline={true}
+                                maxLength={500}
+                            />
                         </View>
 
                         <View style={styles.buttons}>
-                            <View style={styles.buttonContainer}>
-                                <TouchableOpacity onPress={addItem}>
+                            <TouchableOpacity style={{ flex: 1 }} onPress={addItem}>
+                                <View style={styles.buttonContainer}>
                                     <Text style={styles.button}>Add</Text>
-                                </TouchableOpacity>
-                            </View>
-                            <View style={styles.space} />
-                            <View style={styles.buttonContainer}>
-                                <TouchableOpacity onPress={Cancel}>
+                                </View>
+                            </TouchableOpacity>
+
+                            {/* <View style={styles.space} /> */}
+                            <TouchableOpacity style={{ flex: 1 }} onPress={Cancel}>
+                                <View style={styles.buttonContainer}>
+
                                     <Text style={styles.button}>Cancel</Text>
-                                </TouchableOpacity>
-                            </View>
+                                </View>
+
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </ScrollView>
@@ -181,49 +186,50 @@ const styles = StyleSheet.create({
     },
     buttons: {
         flexDirection: 'row',
+        width: null,
         justifyContent: 'space-evenly',
-        padding: 30,
+        
     },
     buttonContainer: {
-        backgroundColor: '#e4eaf7',
+        backgroundColor: '#FFF',
+        borderRadius: 8,
+        height: 50,
+        borderWidth: 2,
         borderColor: '#B87333',
-        borderWidth: 1.5,
-        borderRadius: 15,
-        padding: 20,
-        justifyContent: 'center',
-        paddingVertical: 8,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 0,
-        elevation: 5,
         color: '#000',
-        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+        margin: 10
+
     },
     button: {
         fontSize: 18,
-        fontWeight: 'black',
+        fontWeight: 'bold',
         color: '#000',
     },
     photoBox: {
         margin: normalize(10),
-        borderWidth: 0.5,
+        borderWidth: 2,
         padding: normalize(5),
         borderRadius: 10,
         marginBottom: normalize(10),
-    },
-    photoRow: {
-        flexDirection: 'row',
-        marginLeft:20
+        borderColor:"#fff",
+        
     },
     videoBox: {
         margin: normalize(10),
-        borderWidth: 0.5,
+        borderWidth: 2,
+        borderColor:"#fff",
         padding: normalize(5),
         borderRadius: 10,
         marginBottom: normalize(10),
-        
+
     },
+    photoRow: {
+        flexDirection: 'row',
+        marginLeft: 20
+    },
+
     form: {
         marginTop: normalize(20),
     },
@@ -231,15 +237,16 @@ const styles = StyleSheet.create({
         textAlignVertical: 'top',
         height: normalize(200),
         borderColor: '#fff',
-        backgroundColor: 'rgba(255, 255, 255, 0.3)',
+        backgroundColor: 'rgba(255, 255, 255, .6)',
         borderRadius: 10,
         shadowColor: '#000',
         color: '#000',
+        padding:10,
         // elevation: 5,
         borderWidth: normalize(1),
     },
     space: {
-        width: normalize(40),
+        width: normalize(20),
     }
 });
 

@@ -9,20 +9,18 @@ import { useLocalSearchParams } from 'expo-router';
 import ListItem from '@/components/projectDeatailsFlatList';
 import fetchWithAuth from '@/context/FetchWithAuth';
 import { FontAwesome } from '@expo/vector-icons';
-import { ProjectDetails } from '@/interfaces/IProject';
+import { ProjectDetails, Project } from '@/interfaces/IProject';
 import GlobalStyles from '@/styles/styles';
 import { formatNumber } from '@/functions/stringfunctions';
 import SliderModal from '@/components/Slider';
- 
 
-
-export default function Project() {
+export default function ProjectComponent() {
   const [projectId, setProjectId] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
   const [categories, setCategories] = useState<DropdownItem[]>([]);
   const { data } = useLocalSearchParams();
   const initialData = data ? JSON.parse(data as string) : null;
-  const [projectData, setProjectData] = useState(initialData);
+  const [projectData, setProjectData] = useState<Project>(initialData);
   const [cost, setProjectCost] = useState<number>(0);
   const [title, setProjectTitle] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<DropdownItem | null>(null);
@@ -33,62 +31,60 @@ export default function Project() {
   const [isCostValid, setCostValid] = useState<boolean>(true);
   const [errors, setErrors] = useState<string[]>([]);
 
-
-  const validateCategory = () : boolean =>{
+  const validateCategory = (): boolean => {
     if (selectedCategory) {
-        setCategoryValid(true);
-        return true;
+      setCategoryValid(true);
+      return true;
     } else {
       setCategoryValid(false);
       return false;
     }
-  }
-  const validateProjectName = () : boolean =>{
+  };
+
+  const validateProjectName = (): boolean => {
     if (title.length > 0) {
-        setProjectNameValid(true);
-        return true;
+      setProjectNameValid(true);
+      return true;
     } else {
       setProjectNameValid(false);
       return false;
     }
-  }
+  };
 
-  const validateCost = () : boolean =>{
+  const validateCost = (): boolean => {
     if (cost > 0) {
-        setCostValid(true);
-        return true;
+      setCostValid(true);
+      return true;
     } else {
       setCostValid(false);
       return false;
     }
-  }
+  };
 
   const handleValidation = (): boolean => {
     const validationErrors: string[] = [];
 
-    if (!validateCategory()) validationErrors.push('Invalid username');
-    if (!validateProjectName()) validationErrors.push('Invalid email');
-    if (!validateCost()) validationErrors.push('Invalid password');
+    if (!validateCategory()) validationErrors.push('Invalid category');
+    if (!validateProjectName()) validationErrors.push('Invalid project name');
+    if (!validateCost()) validationErrors.push('Invalid cost');
 
     setErrors(validationErrors);
 
-    // Return true if there are no validation errors
     return validationErrors.length === 0;
   };
-
-
 
   const handleBudgetButtonClick = () => {
     setBudgetModalVisible(!isBudgetModalVisible);
   };
-  const handleBudgetChange = (value:number) => {
+
+  const handleBudgetChange = (value: number) => {
     setProjectCost(value);
   };
 
   useEffect(() => {
     if (projectData) {
       if (projectData.cost !== undefined) {
-        setProjectCost(projectData.cost.toString());
+        setProjectCost(parseInt(projectData.cost));
       }
       setProjectTitle(projectData.title);
       setProjectId(projectData.projectId);
@@ -118,147 +114,145 @@ export default function Project() {
     fetchCategories();
   }, []);
 
-  // useEffect(() => {
-  //   console.log('Selected category updated:', selectedCategory);
-  // }, [selectedCategory]);
+  useEffect(() => {
+//    console.log('Project Data Updated:', projectData);
+    setProjectId(projectData?.projectId);
+  }, [projectData]);
 
   const AddProject = async () => {
+
     const isValid = handleValidation();
-    if (isValid) 
-    {
+    if (isValid) {
+      const json = {
+        id: projectId,
+        categoryId: selectedCategory?.id,
+        title: title,
+        cost: cost.toString(),
+        categoryName: selectedCategory?.description,
+        userId: userId
+      };
 
-    const json = {
-      id: projectId,
-      categoryId: selectedCategory?.id,
-      title: title,
-      cost: cost.toString(),
-      categoryName: selectedCategory?.description,
-      userId: userId
-    };
- 
+      try {
+        const response = await fetchWithAuth(BASE_URL + '/api/projects', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(json),
+        });
+        const result : Project = await response.json();
 
+        if (response.ok) {
+          setProjectData(result);
+          console.log(projectData);
 
-    try {
-      const response = await fetchWithAuth(BASE_URL + '/api/projects', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(json),
-      });
+        } else {
+          Alert.alert('Page Load Error', 'Page Load');
+        }
 
-      // const response = await fetchWithAuth(url);
-      // const result: Project[] = await response.json();
+        if (!response.ok) {
+          throw new Error(`Network response was not ok: ${result.message}`);
+        }
 
-      const responseText = await response.json();
-
-      if (!response.ok) {
-        throw new Error(`Network response was not ok: ${responseText}`);
+        setProjectData(result);
+        console.log(projectData);
+      } catch (error) {
+        console.error('Failed to add project:', error);
       }
-      console.log(responseText);
-      setProjectData(responseText);
-      console.log(projectData);
-    } catch (error) {
-      console.error('Failed to add project:', error);
     }
-  }
-};
+  };
 
-  const renderItem = ({ item }: { item: any }) => <ListItem item={item} onDelete={function (id: number): void {
-    throw new Error('Function not implemented.');
-  } } />;
+  const renderItem = ({ item }: { item: any }) => (
+    <ListItem
+      item={item}
+      onDelete={(id: number) => {
+        // Implement delete function if needed
+      }}
+    />
+  );
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <Text style={{marginLeft:20}} onPress={() => { router.replace('/projects/Projects'); }}>
+      <Text style={{ marginLeft: 20 }} onPress={() => { router.replace('/projects/Projects'); }}>
         <FontAwesome name="arrow-left" /> Projects
       </Text>
-      <ScrollView  style={styles.scrollContainer}>
-        <Text style={{fontWeight:'bold'}}>Build a project. Get Dollars. Or just show off a bit.</Text>
+      <ScrollView style={styles.scrollContainer}>
+        <Text style={{ fontWeight: 'bold' }}>Build a project. Get Dollars. Or just show off a bit.</Text>
         <View style={styles.horizontalRule} />
 
         <View style={styles.inputView}>
           <Text style={styles.label}>Category</Text>
           <DropdownInput
-            data={categories}            
-            //placeholder="Select a Category"
+            data={categories}
             setValue={selectedCategory}
             onSelect={item => {
               setSelectedCategory(item);
-
-            }}            
+            }}
           />
-           {!isCategoryValid &&
-            (<Text style={{ color: 'red' }}>Please choose a category.</Text>)}
+          {!isCategoryValid && (<Text style={{ color: 'red' }}>Please choose a category.</Text>)}
+
           <Text style={styles.label}>Project Name</Text>
           <TextInput
             placeholder="Project Name"
             value={title}
-            onChangeText={(text) => {setProjectTitle(text); validateProjectName();}}
-            onKeyPress={validateProjectName}
+            onChangeText={(text) => { setProjectTitle(text); validateProjectName(); }}
             style={[styles.input, !isProjectNameValid && styles.inputError]}
-            // onBlur={validateProjectName}
           />
-          {!isProjectNameValid &&
-            (<Text style={{ color: 'red' }}>Project Name is required.</Text>)}
-          <Text style={styles.label}>Cost</Text>
-          <TouchableOpacity
-        onPress={() => setBudgetModalVisible(true)}>
-          <TextInput
-            placeholder="Project Cost"
-            keyboardType='number-pad'
-            value={"$" + formatNumber(cost)}
-            onChangeText={setProjectCost}
-            editable={false}
-            pointerEvents="none"
-            style={[styles.input, !isCostValid && styles.inputError]}
-                        
-          />
-            {!isCostValid &&
-            (<Text style={{ color: 'red' }}>Project cost must be {'>'} 0.</Text>)}
+          {!isProjectNameValid && (<Text style={{ color: 'red' }}>Project Name is required.</Text>)}
 
+          <Text style={styles.label}>Cost</Text>
+          <TouchableOpacity onPress={() => setBudgetModalVisible(true)}>
+            <TextInput
+              placeholder="Project Cost"
+              keyboardType='number-pad'
+              value={"$" + formatNumber(cost)}
+              editable={false}
+              pointerEvents="none"
+              style={[styles.input, !isCostValid && styles.inputError]}
+            />
+            {!isCostValid && (<Text style={{ color: 'red' }}>Project cost must be {'>'} 0.</Text>)}
           </TouchableOpacity>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
-            <TouchableOpacity onPress={AddProject}>
-              <View style={GlobalStyles.buttonContainer}>
-              <Text style={GlobalStyles.button}>Save</Text>
+          </View>
+
+          <View style={{ flexDirection: 'row', width:'100%', justifyContent:'space-evenly' }}>
+            <TouchableOpacity onPress={AddProject} style={{flex:1}}>
+              <View style={styles.buttonContainer}>
+                <Text style={styles.button}>Save</Text>
               </View>
             </TouchableOpacity>
-            {!projectData  && <Text>Nope</Text>}
-            {projectData  && <Text>Yup</Text>}
+            {projectData && 
 
-            <TouchableOpacity onPress={() => {
+            <TouchableOpacity style={{flex:1}} onPress={() => {
               router.push({
-                pathname: '/projects/test',
+                pathname: '/projects/media',
                 params: { data: JSON.stringify(projectData) }
               });
             }}>
-              <View style={GlobalStyles.buttonContainer}>
-              <Text style={GlobalStyles.button}>Add Media</Text>
+              <View style={styles.buttonContainer}>
+                <Text style={styles.button}>Add Media</Text>
               </View>
             </TouchableOpacity>
-          </View> 
+            }
+        </View>
 
-          </View>
+        <View style={[styles.horizontalRule, { height: 20 }]} />
 
-          <View style={[styles.horizontalRule, {height:20}]} />
-
-          {(projectData) ? 
-          (
-          <>  
-          <Text>Media</Text>
-          <FlatList
+        {projectData ? (
+          <>
+            <Text>Media</Text>
+            <FlatList
               scrollEnabled={false}
               data={projectData.details}
               keyExtractor={(item) => item.projectDetailId.toString()}
-              renderItem={({ item }) => <ListItem item={item} onDelete={function (id: number): void {
-                throw new Error('Function not implemented.');
-              } } 
-              />}
-               contentContainerStyle={styles.verticalFlatListContainer}                  
-              /></>) : (<><Text>Give your project some details to start getting noticed. </Text></>)}
+              renderItem={renderItem}
+              contentContainerStyle={styles.verticalFlatListContainer}
+            />
+          </>
+        ) : (
+          <><Text>Give your project some details to start getting noticed. </Text></>
+        )}
       </ScrollView>
-      <SliderModal type="dollars" onValueChange={handleBudgetChange} visible={isBudgetModalVisible} userradius={cost} onClose={()=> {setBudgetModalVisible(false);validateCost();}} />
+      <SliderModal type="dollars" onValueChange={handleBudgetChange} visible={isBudgetModalVisible} userradius={cost} onClose={() => { setBudgetModalVisible(false); validateCost(); }} />
     </SafeAreaView>
   );
 }
@@ -266,8 +260,7 @@ export default function Project() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: 'rgba(221, 221, 221, 1)', //
-//    margin: 20,
+    backgroundColor: 'rgba(221, 221, 221, .5)',
   },
   FLImage: {
     width: 100,
@@ -277,7 +270,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row'
   },
   scrollContainer: {
-    padding: 20,
+    padding: 10,
   },
   horizontalRule: {
     borderBottomColor: '#ccc',
@@ -285,55 +278,39 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   buttonContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFF',
+    borderRadius: 8, 
+    height: 50,
+    borderWidth: 2,
     borderColor: '#B87333',
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 0,
-    elevation: 5,
-    width: '100%'
+    color: '#000',
+    justifyContent:'center',
+    alignItems:'center',
+    margin : 10
+
   },
-  touchable: {
-    flexDirection: 'row',
-    width: '100%'
+  button: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000',
   },
   separator: {
     width: '100%',
     backgroundColor: 'black',
     alignSelf: 'stretch',
   },
-  button: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000'
-  },
-  buttons: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    padding: 30,
-  },
   photos: {
     height: '50%',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  inputView: {
-    // height: '50%',
-  },
   label: {
-    color:'#B87333',
+    color: '#B87333',
     marginBottom: 5,
     marginTop: 15,
-    fontWeight:'bold'
+    fontWeight: 'bold'
   },
-  input: {    
+  input: {
     height: normalize(40),
     borderColor: '#fff',
     borderRadius: 10,
@@ -375,8 +352,7 @@ const styles = StyleSheet.create({
   },
   verticalFlatListContainer: {
     paddingVertical: 10,
-    justifyContent:'flex-start',
-//    alignSelf:'center'
+    justifyContent: 'flex-start',
   },
   rowContainer: {
     marginVertical: 10,

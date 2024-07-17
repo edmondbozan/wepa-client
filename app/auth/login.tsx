@@ -16,6 +16,9 @@ export default function SignIn() {
     router.push('/auth/register');
   };
 
+  const handleForgot = async () => {
+    router.push('/auth/reset');
+  };
   const handleLogin = async () => {
     try {
       const response = await fetch(BASE_URL + '/api/auth/login', {
@@ -79,6 +82,9 @@ export default function SignIn() {
           />
           <TouchableOpacity style={styles.button} onPress={handleLogin}>           
             <Text style={styles.buttonText}>SIGN IN</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={handleForgot}>           
+            <Text style={styles.buttonText}>FORGOT PASSWORD</Text>
           </TouchableOpacity>
         </View>
       </ImageBackground>

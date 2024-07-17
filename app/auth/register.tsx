@@ -272,25 +272,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 10,
   },
-  radioSelected: {
-    height: 20,
-    width: 20,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#B87333',
-    backgroundColor: '#B87333',
-    marginRight: 5,
-
-  },
-  radioUnselected: {
-    height: 20,
-    width: 20,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: 'black',
-    backgroundColor: 'white',
-    marginRight: 5,
-  },
   label: {
     color: '#B87333',
     marginBottom: 5,
@@ -305,7 +286,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingHorizontal: 10,
     color: '#000',
-    backgroundColor: 'rgba(255, 255, 255, 0.3)', // White background with transparency
+    backgroundColor: 'rgba(255, 255, 255, 0.3)', 
     borderRadius: 5,
   },
   inputError: {

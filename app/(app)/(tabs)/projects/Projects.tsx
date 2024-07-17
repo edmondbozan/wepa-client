@@ -3,7 +3,7 @@ import { View, Text, FlatList, StyleSheet, ImageBackground, Alert, SafeAreaView,
 import { SessionProvider, useSession } from '@/context/ctx';
 import fetchWithAuth from '@/context/FetchWithAuth';
 import { BASE_URL } from '@/constants/Endpoints';
-import { Project } from '@/interfaces/IProject';
+import { Project, ProjectDetails } from '@/interfaces/IProject';
 import { FontAwesome } from '@expo/vector-icons';
 import { normalize } from 'react-native-elements';
 import { router } from 'expo-router';
@@ -40,21 +40,26 @@ const Projects: React.FC = () => {
     fetchData();
   }, []);
 
-  const renderItem = ({ item }: { item: Project }) => (
+  const findFirstNonNullAfterImage = (details: ProjectDetails[]): string | null => {
+    const detail = details.find(detail => detail.afterImage !== null);
+    return detail?.afterImage || null;
+  };
 
-
-    <View style={styles.projectContainer}>
+  const renderItem = ({ item }: { item: Project }) => {
+    const imageUri = findFirstNonNullAfterImage(item.details);
+  return (
+   <View style={styles.projectContainer}>
       <TouchableOpacity onPress={() => router.push({
         pathname: '/projects/project',
         params: { data: JSON.stringify(item) }
       })}
       >
         <ImageBackground
-          source={
-            (item.details[0]?.afterImage != null)
-              ? { uri: item.details[0].afterImage }
-              : require('../../../../assets/images/background.jpg')
-          }
+        source={
+          imageUri
+            ? { uri: imageUri }
+            : require('../../../../assets/images/background.jpg')
+        }
           style={styles.backgroundImage}
           imageStyle={{ borderRadius: 8 }}
         >
@@ -78,8 +83,8 @@ const Projects: React.FC = () => {
         </ImageBackground>
       </TouchableOpacity>
     </View>
-
   );
+};
 
   return (
     <SafeAreaView style={{flex:1}}>

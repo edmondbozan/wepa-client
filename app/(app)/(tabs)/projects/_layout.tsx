@@ -13,7 +13,7 @@ const ProjectLayout = () => {
             options={{
                 headerShown: false
             }} /><Stack.Screen
-            name="test"
+            name="media"
             options={{
                 headerShown: false
             }} />

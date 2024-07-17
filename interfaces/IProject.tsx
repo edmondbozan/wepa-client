@@ -1,10 +1,3 @@
-export interface ProjectDetails {
-    projectDetailId: number;
-    description: string | null;
-    afterImage: string | null;
-    beforeImage:string | null;
-    video:string | null
-  }
   
 
   export interface ProjectDisplayDetails {
@@ -33,7 +26,14 @@ export  interface Project {
         details: ProjectDetails[]
       }
 
-
+      export interface ProjectDetails {
+        projectDetailId: number;
+        description: string | null;
+        afterImage: string | null;
+        beforeImage:string | null;
+        video:string | null
+      }
+    
 
     
   
