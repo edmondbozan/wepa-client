@@ -5,7 +5,7 @@ import { GestureHandlerRootView, TapGestureHandler, State, TapGestureHandlerStat
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
 import LikeModal from '@/components/LikeModal';
 import ListingDetails from '@/components/listingDetails';
-import normalize from '@/fonts/fonts'
+import {normalize} from 'react-native-elements'
 import CheckboxList, { Item } from '@/components/test'
 import SliderModal from '@/components/Slider';
 import { BASE_URL } from '@/constants/Endpoints'
@@ -24,7 +24,7 @@ interface QueryParams {
 
 // import Icon from 'react-native-vector-icons/FontAwesome';
 export default function App() {
-  const [scrollY, setScrollY] = useState(0);
+  // const [scrollY, setScrollY] = useState(0);
   const [isLeftModalVisible, setLeftModalVisible] = useState(false);
   const [isCategoriesModalVisible, setCategoriesModalVisible] = useState(false);
   const [isRadiusModalVisible, setRadiusModalVisible] = useState(false);
@@ -34,7 +34,8 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [selectedItems, setSelectedItems] = useState<Item[]>([]);
   const { signOut, userId } = useSession();
-  const scrollViewRef = useRef<ScrollView>(null);
+//  const scrollViewRef = useRef<ScrollView>(null);
+  const flatListRef = React.useRef<FlatList>(null)
   const [visibleItems, setVisibleItems] = useState([]);
   const isFocused = useIsFocused();
   const [radius, setRadius] = useState<number>(100);
@@ -73,7 +74,8 @@ export default function App() {
       const result: Project[] = await response.json();
       if (response.ok) {
         setData(result);
-        scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+        console.log("scrooll to");
+        flatListRef.current?.scrollToOffset({ animated: true, offset: 0 })
 
       } else {
         Alert.alert('Page Load Error', 'Page Load');
@@ -194,14 +196,17 @@ export default function App() {
   if (error) {
     return (
       <View style={styles.errorContainer}>
-        <Text>{JSON.stringify(error)}</Text>
+        <Text>Server Error</Text>
+        <TouchableOpacity onPress={fetchData} style={styles.buttonContainer}>
+          <Text>Reload</Text>
+        </TouchableOpacity>
       </View>
     );
   }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <View style={styles.header}>
+      <View style={styles.headerFilters}>
         {/* Header Line 1 */}
         <View style={styles.header1}>
           <TouchableOpacity onPress={handleSettingsClick} >
@@ -217,17 +222,17 @@ export default function App() {
             </View>
           </TouchableOpacity>
 
-            <TouchableOpacity onPress={handleRadiusButtonClick} >
+          <TouchableOpacity onPress={handleRadiusButtonClick} >
             <View style={[styles.buttonContainer]}>
               <Text style={styles.button} >Radius</Text>
-              </View>
-            </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
 
-            <TouchableOpacity onPress={handleBudgetButtonClick} >
+          <TouchableOpacity onPress={handleBudgetButtonClick} >
             <View style={[styles.buttonContainer]}>
               <Text style={styles.button} >Budget</Text>
-              </View>
-            </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
 
 
           {/* <TouchableOpacity onPress={handleCategoryButtonClick}   >
@@ -248,11 +253,11 @@ export default function App() {
           <View style={styles.projectTitle}>
             <Text style={styles.title}>{data[0].title}</Text>
           </View>
-          <View style={{ flexDirection: 'row', marginTop: 10, alignItems: 'center' }}>
-            <Text style={{ fontSize: 18, }}>By {data[0].userName}</Text>
+          <View style={{ flexDirection: 'row', marginTop: normalize(10), alignItems: 'center' }}>
+            <Text style={{ fontSize: normalize(14), }}>By {data[0].userName}</Text>
             {(data[0].userType == "professional") &&
               (
-                <MaterialCommunityIcons name="professional-hexagon" size={30} color="#D8BFD8" />
+                <MaterialCommunityIcons name="professional-hexagon" size={normalize(30)} color="#D8BFD8" />
               )
             }
           </View>
@@ -285,6 +290,7 @@ export default function App() {
             video: item.video,
             description: item.description,
           }))}
+          ref={flatListRef}
           keyExtractor={item => item.id.toString()}
           renderItem={({ item }) => <ListingDetails
             isVisible={isFocused && visibleItems.includes(item.id.toString())}
@@ -331,47 +337,54 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: {
-    margin: 25,
+    margin: normalize(25),
     flex: 1,
     backgroundColor: '#F0F0F0',
   },
   filterbar: {
     flexDirection: "row",
     backgroundColor: "#d3d3d3",
-    paddingLeft: 25,
-    paddingBottom: 1
+    paddingLeft: normalize(25),
+    paddingBottom: normalize(1)
   },
   radiusInput: {
     borderWidth: 1,
     borderColor: '#000',
-    width: 60,
-    marginLeft: 10
+    width: normalize(60),
+    marginLeft: normalize(10)
   },
   header: {
     // padding: 25,
     justifyContent: 'space-evenly',
-    marginLeft: 15,
+   // marginTop: 0,
+    marginLeft: normalize(15),
+  },
+  headerFilters: {
+    // padding: 25,
+    justifyContent: 'space-evenly',
+   // marginTop: 0,
+    margin: normalize(15),
   },
   horizontalRule: {
     borderBottomColor: '#ccc',
     borderBottomWidth: 1,
-    marginVertical: 10,
+    marginVertical: normalize(10),
   },
   projectTitle: {
 
   },
   header1: {
     flexDirection: 'row',
-    justifyContent: 'space-evenly'
+    justifyContent: 'space-around'
 
   },
   header2: {
-    paddingTop: 12,
+    paddingTop: normalize(12),
     flexDirection: "row",
   },
   header2heart: {
     flexDirection: 'row',
-    paddingRight: 20
+    paddingRight: normalize(20)
 
   },
   header2like: {
@@ -398,25 +411,23 @@ const styles = StyleSheet.create({
   containerImage: {
     backgroundColor: '#000',
     borderRadius: 18,
-    margin: 10,
-
-
+    margin: normalize(10),
   },
 
   image: {
-    width: '100%',
-    height: 440,
-    borderRadius: 18,
+    // width: '100%',
+    // height: 440,
+    // borderRadius: 18,
   },
   card: {
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    overflow: 'hidden',
-    backgroundColor: '#fff',
-    margin: 10,
-    padding: 15,
-    fontWeight: 900
+    // borderRadius: 18,
+    // borderWidth: 1,
+    // borderColor: '#ddd',
+    // overflow: 'hidden',
+    // backgroundColor: '#fff',
+    // margin: 10,
+    // padding: 15,
+    // fontWeight: 900
   },
   cardImage: {
     // width: '100%',
@@ -469,7 +480,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   dollarSpace: {
-    width: 10
+    width: normalize(10)
   },
   buttonContainer: {
     backgroundColor: '#e4eaf7',
@@ -478,9 +489,9 @@ const styles = StyleSheet.create({
     borderRadius: 15, // Rounded edges
     paddingHorizontal: normalize(15),
     paddingVertical: normalize(8),
-    // alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000', // Shadow for a subtle depth effect
+     alignItems: 'center',
+     justifyContent: 'space-evenly',
+    shadowColor: '#000', 
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 0,

@@ -1,9 +1,11 @@
 import React from 'react';
-import { Modal, View, Text, StyleSheet, TextInput, Switch } from 'react-native';
+import { Modal, View, Text, StyleSheet, TextInput, Switch, ScrollView, KeyboardAvoidingView, Platform, Dimensions } from 'react-native';
 import { FontAwesome, FontAwesome6 } from '@expo/vector-icons';
 import { GestureHandlerRootView, TouchableOpacity } from 'react-native-gesture-handler';
 import GlobalStyles from '@/styles/styles';
 import { Checkbox } from 'react-native-paper';
+import { normalize } from 'react-native-elements';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface LikeModalProps {
   visible: boolean;
@@ -12,6 +14,8 @@ interface LikeModalProps {
   userType:string;
   onSubmit: (feedback: string, share: boolean) => void;
 }
+
+
 
 const LikeModal: React.FC<LikeModalProps> = ({ visible, onClose, message, userType, onSubmit }) => {
   const [feedback, setFeedback] = React.useState('');
@@ -31,12 +35,14 @@ const LikeModal: React.FC<LikeModalProps> = ({ visible, onClose, message, userTy
 
   return (
     <Modal
-      animationType="slide"
+      animationType="slide"      
       transparent={true}
       visible={visible}
-      onRequestClose={onClose}
+      onRequestClose={onClose}      
+      style={{width:'100%'}}
     >
-      <GestureHandlerRootView style={styles.centeredView}>
+      <ScrollView  automaticallyAdjustKeyboardInsets={true}>
+      <GestureHandlerRootView>
         <View style={styles.modalView}>
             {userType=="professional"  && 
            (<View style={{flexDirection:'row', alignItems:'center', marginRight:20}}>
@@ -47,8 +53,8 @@ const LikeModal: React.FC<LikeModalProps> = ({ visible, onClose, message, userTy
          onValueChange={toggleSwitch}
          value={share}
       />
-      <Text> 
-            <Text style={{fontWeight:'bold', color:'#B87333'}}>{share?' Share ':' Do not share '}</Text>
+      <Text style={{fontSize:normalize(14)}}> 
+            <Text style={{ fontWeight:'bold', color:'#B87333'}}>{share?' Share ':' Do not share '}</Text>
             <Text>my info with this pro.</Text>
       </Text>
       </View>
@@ -78,6 +84,7 @@ const LikeModal: React.FC<LikeModalProps> = ({ visible, onClose, message, userTy
           </View>
         </View>
       </GestureHandlerRootView>
+      </ScrollView>
     </Modal>
   );
 };
@@ -86,13 +93,14 @@ const styles = StyleSheet.create({
   centeredView: {
     flex: 1,
     justifyContent: 'center',
-    marginTop: 22,
+    marginTop: normalize(121),
   },
   modalView: {
-    margin: 20,
-    backgroundColor: 'white',
+    marginVertical:normalize(128),
+    margin: 10,
     borderRadius: 20,
-    padding: 35,
+    padding: 30,
+    backgroundColor:'white',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -115,17 +123,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  modalText: {
-    marginBottom: 15,
-  },
   textInput: {
-    height: 100,
+    height: normalize(200),
     borderColor: 'gray',
     borderWidth: 1,
-    marginLeft: 20,
     marginTop: 10,
-    marginBottom:10
-    // paddingLeft: 0,
+    marginBottom:10,
+    padding: 10,
   },
 });
 

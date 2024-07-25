@@ -119,7 +119,7 @@ const Register: React.FC = () => {
 
       const data = await response.json();
       if (response.ok) {
-        await signIn(data.token, JSON.stringify(data.userId), JSON.stringify(data.userType));
+        await signIn(data.token, JSON.stringify(data.userId), data.userType);
         router.replace('/');
       } else {
         Alert.alert('Error', data.message || 'Registration failed');
@@ -139,7 +139,7 @@ const Register: React.FC = () => {
             <FontAwesome name="arrow-left" /> Login
           </Text>
           <ImageBackground source={require('.././../assets/images/register-background.jpg')} style={styles.background} imageStyle={{ opacity: 0.45, backgroundColor: "#000" }}>
-            <TypingText text={'Registering is easy.  Almost as asy as finding '}></TypingText>
+            <TypingText text={'Find your forever professional'}></TypingText>
             {/* <Text style={{color:"#fff", marginLeft:20, fontWeight:'bold'}}></Text> */}
           </ImageBackground>
           <View style={{flexDirection:'row', alignItems:'center',marginTop:normalize(20)}}>
@@ -179,7 +179,7 @@ const Register: React.FC = () => {
           <Text style={styles.label}>Password:</Text>
           <TextInput
             value={password}
-            onChangeText={setPassword}
+            // onChangeText={setPassword}
             placeholderTextColor="#000"
             secureTextEntry
             onBlur={validatePassword}

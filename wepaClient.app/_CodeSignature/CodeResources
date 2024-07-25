@@ -40,6 +40,14 @@
 		<data>
 		OI+P4nZVo9J8M06vm3xn9SJcT6w=
 		</data>
+		<key>ExpoApplication_privacy.bundle/Info.plist</key>
+		<data>
+		bWrhtL8O4Fbvw+ThgDsg2bNJ9Sc=
+		</data>
+		<key>ExpoApplication_privacy.bundle/PrivacyInfo.xcprivacy</key>
+		<data>
+		mUc2YHiDtobIhFXi+Mvm12TXeb8=
+		</data>
 		<key>ExpoConstants_privacy.bundle/Info.plist</key>
 		<data>
 		XHreZe7HU7SCbuAOSaNRQMtqQso=
@@ -48,6 +56,14 @@
 		<data>
 		dHAsEQehwJCS8hMOpBoz7emiNj8=
 		</data>
+		<key>ExpoDevice_privacy.bundle/Info.plist</key>
+		<data>
+		i1suaI7DRhE3K6i9/Nqhlov3/nM=
+		</data>
+		<key>ExpoDevice_privacy.bundle/PrivacyInfo.xcprivacy</key>
+		<data>
+		hWEgzzi+YPgmddeTqWfAi6jGQ0E=
+		</data>
 		<key>ExpoFileSystem_privacy.bundle/Info.plist</key>
 		<data>
 		ZXpL+2f/iVHYRNmtEZHA+8Z3de8=
@@ -55,6 +71,14 @@
 		<key>ExpoFileSystem_privacy.bundle/PrivacyInfo.xcprivacy</key>
 		<data>
 		UieOpg4b1PxYR6jA3/cs9mU9rdo=
+		</data>
+		<key>ExpoNotifications_privacy.bundle/Info.plist</key>
+		<data>
+		vJNa+zsaExdXAVeUJjv2jxBVoYI=
+		</data>
+		<key>ExpoNotifications_privacy.bundle/PrivacyInfo.xcprivacy</key>
+		<data>
+		dHAsEQehwJCS8hMOpBoz7emiNj8=
 		</data>
 		<key>ExpoSystemUI_privacy.bundle/Info.plist</key>
 		<data>
@@ -146,7 +170,7 @@
 		</data>
 		<key>PrivacyInfo.xcprivacy</key>
 		<data>
-		tJC7E2lVYRYU4amSd7YWhXrCVRo=
+		QWVPQQrLs8XwFZWrDE5vARWvUdA=
 		</data>
 		<key>RCTI18nStrings.bundle/Info.plist</key>
 		<data>
@@ -857,6 +881,10 @@
 		<data>
 		OXjhCf+HtFENZaejiuhGvhbiGr8=
 		</data>
+		<key>assets/assets/images/reset-background.jpeg</key>
+		<data>
+		8reYvpzMCt26GT3iD278kING2lg=
+		</data>
 		<key>assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/AntDesign.ttf</key>
 		<data>
 		TneGhDkoD7Q01Gl8e5EScUBsgfM=
@@ -995,7 +1023,7 @@
 		</data>
 		<key>main.jsbundle</key>
 		<data>
-		fwrZYGyMuGxZpFJcRUCMyQjz2sQ=
+		DbmU/T5bgL8ysGk/4+19l9NH3Ik=
 		</data>
 	</dict>
 	<key>files2</key>
@@ -1063,6 +1091,20 @@
 			0sOz3rrTPbK4V3ypiuYgG0bl+K95KyOmhxesfjlc770=
 			</data>
 		</dict>
+		<key>ExpoApplication_privacy.bundle/Info.plist</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			jOIZlq0o1r4Vr4wpvLRI1HQqmm6U05TE9Ud6SaJ/Ki8=
+			</data>
+		</dict>
+		<key>ExpoApplication_privacy.bundle/PrivacyInfo.xcprivacy</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			tIdj/9KcutgVElrlbhBzJz5BiuCGED/H3/fvvsFnWqo=
+			</data>
+		</dict>
 		<key>ExpoConstants_privacy.bundle/Info.plist</key>
 		<dict>
 			<key>hash2</key>
@@ -1077,6 +1119,20 @@
 			Ky2O23HVHFsfGs5M2yipS68i/d6bvy4r/BfRh/97X0c=
 			</data>
 		</dict>
+		<key>ExpoDevice_privacy.bundle/Info.plist</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			yOapHDJOMm8WU2Z2uq0IyT1sIOcXAn4seiKc6j+3YVA=
+			</data>
+		</dict>
+		<key>ExpoDevice_privacy.bundle/PrivacyInfo.xcprivacy</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			2JioNW3Ie3zSsXkh1opGNtQkBns6dcg7eTX9eXcZycs=
+			</data>
+		</dict>
 		<key>ExpoFileSystem_privacy.bundle/Info.plist</key>
 		<dict>
 			<key>hash2</key>
@@ -1089,6 +1145,20 @@
 			<key>hash2</key>
 			<data>
 			M7DgdPJz9YimS6VjKQnGqM8fFtuOTNhMaXi9Ii39Zb0=
+			</data>
+		</dict>
+		<key>ExpoNotifications_privacy.bundle/Info.plist</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			riR1yGli5nm6Y9x39c/0BfiWgSDO85Vbwia3eppwBnk=
+			</data>
+		</dict>
+		<key>ExpoNotifications_privacy.bundle/PrivacyInfo.xcprivacy</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			Ky2O23HVHFsfGs5M2yipS68i/d6bvy4r/BfRh/97X0c=
 			</data>
 		</dict>
 		<key>ExpoSystemUI_privacy.bundle/Info.plist</key>
@@ -1235,7 +1305,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			5EZbrs+00gNyf9yHAR0AdtHTlzRdo8ljWbgjN23zoMI=
+			0iT0B29OMhTbiXYnweoynu+q6Im8gta4P/eeuquI8zU=
 			</data>
 		</dict>
 		<key>RCTI18nStrings.bundle/Info.plist</key>
@@ -1986,6 +2056,13 @@
 			ja5m5NexRAQuTDYOxyQ6pUBqWMEYuqVpGDf0EUpHKTA=
 			</data>
 		</dict>
+		<key>assets/assets/images/reset-background.jpeg</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			hd/CbUuqhnHGFPBfoKiNPe8qbS55Gl3vMs3oq1XOtkY=
+			</data>
+		</dict>
 		<key>assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/AntDesign.ttf</key>
 		<dict>
 			<key>hash2</key>
@@ -2228,7 +2305,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			koYDplS9LGnzaf3ey2XDcSRijxvN9N6lxEh6BuSd6w4=
+			u0rdSfwL+0nLXb8U+4O7JEx59WqhXnergfKTy6/6fCo=
 			</data>
 		</dict>
 	</dict>

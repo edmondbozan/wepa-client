@@ -4,6 +4,7 @@ import Modal from 'react-native-modal';
 import { Checkbox } from 'react-native-paper';
 import { BASE_URL } from '@/constants/Endpoints';
 import GlobalStyles from '@/styles/styles';
+import normalize from 'react-native-elements/dist/helpers/normalizeText';
 
 export interface Item {
   id: number;
@@ -71,12 +72,12 @@ const CheckboxList: React.FC<CheckboxListProps> = ({
       <View style={styles.modalContent}>
         <ScrollView>
           {items.map((item) => (
-            <View key={item.id} style={styles.item}>
+            <View key={item.id} style={styles.item} >
               <Checkbox
                 status={selectedItems.includes(item.id) ? 'checked' : 'unchecked'}
                 onPress={() => toggleSelection(item.id)}
               />
-              <Text>{item.description}</Text>
+              <Text onPress={() => toggleSelection(item.id)}>{item.description}</Text>
             </View>
           ))}
         </ScrollView>
@@ -95,11 +96,11 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: 'white',
-    padding: 22,
+    padding: normalize(22),
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     borderColor: 'rgba(0, 0, 0, 0.1)',
-    maxHeight: '50%',
+    // maxHeight: '50%',
   },
   item: {
     marginBottom: 10,

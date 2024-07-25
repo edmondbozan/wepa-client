@@ -10,7 +10,10 @@
       "distribution": "internal"
     },
         "preview": {
-          "distribution": "internal"
+          "distribution": "internal",        
+          "ios": {
+            "enterpriseProvisioning": "universal"
+          }
       }      
   }
 }

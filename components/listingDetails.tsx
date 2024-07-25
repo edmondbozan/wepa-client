@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, View, Text, ScrollView, ImageSourcePropType, TouchableOpacity, Alert, FlatList, Image } from 'react-native';
+import { SafeAreaView, StyleSheet, View, Text, ScrollView, ImageSourcePropType, TouchableOpacity, Alert, FlatList, Image, Dimensions } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons'
 import { GestureHandlerRootView, TapGestureHandler, State, TapGestureHandlerStateChangeEvent } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
-import normalize from '@/fonts/fonts';
+import {normalize} from 'react-native-elements';
 import { isNullOrEmpty } from '../functions/stringfunctions'
 import {ProjectDetails, ProjectDisplayDetails} from '@/interfaces/IProject'
 import { AVPlaybackStatus, ResizeMode, Video } from 'expo-av';
@@ -14,7 +14,9 @@ interface DetailProps {
     isVisible:boolean;
 }
 
-// import Icon from 'react-native-vector-icons/FontAwesome';
+// const { height: screenHeight } = Dimensions.get('window');
+console.log(normalize(400));
+
     const ListingDetails: React.FC<DetailProps> = ({ child,isVisible }) => {
 
     const afterImage = { uri: child.images?.afterImage };
@@ -186,12 +188,12 @@ const styles = StyleSheet.create({
         alignItems:'center'
       },
     videoContainer :{
-        margin: 10,
+        margin: normalize(10),
 
     },
     videoStyle:{
         // width:'100%',
-        height : normalize(440),
+        height : normalize(420),
         borderRadius: 18,
 
     },
@@ -232,15 +234,16 @@ const styles = StyleSheet.create({
     containerImage: {
         backgroundColor: '#000',
         borderRadius: 18,
-        margin: 10,
+        margin: normalize(10),
 
 
     },
 
     image: {
         width: '100%',
-        height: normalize(440),
+        height: normalize(420),
         borderRadius: 18,
+        resizeMode:'contain'
     },
     card: {
         borderRadius: 18,
@@ -257,7 +260,7 @@ const styles = StyleSheet.create({
     },
 
     cardDescription: {
-        fontSize: 19,
+        fontSize: normalize(19),
         fontWeight: "500"
     },
     floatingButtonLeft: {

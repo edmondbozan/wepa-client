@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "wepaClient",
-    "slug": "wepaClient",
+    "name": "Wepa",
+    "slug": "Wepa",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "wepa",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",
@@ -14,14 +14,14 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.wepaClient"
+      "bundleIdentifier": "com.finelycrafted.wepa"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.wepaClient"
+      "package": "com.anonymous.wepa"
     },
     "web": {
       "bundler": "metro",

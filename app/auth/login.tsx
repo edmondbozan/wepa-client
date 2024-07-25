@@ -16,6 +16,10 @@ export default function SignIn() {
     router.push('/auth/register');
   };
 
+  // token = await Notifications.getExpoPushTokenAsync({
+  //   projectId: Constants.expoConfig.extra.eas.projectId,
+  // });
+
   const handleForgot = async () => {
     router.push('/auth/reset');
   };
@@ -33,7 +37,7 @@ export default function SignIn() {
       });
       if (response.ok) {
         const data = await response.json();
-        await signIn(data.token, JSON.stringify(data.userId), JSON.stringify(data.userType));
+        await signIn(data.token, JSON.stringify(data.userId), data.userType);
         router.replace('/');
       } else {
         Alert.alert('Login failed', 'Invalid credentials');
@@ -70,7 +74,6 @@ export default function SignIn() {
             placeholderTextColor="#FFF"
             style={styles.input}
           />
-          <Text>Display Name is required</Text>
           <Text style={styles.label}>PASSWORD</Text>
           <TextInput
             value={password}

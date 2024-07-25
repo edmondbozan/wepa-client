@@ -27,7 +27,7 @@ export default function Index() {
 
   if (isAuthenticated === null) {
     // While loading, you can return a loading indicator or nothing
-    return <View><Text>Loading...</Text></View>;
+    return <View></View>;
   }
 
   return (

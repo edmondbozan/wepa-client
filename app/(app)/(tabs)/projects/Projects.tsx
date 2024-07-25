@@ -5,8 +5,9 @@ import fetchWithAuth from '@/context/FetchWithAuth';
 import { BASE_URL } from '@/constants/Endpoints';
 import { Project, ProjectDetails } from '@/interfaces/IProject';
 import { FontAwesome } from '@expo/vector-icons';
-import { normalize } from 'react-native-elements';
+ import { normalize } from 'react-native-elements'
 import { router } from 'expo-router';
+//import normalize from '@/fonts/fonts';
 
 // Define the types for your data
 
@@ -65,18 +66,18 @@ const Projects: React.FC = () => {
         >
           <View style={styles.contentContainer}>
             <Text style={styles.title}>{item.title}</Text>
-            <View style={styles.viewRow}>
+            <View >
               <Text style={styles.category}>Category: {item.categoryName}</Text>
               <View style={styles.space} />
               <Text style={styles.cost}>Cost: ${item.cost}</Text>
             </View>
             <View style={styles.icon}>
               <View>
-                <Text ><FontAwesome name="heart" size={normalize(35)} color="#FA9BCF" /> {item.likes}</Text>
+                <Text ><FontAwesome name="heart" size={normalize(20)} color="#FA9BCF" /> {item.likes}</Text>
               </View>
               <View style={styles.space} />
               <View>
-                <Text ><FontAwesome name="comment" size={normalize(35)} color="#000" />{item.messageCount}</Text>
+                <Text ><FontAwesome name="comment" size={normalize(20)} color="#000" /> {item.messageCount}</Text>
               </View>
             </View>
           </View>
@@ -98,7 +99,7 @@ const Projects: React.FC = () => {
          ) :  
          (
          <ImageBackground style={{flex:1}} source={require('../../../../assets/images/background.jpg')} imageStyle={{ opacity: 0.25, height:'100%', justifyContent:'center', alignItems:'center' }}>
-          <View style={{marginTop:100, margin:20, padding:15, borderRadius:12, backgroundColor:'rgba(211, 211, 211, .35)'}}>
+          <View style={{marginTop:100, margin:normalize(20), padding:15, borderRadius:12, backgroundColor:'rgba(211, 211, 211, .35)'}}>
             <Text style={{color:"#654321", fontSize:20, fontWeight:'700', lineHeight:30}}>Looks like you do not have any projects. Click the add new project button below to get started.{'\n\n'}</Text>
             <View style={{alignItems:'center'}}>
               <Text style={{color:"#654321", fontSize:normalize(17), fontWeight:'600',fontStyle:'italic', lineHeight:30}}> Go ahead and Peacock a bit.</Text>
@@ -140,7 +141,7 @@ const styles = StyleSheet.create({
     alignContent: 'center'
   },
   projectContainer: {
-    marginBottom: 20,
+    marginBottom: normalize(20),
     padding: 10,
     borderRadius: 8,
     shadowColor: '#000',
@@ -187,22 +188,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row'
   },
   space: {
-    width: 20
+    width: normalize(10)
   },
   buttonContainer: {
     backgroundColor: '#FFF', // Hinge-inspired pastel color
     borderRadius: 8, // Rounded edges
-    height: 50,
+    height: normalize(50),
     borderWidth: 2,
     borderColor: '#B87333',
     color: '#000',
     justifyContent:'center',
     alignItems:'center'
-
-
   },
   button: {
-    fontSize: 18,
+    fontSize: normalize(18),
     fontWeight: 'bold',
     color: '#000',
   }

@@ -30,7 +30,7 @@ const TypingText: React.FC<TypingTextProps> = ({ text, speed = 100 }) => {
 const styles = StyleSheet.create({
   typingText:{
     margin: 10,
-    color: '#B87333',
+    color: '#FFF',
     fontSize:normalize(16),
     // fontWeight:'',
     fontFamily: 'Pacifico-Regular',

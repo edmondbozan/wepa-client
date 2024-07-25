@@ -47,7 +47,7 @@ export function SessionProvider(props: React.PropsWithChildren<{}>): JSX.Element
         if (token && storedUserId) {
           setSession(token);
           setUserId(storedUserId);
-          setUserType(storedUserId);
+          setUserType(storedUserType);
           setIsAuthenticated(true); 
         }
       } catch (error) { 

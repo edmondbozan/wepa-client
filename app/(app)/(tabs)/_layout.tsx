@@ -6,8 +6,8 @@ import { useSession } from '@/context/ctx';
 
 const TabsLayout = () => {
     const colorScheme = useColorScheme();
-    const { userType } = useSession();
-
+    const {userType } = useSession();
+    
     return (        
         <Tabs 
         screenOptions={({ route }) => ({
@@ -44,7 +44,7 @@ const TabsLayout = () => {
              <Tabs.Screen
                 name="leads/leads"
                 options={{
-                    href: (userType?.toString() != '"professional"') ? null : 'leads/leads',
+                    href: (userType?.toString() != "professional") ? null : 'leads/leads',
                     headerShown:false,
                     title:'leads',
                     tabBarIcon: ({ color }) => <FontAwesome size={28} name="phone" color={color} /> }}    
