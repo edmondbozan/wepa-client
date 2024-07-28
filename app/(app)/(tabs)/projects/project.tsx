@@ -104,10 +104,9 @@ export default function ProjectComponent() {
             id: projectData.categoryId
           };
           setSelectedCategory(initialCategory);
-          console.log('Initial category:', initialCategory);
         }
       } catch (error) {
-        console.error('Error fetching categories:', error);
+        Alert.alert('Error fetching categories.');
       }
     };
 
@@ -115,9 +114,31 @@ export default function ProjectComponent() {
   }, []);
 
   useEffect(() => {
-//    console.log('Project Data Updated:', projectData);
+    //    console.log('Project Data Updated:', projectData);
     setProjectId(projectData?.projectId);
   }, [projectData]);
+
+  const deleteItem = async (id: number) => {
+    console.log(BASE_URL + '/api/upload/projectDetails/' + id);
+    try {
+      const response = await fetchWithAuth(BASE_URL + '/api/upload/projectDetails/' + id, {
+        method: 'DELETE',
+      });
+      const responseText = await response.text(); // Read response as text
+
+      if (!response.ok) {
+        Alert.alert("There was an issue trying to delete the media")
+        return;
+      }
+      const updatedDetails = projectData.details.filter(detail => detail.projectDetailId !== id);
+      setProjectData({ ...projectData, details: updatedDetails });
+    }
+    catch (error) {
+      Alert.alert('Server Error. Please try again');
+    }
+  }
+
+
 
   const AddProject = async () => {
 
@@ -140,11 +161,10 @@ export default function ProjectComponent() {
           },
           body: JSON.stringify(json),
         });
-        const result : Project = await response.json();
+        const result: Project = await response.json();
 
         if (response.ok) {
           setProjectData(result);
-          console.log(projectData);
 
         } else {
           Alert.alert('Page Load Error', 'Page Load');
@@ -166,7 +186,7 @@ export default function ProjectComponent() {
     <ListItem
       item={item}
       onDelete={(id: number) => {
-        // Implement delete function if needed
+        deleteItem(id);
       }}
     />
   );
@@ -177,10 +197,10 @@ export default function ProjectComponent() {
         <FontAwesome name="arrow-left" /> Projects
       </Text>
       <ScrollView style={styles.scrollContainer}>
-        <Text style={{ fontWeight: 'bold' }}>Build a project. Get Dollars. Or just show off a bit.</Text>
+        <Text style={{ fontWeight: 'bold' }}>Build a project. Get Dollars. Or just show off.</Text>
         <View style={styles.horizontalRule} />
 
-        <View style={styles.inputView}>
+        <View>
           <Text style={styles.label}>Category</Text>
           <DropdownInput
             data={categories}
@@ -195,7 +215,8 @@ export default function ProjectComponent() {
           <TextInput
             placeholder="Project Name"
             value={title}
-            onChangeText={(text) => { setProjectTitle(text); validateProjectName(); }}
+            onChangeText={setProjectTitle}
+            onBlur={() => { validateProjectName(); }}
             style={[styles.input, !isProjectNameValid && styles.inputError]}
           />
           {!isProjectNameValid && (<Text style={{ color: 'red' }}>Project Name is required.</Text>)}
@@ -212,17 +233,17 @@ export default function ProjectComponent() {
             />
             {!isCostValid && (<Text style={{ color: 'red' }}>Project cost must be {'>'} 0.</Text>)}
           </TouchableOpacity>
-          </View>
+        </View>
 
-          <View style={{ flexDirection: 'row', width:'100%', justifyContent:'space-evenly' }}>
-            <TouchableOpacity onPress={AddProject} style={{flex:1}}>
-              <View style={styles.buttonContainer}>
-                <Text style={styles.button}>Save</Text>
-              </View>
-            </TouchableOpacity>
-            {projectData && 
+        <View style={{ flexDirection: 'row', width: '100%', justifyContent: 'space-evenly' }}>
+          <TouchableOpacity onPress={AddProject} style={{ flex: 1 }}>
+            <View style={styles.buttonContainer}>
+              <Text style={styles.button}>Save</Text>
+            </View>
+          </TouchableOpacity>
+          {projectData &&
 
-            <TouchableOpacity style={{flex:1}} onPress={() => {
+            <TouchableOpacity style={{ flex: 1 }} onPress={() => {
               router.push({
                 pathname: '/projects/media',
                 params: { data: JSON.stringify(projectData) }
@@ -232,7 +253,7 @@ export default function ProjectComponent() {
                 <Text style={styles.button}>Add Media</Text>
               </View>
             </TouchableOpacity>
-            }
+          }
         </View>
 
         <View style={[styles.horizontalRule, { height: 20 }]} />
@@ -279,14 +300,14 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     backgroundColor: '#FFF',
-    borderRadius: 8, 
+    borderRadius: 8,
     height: 50,
     borderWidth: 2,
     borderColor: '#B87333',
     color: '#000',
-    justifyContent:'center',
-    alignItems:'center',
-    margin : 10
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 10
 
   },
   button: {

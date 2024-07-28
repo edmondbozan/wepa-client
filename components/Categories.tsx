@@ -20,7 +20,7 @@ export const Categories: React.FC = () => {
           const data = await response.json();
           setCategories(data);
         } catch (error) {
-          console.error('Error fetching categories:', error);
+          Alert.alert('Error fetching categories.');
         } finally {
           setLoading(false);
         }

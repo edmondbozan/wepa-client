@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, ImageBackground, Alert, SafeAreaView, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ImageBackground, Alert, SafeAreaView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SessionProvider, useSession } from '@/context/ctx';
 import fetchWithAuth from '@/context/FetchWithAuth';
 import { BASE_URL } from '@/constants/Endpoints';
@@ -18,37 +18,97 @@ const Projects: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const { userId } = useSession();
 
-
+  const fetchData = async () => {
+    try {
+      const response = await fetchWithAuth(BASE_URL + '/api/Projects/user/' + userId);
+      const result: Project[] = await response.json();
+      if (response.ok) {
+        setData(result);
+      } else {
+        setError("Server Error");
+        // Alert.alert('Page Load Error');
+      }
+    } catch (err) {
+      setError(JSON.stringify(err));
+    } finally {
+      setLoading(false);
+    }};
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetchWithAuth(BASE_URL + '/api/Projects/user/' + userId);
-        const result: Project[] = await response.json();
-        if (response.ok) {
-          setData(result);
-          console.log(data);
-        } else {
-          Alert.alert('Page Load Error', 'Page Load');
-        }
-      } catch (err) {
-        setError(JSON.stringify(err));
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, []);
+
+
+  const deleteProject = async (projectId:number) => {
+    console.log(BASE_URL + '/api/projects/' + projectId);
+    try { 
+      const response = await fetchWithAuth(BASE_URL + '/api/projects/' + projectId, {
+        method: 'DELETE',
+      });
+      const responseText = await response.text();
+      if (response.ok) {
+        const deleteData = data.filter(detail => detail.projectId !== projectId);
+        setData(deleteData);
+      }
+      else{
+        Alert.alert('Failed to Delete Project', 'Please try again.');
+      }
+    } catch (error) {
+      Alert.alert('Server Error.  Please try again.');
+    }
+  }
+
+
+  const handleDeleteProject = (projectId:number) => {
+    Alert.alert(
+      "Are you sure you want to delete this project?",
+      "All data including leads and likes will be permantly deleted.",
+      [
+        {
+          text: "Cancel",
+          onPress: () => {},
+          style: "cancel"
+        },
+        { text: "Delete", onPress: () => deleteProject(projectId) }
+      ],
+      { cancelable: false }
+    );
+  }
+
+
 
   const findFirstNonNullAfterImage = (details: ProjectDetails[]): string | null => {
     const detail = details.find(detail => detail.afterImage !== null);
     return detail?.afterImage || null;
   };
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text>Server Error</Text>
+        <TouchableOpacity onPress={()=>{setError(null); fetchData(); }} style={styles.buttonContainer}>
+          <Text>Reload</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+
+
+
   const renderItem = ({ item }: { item: Project }) => {
     const imageUri = findFirstNonNullAfterImage(item.details);
   return (
+
+
    <View style={styles.projectContainer}>
       <TouchableOpacity onPress={() => router.push({
         pathname: '/projects/project',
@@ -80,6 +140,12 @@ const Projects: React.FC = () => {
                 <Text ><FontAwesome name="comment" size={normalize(20)} color="#000" /> {item.messageCount}</Text>
               </View>
             </View>
+            <TouchableOpacity style={{position:'absolute', right:10, bottom:10}} onPress={() => handleDeleteProject(item.projectId)}>
+          <View style={{ flexDirection:'row' }}>
+          <FontAwesome  name="trash" size={20} color="#000000" />
+          {/* <Text> Delete Project</Text> */}
+          </View>
+          </TouchableOpacity>
           </View>
         </ImageBackground>
       </TouchableOpacity>
@@ -92,10 +158,11 @@ const Projects: React.FC = () => {
       <View style={styles.container}>
 
         {(data.length > 0) ? (
+          <><Text style={{fontWeight:500}}>Your Projects {'\n'}</Text>
           <FlatList
             data={data}
             keyExtractor={(item) => item.projectId.toString()}
-            renderItem={renderItem} />
+            renderItem={renderItem} /></>
          ) :  
          (
          <ImageBackground style={{flex:1}} source={require('../../../../assets/images/background.jpg')} imageStyle={{ opacity: 0.25, height:'100%', justifyContent:'center', alignItems:'center' }}>
@@ -125,12 +192,22 @@ const Projects: React.FC = () => {
             <Text style={styles.button}>Add New Project</Text>
             </View>
           </TouchableOpacity>
-      </View>
+      </View>      
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   container: {
     flex: 1,    
     backgroundColor: 'rgba(221, 221, 221, 0.5)', // 

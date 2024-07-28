@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, Image, Alert, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, Image, Alert, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { Button, Provider, Card, IconButton } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
 import CameraButton from '@/components/CameraButton';
@@ -12,6 +12,7 @@ import VideoButton from '@/components/VideoButton';
 import { ResizeMode, Video } from 'expo-av';
 import { BASE_URL } from '@/constants/Endpoints';
 import { DropdownItem } from '@/components/DropDowmList';
+import fetchWithAuth from '@/context/FetchWithAuth';
 
 interface Item {
     id: number;
@@ -31,6 +32,7 @@ const App: React.FC = () => {
     const projectData = data ? JSON.parse(data as string) : null;
     const video = React.useRef(null);
     const [status, setStatus] = React.useState({});
+    const [loading, setLoading] = useState(false);
 
     // const projectData = data ? JSON.parse(data as string) : null;
 
@@ -54,7 +56,9 @@ const App: React.FC = () => {
         });
     }
 
+
     const addItem = async () => {
+        setLoading(true);
         //call database first then set object 
         let formData = new FormData();
 
@@ -98,10 +102,9 @@ const App: React.FC = () => {
             const updatedProjectData = projectData;
             updatedProjectData.details = [...updatedProjectData.details, responseData];
             setItems(updatedProjectData.details);
-            console.log(projectData.details);
 
         } catch (error) {
-            console.error('There was a problem with the fetch operation:', error);
+            Alert.alert("There was a problem adding the media.", "Please try again.");
         }
 
         // Reset form
@@ -114,6 +117,16 @@ const App: React.FC = () => {
             params: { data: JSON.stringify(projectData) }
         });
     };
+
+    if (loading) {
+        return (
+          <View style={styles.loadingContainer}>
+            <Text>Saving Media{'\n'}</Text>
+            <ActivityIndicator size="large" color="#0000ff" />
+          </View>
+        );
+      }
+    
 
     return (
         <SafeAreaView style={styles.container}>
@@ -180,6 +193,11 @@ const App: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
     container: {
         flex: 1,
         backgroundColor: 'rgba(221, 221, 221, 1)',

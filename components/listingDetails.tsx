@@ -15,7 +15,7 @@ interface DetailProps {
 }
 
 // const { height: screenHeight } = Dimensions.get('window');
-console.log(normalize(400));
+//console.log(normalize(400));
 
     const ListingDetails: React.FC<DetailProps> = ({ child,isVisible }) => {
 
@@ -35,7 +35,7 @@ console.log(normalize(400));
 
 
     useEffect(() => {
-        console.log(isVisible);
+        // console.log(isVisible);
         if (isVisible) {
           video.current?.playAsync();
         } else {
@@ -262,30 +262,6 @@ const styles = StyleSheet.create({
     cardDescription: {
         fontSize: normalize(19),
         fontWeight: "500"
-    },
-    floatingButtonLeft: {
-        position: 'absolute',
-        bottom: 20,
-        left: 20,
-        backgroundColor: '#6200ea',
-        borderRadius: 50,
-        width: 60,
-        height: 60,
-        justifyContent: 'center',
-        alignItems: 'center',
-        elevation: 5,
-    },
-    floatingButtonRight: {
-        position: 'absolute',
-        bottom: 20,
-        right: 20,
-        backgroundColor: '#6200ea',
-        borderRadius: 50,
-        width: 60,
-        height: 60,
-        justifyContent: 'center',
-        alignItems: 'center',
-        elevation: 5,
     },
 });
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import Modal from 'react-native-modal';
 import { Checkbox } from 'react-native-paper';
 import { BASE_URL } from '@/constants/Endpoints';
@@ -43,7 +43,7 @@ const CheckboxList: React.FC<CheckboxListProps> = ({
       const data: Item[] = await response.json();
       setItems(data);
     } catch (error) {
-      console.error('Failed to fetch items:', error);
+      Alert.alert('Failed to fetch categories');
     }
   };
 

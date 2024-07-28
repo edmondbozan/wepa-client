@@ -3,12 +3,14 @@ import LogoutButton from '@/components/LogoutButton'
 import { FontAwesome } from '@expo/vector-icons'
 import { useColorScheme } from 'react-native';
 import { useSession } from '@/context/ctx';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const TabsLayout = () => {
     const colorScheme = useColorScheme();
     const {userType } = useSession();
     
-    return (        
+    return (      
+  
         <Tabs 
         screenOptions={({ route }) => ({
             tabBarIcon: ({ color, size }) => {

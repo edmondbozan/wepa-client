@@ -20,21 +20,18 @@ interface ProjectLeads{
 }
 
 const Leads: React.FC = () => {
-  const [leads, setData] = React.useState<ProjectLeads[]>([]);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+  const [leads, setData] = useState<ProjectLeads[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
   useFocusEffect(
     useCallback(() => {
-      // Code to refresh or fetch new data
       fetchData();
       setRefreshKey((prevKey) => prevKey + 1);
     }, [])
   );
 
-
-  
   const { userId } = useSession();
   const fetchData = async () => {
     try {
@@ -58,65 +55,90 @@ const Leads: React.FC = () => {
     fetchData();
   }, []);
 
-  const renderItem: ListRenderItem<ProjectLeads> = ({ item }) => {
-  return(
-  <View style={styles.itemContainer}>
-    <View style={{ flexDirection: 'row' }}>
-      <FontAwesome name="user" size={18} color="#B87333" />
-      <Text> {item.userName}</Text>
+  const renderItem: ListRenderItem<ProjectLeads> = ({ item }) => (
+    <View style={styles.itemContainer}>
+      <View style={{ flexDirection: 'row' }}>
+        <FontAwesome name="user" size={18} color="#B87333" />
+        <Text> {item.userName}</Text>
+      </View>
+      <View style={styles.separator} />
+      <View style={{ flexDirection: 'row' }}>
+        <FontAwesome name="phone" size={18} color="#B87333" />
+        <Text> {item.phoneNumber}</Text>
+      </View>
+      <View style={styles.separator} />
+      <View style={{ flexDirection: 'row' }}>
+        <FontAwesome name="envelope" size={18} color="#B87333" />
+        <Text> {item.email}</Text>
+      </View>
+      <View style={styles.separator} />
+      <View style={{ flexDirection: 'row' }}>
+        <FontAwesome name="heart" size={18} color="#B87333" />
+        <Text> {item.title}</Text>
+      </View>
+      <View style={styles.separator} />
+      <View style={{ flexDirection: 'row' }}>
+        <FontAwesome name="calendar" size={18} color="#B87333" />
+        <Text> {formatDate(item.createDate)}</Text>
+      </View>
     </View>
-    <View style={{ borderBottomColor: '#ccc', borderBottomWidth: 1, marginVertical: 10 }}></View>
-    <View style={{ flexDirection: 'row' }}>
-      <FontAwesome name="phone" size={18} color="#B87333" />
-      <Text> {item.phoneNumber}</Text>
-    </View>
-    <View style={{ borderBottomColor: '#ccc', borderBottomWidth: 1, marginVertical: 10 }}></View>
-    <View style={{ flexDirection: 'row' }}>
-      <FontAwesome name="envelope" size={18} color="#B87333" />
-      <Text> {item.email}</Text>
-    </View>
-    <View style={{ borderBottomColor: '#ccc', borderBottomWidth: 1, marginVertical: 10 }}></View>
-    <View style={{ flexDirection: 'row' }}>
-      <FontAwesome name="heart" size={18} color="#B87333" />
-      <Text> {item.title}</Text>
-    </View>
-    <View style={{ borderBottomColor: '#ccc', borderBottomWidth: 1, marginVertical: 10 }}></View>
-    <View style={{ flexDirection: 'row' }}>
-      <FontAwesome name="calendar" size={18} color="#B87333" />
-      <Text> {formatDate(item.createDate)}</Text>
-    </View>
-  </View>
-
-  )};
-
-
+  );
 
   return (
-    <SafeAreaView key={refreshKey}>
-        {(leads.length > 0) ? (
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        {leads.length > 0 ? (
           <FlatList
             data={leads}
             keyExtractor={(lead) => lead.id.toString()}
-            renderItem={renderItem} />
-        ) :
-          (
-            <ImageBackground style={{ flex: 1 }} source={require('../../../../assets/images/background.jpg')} imageStyle={{ opacity: 0.25, height: '100%', justifyContent: 'center', alignItems: 'center' }}>
-              <View style={{ marginTop: 100, margin: 20, padding: 15, borderRadius: 12, backgroundColor: 'rgba(211, 211, 211, .35)' }}>
-                <Text style={{ color: "#654321", fontSize: 20, fontWeight: '700', lineHeight: 30 }}>Looks like you do not have any projects. Click the add new project button below to get started.{'\n\n'}</Text>
-                <View style={{ alignItems: 'center' }}>
-                  <Text style={{ color: "#654321", fontSize: normalize(17), fontWeight: '600', fontStyle: 'italic', lineHeight: 30 }}> Go ahead and Peacock a bit.</Text>
-                </View>
-                <View style={{ alignItems: 'center' }}>
-                  <Text style={{ color: "#654321", fontSize: normalize(17), fontWeight: '600', fontStyle: 'italic' }}>
-                    We wont judge.</Text>
-                </View>
-              </View>
-            </ImageBackground>)}
+            renderItem={renderItem}
+          />
+        ) : (
+          <ImageBackground
+            source={require('../../../../assets/images/background.jpg')}
+            style={styles.backgroundImage}
+            imageStyle={{ opacity: 0.25 }}
+          >
+            <View style={styles.noLeadsContainer}>
+              <Text style={styles.noLeadsText}>
+                You do not have any Leads. {'\n'}{'\n'}
+                Create more projects to generate leads. {'\n\n'}
+              </Text>
+            </View>
+          </ImageBackground>
+        )}
+      </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
+  container: {
+    flex: 1,
+  },
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noLeadsContainer: {
+    marginTop: 100,
+    margin: 20,
+    padding: 15,
+    borderRadius: 12,
+    backgroundColor: 'rgba(211, 211, 211, .35)',
+  },
+  noLeadsText: {
+    color: "#654321",
+    fontSize: 20,
+    fontWeight: '700',
+    lineHeight: 30,
+  },
   itemContainer: {
     borderColor: '#B87333',
     borderWidth: 1,
@@ -130,6 +152,11 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
     margin: 20,
+  },
+  separator: {
+    borderBottomColor: '#ccc',
+    borderBottomWidth: 1,
+    marginVertical: 10,
   },
 });
 

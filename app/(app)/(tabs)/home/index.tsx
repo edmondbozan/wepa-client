@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { SafeAreaView, StyleSheet, View, Text, ScrollView, ImageSourcePropType, TouchableOpacity, Alert, ActivityIndicator, TextInput, Button, FlatList, ImageBackground } from 'react-native';
+import { SafeAreaView, StyleSheet, View, Text, ScrollView, ImageSourcePropType, TouchableOpacity, Alert, ActivityIndicator, TextInput, Button, FlatList, ImageBackground, Platform } from 'react-native';
 import { AntDesign, FontAwesome, FontAwesome5, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons'
 import { GestureHandlerRootView, TapGestureHandler, State, TapGestureHandlerStateChangeEvent } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
@@ -16,6 +16,9 @@ import { router } from 'expo-router';
 import { useIsFocused } from '@react-navigation/native';
 import MessagesModal from '@/components/Messages';
 import EmptyHome from '@/components/EmptyHome';
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
 
 
 interface QueryParams {
@@ -43,6 +46,13 @@ export default function App() {
   const [bind, setBind] = useState<boolean>(false);
   const [modalMessageVisible, setModalMessageVisible] = useState(false);
   const opacity = useSharedValue<number>(1);
+  const [expoPushToken, setExpoPushToken] = useState('');
+  const [notification, setNotification] = useState<Notifications.Notification | undefined>(undefined);
+  const notificationListener = useRef<Notifications.Subscription>();
+  const responseListener = useRef<Notifications.Subscription>();
+
+
+
   const buildQueryString = (params: { [key: string]: any }): string => {
     return Object.keys(params)
       .map(key => {
@@ -56,6 +66,67 @@ export default function App() {
   };
 
 
+
+
+
+  function handleRegistrationError(errorMessage: string) {
+    alert(errorMessage);
+    throw new Error(errorMessage);
+  }
+  async function registerForPushNotificationsAsync() {
+    if (Platform.OS === 'android') {
+      Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+    }
+  
+    if (Device.isDevice) {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      console.log('existing status ' + existingStatus);
+
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        console.log(status);
+        finalStatus = status;
+      }
+      if (finalStatus !== 'granted') {
+//        handleRegistrationError('Permission not granted to get push token for push notification!');
+        return;
+      }
+      const projectId =
+        Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
+        console.log(projectId);
+      if (!projectId) {
+        handleRegistrationError('Project ID not found');
+      }
+      try {
+        const pushTokenString = (
+          await Notifications.getExpoPushTokenAsync({
+            projectId,
+          })
+        ).data;
+        return pushTokenString;
+      } catch (e: unknown) {
+        handleRegistrationError(`${e}`);
+      }
+    } else {
+      handleRegistrationError('Must use physical device for push notifications');
+    }
+  }
+  
+ const updatePush = async () => {
+      const response = await fetch(BASE_URL + '/api/Auth/expoToken', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: userId,   
+          expoToken: expoPushToken })
+      },
+      );
+  }
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat('en-US').format(num);
   };
@@ -74,7 +145,6 @@ export default function App() {
       const result: Project[] = await response.json();
       if (response.ok) {
         setData(result);
-        console.log("scrooll to");
         flatListRef.current?.scrollToOffset({ animated: true, offset: 0 })
 
       } else {
@@ -87,22 +157,52 @@ export default function App() {
     }
   };
 
+
+  useEffect(() => {
+    if (expoPushToken) {
+      console.log(expoPushToken);
+      updatePush();
+    }
+  }, [expoPushToken]);
+
   useEffect(() => {
 
     fetchData();
   }, [selectedItems, bind]);
 
+  useEffect(() => {
+    registerForPushNotificationsAsync()
+      .then(token => setExpoPushToken(token ?? ''))
+      .catch((error: any) => setExpoPushToken(`${error}`));
+
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      setNotification(notification);
+    });
+
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log(response);
+    });
+
+    return () => {
+      notificationListener.current &&
+        Notifications.removeNotificationSubscription(notificationListener.current);
+      responseListener.current &&
+        Notifications.removeNotificationSubscription(responseListener.current);
+    };
+  }, []);
+
 
 
   const onViewableItemsChanged = ({ viewableItems }) => {
-    console.log(data[0].details.map((item, index) => ({
-      id: `${item.projectDetailId}-${index}`, // Ensuring unique key
-      afterImage: item.afterImage,
-      video: item.video,
-      description: item.description,
-    })));
+    // console.log
+    // (data[0].details.map((item, index) => ({
+    //   id: `${item.projectDetailId}-${index}`, // Ensuring unique key
+    //   afterImage: item.afterImage,
+    //   video: item.video,
+    //   description: item.description,
+    // })));
     setVisibleItems(viewableItems.map((item: { key: any; }) => item.key));
-    console.log(viewableItems);
+    // console.log(viewableItems);
   };
 
   const viewabilityConfig = {
@@ -146,7 +246,7 @@ export default function App() {
       }
       fetchData();
     } catch (error) {
-      console.error('Failed to send like:', error);
+      Alert.alert('Failed to send like:', 'Please try agin.');
     }
   }
   const handleSettingsClick = () => {
@@ -197,7 +297,7 @@ export default function App() {
     return (
       <View style={styles.errorContainer}>
         <Text>Server Error</Text>
-        <TouchableOpacity onPress={fetchData} style={styles.buttonContainer}>
+        <TouchableOpacity onPress={()=>{setError(null); fetchData(); }} style={styles.buttonContainer}>
           <Text>Reload</Text>
         </TouchableOpacity>
       </View>

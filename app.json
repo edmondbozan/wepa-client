@@ -21,7 +21,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.wepa"
+      "package": "com.finelycrafted.wepa"
     },
     "web": {
       "bundler": "metro",
@@ -40,7 +40,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "7896c9b5-f1d3-4568-a68d-d1f967ee269a"
+        "projectId": "c13e0cfe-808d-40bd-adc4-9c95bc60e305"
       }
     }
   }

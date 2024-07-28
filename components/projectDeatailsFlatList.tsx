@@ -10,35 +10,33 @@ interface ItemProps {
   onDelete: (id: number) => void;
 }
 
-const ListItem: React.FC<ItemProps> = ({ item }) => {
+const ListItem: React.FC<ItemProps> = ({ item, onDelete }) => {
   const renderImage = () => (
-    item.afterImage ? (
-      <Image source={{ uri: item.afterImage  }} style={styles.image} resizeMode="cover" />
-    ) : null
+    item.afterImage && (
+      <Image source={{ uri: item.afterImage  }} style={styles.image} />
+    ) 
   );
   
 
   const renderVideo = () => (
-    item.video ? (
-      <View style={{width:200}}>
+    item.video && (
       <Video
         source={{ uri: item.video }}
         style={styles.video}
         useNativeControls
         isLooping
       />
-      </View>
-    ) : null
+    ) 
   );
 
   const renderText = () => (
-    item.description ? (
+    item.description && (
        <View style={styles.textContainer}>
       <Text style={styles.text}>
         {item.description.length > 100 ? `${item.description.substring(0, 100)}...` : item.description}
       </Text>
        </View>
-    ) : null
+    ) 
   );
 
   return (
@@ -54,18 +52,24 @@ const ListItem: React.FC<ItemProps> = ({ item }) => {
       horizontal
       showsVerticalScrollIndicator={false}
       showsHorizontalScrollIndicator={false}
-      contentContainerStyle={{ paddingVertical: 20 }}>
+      contentContainerStyle={{ paddingVertical: normalize(20) }}>
 
-        <View style={{ flexDirection: 'row' }}>
+        <View style={{ flexDirection: 'row', justifyContent:'flex-start' }}>
+        {item.afterImage && (
           <View style={styles.itemContainer}>
             {renderImage()}
           </View>
+        )}
+        { item.video && (
           <View style={styles.itemContainer}>
             {renderVideo()}
           </View>
+        )}
+        {item.description && (
           <View style={styles.itemContainer}>
             {renderText()}
           </View>
+        )}
         </View>
       </ScrollView></>
   );
@@ -74,36 +78,33 @@ const ListItem: React.FC<ItemProps> = ({ item }) => {
 const styles = StyleSheet.create({
   itemContainer: {
     borderRadius: 10,
-    //margin:10,
-    // justifyContent:''
+//    padding:10
+    margin:normalize(10),
+//     justifyContent:'flex-start'
   },
   image: {
     width: normalize(200),
     height: normalize(150),
-     borderRadius: 10,    
-    margin:normalize(10)
+    borderRadius: 10,    
   },
   video: {
     width: normalize(200),
     height: normalize(150),
-     borderRadius: 10,
-    margin:10
-
+    borderRadius: 10,    
+    resizeMode:'cover'
   },
   text: {
-    fontSize: 18,
+    fontSize: normalize(18),
     color: '#000',
   },
   textContainer:{
     width: normalize(200),
     height: normalize(150),
-     margin:10,
-//     padding: 10,
     borderColor:'white',
     backgroundColor: 'rgba(221, 221, 221, 0.5)', //
     borderRadius:10,
     borderWidth:1,
-    padding:10,
+    padding:normalize(10),
   },
   deleteButton: {
     justifyContent: 'center',

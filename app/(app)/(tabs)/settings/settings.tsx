@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, Alert } from 'react-native';
+import { View, Text, Image, StyleSheet, Alert, ScrollView } from 'react-native';
 import { ProjectDetails } from '@/interfaces/IProject';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -7,6 +7,7 @@ import { useSession } from '@/context/ctx';
 import { FontAwesome } from '@expo/vector-icons';
 import fetchWithAuth from '@/context/FetchWithAuth';
 import { BASE_URL } from '@/constants/Endpoints';
+import { GestureHandlerRootView, TouchableOpacity, gestureHandlerRootHOC } from 'react-native-gesture-handler';
 
 
 
@@ -31,11 +32,10 @@ const Settings: React.FC = () => {
         router.navigate("auth/login");
       }
       else{
-        Alert.alert('Failed to Delete User');
-        console.error('Failed to Delete User:', userId);        
+        Alert.alert('Failed to Delete User.', 'Please try again.');
       }
     } catch (error) {
-      console.error('Failed to send like:', error);
+      Alert.alert('Failed to Delete User.', 'Please try again.');
     }
   }
 
@@ -58,18 +58,24 @@ const Settings: React.FC = () => {
   }
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{flex:1}}>
+    <GestureHandlerRootView>
       <View style={styles.itemContainer}>
+      <TouchableOpacity onPress={handleSignOut}>
         <View style={{ flexDirection: 'row' }}>
           <FontAwesome name="lock" size={18} color="#B87333" />
-          <Text onPress={handleSignOut}> Sign Out</Text>
+          <Text> Sign Out</Text>
         </View>
+        </TouchableOpacity>
         <View style={{ borderBottomColor: '#ccc', borderBottomWidth: 1, marginVertical: 10 }}></View>
-        <View style={{ flexDirection: 'row' }}>
-          <FontAwesome name="trash" size={18} color="#B87333" />
-          <Text onPress={handleDeleteAccount}> Delete Account</Text>
-        </View>
+          <TouchableOpacity onPress={handleDeleteAccount}>
+          <View style={{ flexDirection:'row' }}>
+          <FontAwesome  name="trash" size={18} color="#B87333" />
+          <Text> Delete Account</Text>
+          </View>
+          </TouchableOpacity>
       </View>
+      </GestureHandlerRootView>
     </SafeAreaView>
   );
 };
@@ -88,6 +94,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
     margin: 20,
+//    flex:1
   },
 });
 

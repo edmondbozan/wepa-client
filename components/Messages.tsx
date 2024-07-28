@@ -21,8 +21,6 @@ const MessagesModal: React.FC<MessagesModalProps> = ({ projectId, visible, onClo
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log(projectId); 
-    console.log(BASE_URL + "/api/projects/"+ projectId + "/messages");        
     const getMessages = async () => {
       setLoading(true);     
         try {
@@ -32,8 +30,6 @@ const MessagesModal: React.FC<MessagesModalProps> = ({ projectId, visible, onClo
           }
           const data = await response.json();
           setMessages(data);
-          console.log(data);
-          console.log(messages); 
         } catch (error) {
           console.error('Error fetching messages:', error);
         }

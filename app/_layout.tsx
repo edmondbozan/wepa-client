@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Text } from 'react-native';
 import LogoutButton from '@/components/LogoutButton';
 import * as Font from 'expo-font';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const loadFonts = async () => {
   await Font.loadAsync({
@@ -23,7 +24,6 @@ export default function Root() {
   // Set up the auth context and render our layout inside of it.
 
   return (
-
       <SessionProvider>        
       <LogoutButton></LogoutButton>
       <Slot />
