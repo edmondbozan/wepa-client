@@ -95,14 +95,14 @@ const Leads: React.FC = () => {
           />
         ) : (
           <ImageBackground
-            source={require('../../../../assets/images/background.jpg')}
+            source={require('../../../../assets/images/register-background.jpg')}
             style={styles.backgroundImage}
             imageStyle={{ opacity: 0.25 }}
           >
             <View style={styles.noLeadsContainer}>
               <Text style={styles.noLeadsText}>
                 You do not have any Leads. {'\n'}{'\n'}
-                Create more projects to generate leads. {'\n\n'}
+                Create projects to generate leads. {'\n\n'}
               </Text>
             </View>
           </ImageBackground>

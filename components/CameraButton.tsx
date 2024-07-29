@@ -1,4 +1,4 @@
-import normalize from '@/fonts/fonts';
+import { normalize } from 'react-native-elements';
 import React from 'react';
 import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
 import { IconButton } from 'react-native-paper';

@@ -3,9 +3,6 @@ import { Alert, Button, Text, TextInput, View, StyleSheet, ScrollView, SafeAreaV
 import { useSession } from '@/context/ctx';
 import { useState } from 'react';
 import { BASE_URL } from '@/constants/Endpoints';
-import PhotoCarousel from '@/components/PhotoCarousel';
-import normalize from '@/fonts/fonts';
-import TypingText from '@/components/TypingComponent';
 
 export default function SignIn() {
   const { signIn } = useSession();
@@ -73,6 +70,9 @@ export default function SignIn() {
             placeholder="Email"
             placeholderTextColor="#FFF"
             style={styles.input}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
           />
           <Text style={styles.label}>PASSWORD</Text>
           <TextInput

@@ -23,6 +23,7 @@ export  interface Project {
         categoryName: string;
         likes:number;
         messageCount:number;
+        phoneNumber:string;
         details: ProjectDetails[]
       }
 

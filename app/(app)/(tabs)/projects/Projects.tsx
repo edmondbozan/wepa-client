@@ -158,19 +158,19 @@ const Projects: React.FC = () => {
       <View style={styles.container}>
 
         {(data.length > 0) ? (
-          <><Text style={{fontWeight:500}}>Your Projects {'\n'}</Text>
+          <><Text style={{fontWeight:500,margin:10}}>Your Projects {'\n'}</Text>
           <FlatList
             data={data}
             keyExtractor={(item) => item.projectId.toString()}
             renderItem={renderItem} /></>
          ) :  
          (
-         <ImageBackground style={{flex:1}} source={require('../../../../assets/images/background.jpg')} imageStyle={{ opacity: 0.25, height:'100%', justifyContent:'center', alignItems:'center' }}>
+         <ImageBackground style={{flex:1}} source={require('../../../../assets/images/reset-background.jpeg')} imageStyle={{ opacity: 0.25, height:'100%', justifyContent:'center', alignItems:'center' }}>
           <View style={{marginTop:100, margin:normalize(20), padding:15, borderRadius:12, backgroundColor:'rgba(211, 211, 211, .35)'}}>
             <Text style={{color:"#654321", fontSize:20, fontWeight:'700', lineHeight:30}}>Looks like you do not have any projects. Click the add new project button below to get started.{'\n\n'}</Text>
             <View style={{alignItems:'center'}}>
               <Text style={{color:"#654321", fontSize:normalize(17), fontWeight:'600',fontStyle:'italic', lineHeight:30}}> Go ahead and Peacock a bit.</Text>
-</View>
+            </View>
               <View style={{alignItems:'center'}}> 
               <Text style={{color:"#654321", fontSize:normalize(17), fontWeight:'600',fontStyle:'italic'}}>
               We wont judge.</Text>
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,    
     backgroundColor: 'rgba(221, 221, 221, 0.5)', // 
-    padding: 10,
+    // padding: 10,
   },
   viewRow: {
     flexDirection: 'row',
@@ -275,7 +275,8 @@ const styles = StyleSheet.create({
     borderColor: '#B87333',
     color: '#000',
     justifyContent:'center',
-    alignItems:'center'
+    alignItems:'center',
+    margin:10
   },
   button: {
     fontSize: normalize(18),

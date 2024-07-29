@@ -126,7 +126,6 @@ const Register: React.FC = () => {
       }
     } catch (error) {
       Alert.alert('Error', 'An error occurred while registering. Please try again.');
-      console.error('Registration error:', error);
     }
   }
   }
@@ -144,9 +143,9 @@ const Register: React.FC = () => {
           </ImageBackground>
           <View style={{flexDirection:'row', alignItems:'center',marginTop:normalize(20)}}>
           <Switch
-        trackColor={{ false: "#767577", true: "#81b0ff" }}
-         thumbColor={isProfessional ? "#f5dd4b" : "#f4f3f4"}
-         ios_backgroundColor="#a7abb5"
+         trackColor={{ false: "#C0C0C0", true: "#4CAF50" }}
+         thumbColor={isProfessional ? "#FFD700" : "#D2691E"}
+         ios_backgroundColor="#C0C0C0"
          onValueChange={toggleSwitch}
          value={isProfessional}
       />
@@ -179,11 +178,10 @@ const Register: React.FC = () => {
           <Text style={styles.label}>Password:</Text>
           <TextInput
             value={password}
-            // onChangeText={setPassword}
+             onChangeText={setPassword}
             placeholderTextColor="#000"
             secureTextEntry
             onBlur={validatePassword}
-            onTextInput={validatePassword}
             style={[styles.input, !isPasswordValid && styles.inputError]}
           />
           {!isPasswordValid &&
@@ -223,6 +221,9 @@ const Register: React.FC = () => {
             placeholderTextColor="#000"
             onBlur={validateEmail}
             style={[styles.input, !isEmailValid && styles.inputError]}
+            autoCapitalize="none"
+            autoCorrect={false}
+
           />
           {!isEmailValid &&
             (<Text style={{ color: 'red' }}>Proper email is required.</Text>)}

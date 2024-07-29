@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     },
     photoRow: {
         flexDirection: 'row',
-        marginLeft: 20
+        marginLeft: normalize(20)
     },
 
     form: {

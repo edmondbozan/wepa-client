@@ -159,7 +159,7 @@ export default function App() {
 
 
   useEffect(() => {
-    if (expoPushToken) {
+    if (expoPushToken && Device.isDevice) {
       console.log(expoPushToken);
       updatePush();
     }
@@ -309,11 +309,11 @@ export default function App() {
       <View style={styles.headerFilters}>
         {/* Header Line 1 */}
         <View style={styles.header1}>
-          <TouchableOpacity onPress={handleSettingsClick} >
+          {/* <TouchableOpacity  > */}
             <View style={[styles.buttonContainer]}>
-              <FontAwesome6 name="question" size={normalize(12)} />
+              <FontAwesome6 name="filter" size={normalize(12)} />
             </View>
-          </TouchableOpacity>
+          {/* </TouchableOpacity> */}
 
 
           <TouchableOpacity onPress={handleCategoryButtonClick} >
@@ -356,8 +356,10 @@ export default function App() {
           <View style={{ flexDirection: 'row', marginTop: normalize(10), alignItems: 'center' }}>
             <Text style={{ fontSize: normalize(14), }}>By {data[0].userName}</Text>
             {(data[0].userType == "professional") &&
-              (
+              (<>
                 <MaterialCommunityIcons name="professional-hexagon" size={normalize(30)} color="#D8BFD8" />
+                <Text>{data[0].phoneNumber}</Text>
+                </>
               )
             }
           </View>

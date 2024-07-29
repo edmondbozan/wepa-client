@@ -64,6 +64,7 @@ const LikeModal: React.FC<LikeModalProps> = ({ visible, onClose, message, userTy
             placeholder="Leave a comments"
             multiline
             value={feedback}
+            maxLength={500}
             onChangeText={setFeedback} // Update feedback state
           />
           <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>

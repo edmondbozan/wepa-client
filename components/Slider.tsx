@@ -48,7 +48,7 @@ interface SliderModalProps {
       <Slider
         style={styles.slider}
         minimumValue={0}
-        maximumValue={(type=="radius") ? 3000 : 500000}
+        maximumValue={(type=="radius") ? 4000 : 500000}
         step={(type=="radius") ? 1 : 5000}
         value={radius}
         onValueChange={handleValueChange}
