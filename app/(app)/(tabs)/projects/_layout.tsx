@@ -1,23 +1,24 @@
 import { Stack } from 'expo-router'
 
 const ProjectLayout = () => {
-    return <Stack>
+        return <Stack>
 
-       <Stack.Screen
-        name="Projects"
-        options={{
-            headerShown: false
-        }} />
-         <Stack.Screen
-            name="project"
-            options={{
-                headerShown: false
-            }} /><Stack.Screen
-            name="media"
+        <Stack.Screen
+            name="Projects"
             options={{
                 headerShown: false
             }} />
-            </Stack> 
+            <Stack.Screen
+                name="project"
+                options={{
+                    headerShown: false
+                }} />
+                <Stack.Screen
+                name="media"
+                options={{
+                    headerShown: false
+                }} />
+                </Stack> 
 }
 
 export default ProjectLayout

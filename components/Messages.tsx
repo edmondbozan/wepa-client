@@ -54,7 +54,7 @@ const MessagesModal: React.FC<MessagesModalProps> = ({ projectId, visible, onClo
         {loading ? (
           <ActivityIndicator size="large" color="#000000" />
         ) : (
-         <><Button title="Close" onPress={onClose} />
+         <><Button title="Close" color="black" onPress={onClose} />
           <FlatList 
             data={messages}
             keyExtractor={(item) => item.id.toString()}

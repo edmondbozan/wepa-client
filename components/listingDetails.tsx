@@ -221,6 +221,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#000',
         borderRadius: 18,
         margin: normalize(10),
+        //aspectRatio: 16 / 9,
 
 
     },
@@ -229,6 +230,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: normalize(420),
         borderRadius: 18,
+        resizeMode:"cover",
         
         // resizeMode:'contain'
     },

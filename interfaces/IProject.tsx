@@ -25,6 +25,7 @@ export  interface Project {
         likes:number;
         messageCount:number;
         phoneNumber:string;
+        message:string;
         details: ProjectDetails[]
       }
 

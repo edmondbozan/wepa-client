@@ -9,9 +9,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { ProjectDetails } from '@/interfaces/IProject';
 import { normalize } from 'react-native-elements';
 import VideoButton from '@/components/VideoButton';
-import { ResizeMode, Video } from 'expo-av';
 import { BASE_URL } from '@/constants/Endpoints';
-import { DropdownItem } from '@/components/DropDowmList';
 import fetchWithAuth from '@/context/FetchWithAuth';
 
 interface Item {
@@ -58,7 +56,13 @@ const App: React.FC = () => {
 
 
     const addItem = async () => {
+        console.log(description);
+        if (afterImage == null && videoUri == null && description.length == 0){
+            Alert.alert("Please add media.");
+            return;
+        }
         setLoading(true);
+
         //call database first then set object 
         let formData = new FormData();
 
@@ -91,13 +95,14 @@ const App: React.FC = () => {
                 method: 'POST',
                 body: formData,
             });
-            const responseText = await response.text(); // Read response as text
+            const responseText = await response.json(); // Read response as text
 
             if (!response.ok) {
-                throw new Error(`Network response was not ok: ${responseText}`);
+                Alert.alert("Error",responseText.message)
+                return;
             }
-
-            const responseData = JSON.parse(responseText);
+            
+            const responseData = responseText;
 
             const updatedProjectData = projectData;
             updatedProjectData.details = [...updatedProjectData.details, responseData];
@@ -105,6 +110,8 @@ const App: React.FC = () => {
 
         } catch (error) {
             Alert.alert("There was a problem adding the media.", "Please try again.");
+            setLoading(false);
+            return;
         }
 
         // Reset form

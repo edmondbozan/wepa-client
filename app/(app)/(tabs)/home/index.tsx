@@ -20,6 +20,7 @@ import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import BlockModal from '@/components/BlockModal';
+import { Checkbox } from 'react-native-paper';
 
 
 interface QueryParams {
@@ -240,10 +241,10 @@ export default function App() {
         body: JSON.stringify(json),
       });
 
-      const responseText = await response.text();
-
+      const responseText = await response.json();
       if (!response.ok) {
-        throw new Error(`Network response was not ok: ${responseText}`);
+        Alert.alert('Error', responseText.message || 'Like failed');
+//        fetchData();
       }
       fetchData();
     } catch (error) {
@@ -335,7 +336,11 @@ export default function App() {
               <Text style={styles.button} >Budget</Text>
             </View>
           </TouchableOpacity>
-
+          {/* <TouchableOpacity >
+            <View style={[styles.buttonContainer]}>
+              <Text style={styles.button}>Pros</Text>
+            </View>
+          </TouchableOpacity> */}
 
           {/* <TouchableOpacity onPress={handleCategoryButtonClick}   >
               <FontAwesome name="filter" size={normalize(26)} color="#000" />
@@ -470,11 +475,11 @@ const styles = StyleSheet.create({
    // marginTop: 0,
     margin: normalize(15),
   },
-  horizontalRule: {
-    borderBottomColor: '#ccc',
-    borderBottomWidth: 1,
-    marginVertical: normalize(10),
-  },
+    horizontalRule: {
+      borderBottomColor: '#ccc',
+      borderBottomWidth: 1,
+      marginVertical: normalize(10),
+    },
   projectTitle: {
 
   },

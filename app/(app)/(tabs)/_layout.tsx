@@ -6,9 +6,6 @@ import { useSession } from '@/context/ctx';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import React from 'react';
 
-const LazyLoadScreen = React.lazy(() => import('./settings/settings'));
-
-
 const TabsLayout = () => {
     const colorScheme = useColorScheme();
     const {userType } = useSession();
@@ -55,6 +52,14 @@ const TabsLayout = () => {
                     title:'leads',
                     tabBarIcon: ({ color }) => <FontAwesome size={28} name="phone" color={color} /> }}    
                  /> 
+            <Tabs.Screen
+            name="likes/likes"
+            options={{
+                headerShown:false,
+                title:'likes',
+                tabBarIcon: ({ color }) => <FontAwesome size={28}  name="heart" color={color} /> }}>
+          </Tabs.Screen>
+
             <Tabs.Screen
             name="settings/settings"
             options={{

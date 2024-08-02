@@ -5,13 +5,13 @@ import Modal from 'react-native-modal';
 import { BASE_URL } from '@/constants/Endpoints';
 
 
-interface SliderModalProps {
-    type:string;
-    visible: boolean;
-    userradius:number;
-    onClose: () => void;
-    onValueChange: (value: number) => void;
-  }
+  interface SliderModalProps {
+      type:string;
+      visible: boolean;
+      userradius:number;
+      onClose: () => void;
+      onValueChange: (value: number) => void;
+    }
 
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat('en-US').format(num);
