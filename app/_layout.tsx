@@ -2,7 +2,6 @@ import { Redirect, Slot, Stack } from 'expo-router';
 import { SessionProvider, useSession } from '@/context/ctx';
 import React, { useEffect, useState } from 'react';
 import { Text } from 'react-native';
-import LogoutButton from '@/components/LogoutButton';
 import * as Font from 'expo-font';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
@@ -24,9 +23,11 @@ export default function Root() {
   // Set up the auth context and render our layout inside of it.
 
   return (
-      <SessionProvider>        
-      <LogoutButton></LogoutButton>
+
+    <SessionProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <Slot />
-      </SessionProvider>
+    </GestureHandlerRootView>
+  </SessionProvider>
   );
 }

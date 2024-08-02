@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { SafeAreaView, StyleSheet, View, Text, ScrollView, ImageSourcePropType, TouchableOpacity, Alert, ActivityIndicator, TextInput, Button, FlatList, ImageBackground, Platform } from 'react-native';
+import { SafeAreaView, StyleSheet, View, Text, ScrollView, ImageSourcePropType, TouchableOpacity, Alert, ActivityIndicator, TextInput, Button, FlatList, ImageBackground, Platform, Pressable } from 'react-native';
 import { AntDesign, FontAwesome, FontAwesome5, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons'
 import { GestureHandlerRootView, TapGestureHandler, State, TapGestureHandlerStateChangeEvent } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
@@ -19,6 +19,7 @@ import EmptyHome from '@/components/EmptyHome';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
+import BlockModal from '@/components/BlockModal';
 
 
 interface QueryParams {
@@ -37,7 +38,6 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [selectedItems, setSelectedItems] = useState<Item[]>([]);
   const { signOut, userId } = useSession();
-//  const scrollViewRef = useRef<ScrollView>(null);
   const flatListRef = React.useRef<FlatList>(null)
   const [visibleItems, setVisibleItems] = useState([]);
   const isFocused = useIsFocused();
@@ -45,6 +45,7 @@ export default function App() {
   const [budget, setBudget] = useState<number>(50000);
   const [bind, setBind] = useState<boolean>(false);
   const [modalMessageVisible, setModalMessageVisible] = useState(false);
+  const [modalBlockVisible, setModalBlockVisible] = useState(false);
   const opacity = useSharedValue<number>(1);
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notification, setNotification] = useState<Notifications.Notification | undefined>(undefined);
@@ -310,11 +311,12 @@ export default function App() {
         {/* Header Line 1 */}
         <View style={styles.header1}>
           {/* <TouchableOpacity  > */}
-            <View style={[styles.buttonContainer]}>
-              <FontAwesome6 name="filter" size={normalize(12)} />
-            </View>
-          {/* </TouchableOpacity> */}
-
+          {(data.length > 0) ?
+            (<TouchableOpacity style={[styles.buttonContainer]} onPress={()=>{setModalBlockVisible(true)}}>
+              <FontAwesome6 name="ban" style={{color:'red'}} size={normalize(12)} />
+            </TouchableOpacity>) : null
+          }
+          
 
           <TouchableOpacity onPress={handleCategoryButtonClick} >
             <View style={[styles.buttonContainer]}>
@@ -357,7 +359,7 @@ export default function App() {
             <Text style={{ fontSize: normalize(14), }}>By {data[0].userName}</Text>
             {(data[0].userType == "professional") &&
               (<>
-                <MaterialCommunityIcons name="professional-hexagon" size={normalize(30)} color="#D8BFD8" />
+                <MaterialCommunityIcons name="professional-hexagon" size={normalize(30)} color="#B87333" />
                 <Text>{data[0].phoneNumber}</Text>
                 </>
               )
@@ -432,6 +434,7 @@ export default function App() {
         initialSelectedItems={selectedItems.map(item => item.id)}
       />
       <MessagesModal onClose={() => setModalMessageVisible(false)} projectId={(data.length > 0) ? data[0].projectId.toString() : 0} visible={modalMessageVisible} />
+      <BlockModal onClose={() => setModalBlockVisible(false)} projectId={(data.length > 0) ? data[0].projectId : 0} visible={modalBlockVisible} userId={userId} blockUserId={(data.length > 0) ? data[0].userId : 0} onRebind={() => { setModalBlockVisible(false); setBind(!bind); }} />
     </SafeAreaView>
 
   );

@@ -9,6 +9,7 @@ import { View, Text, TextInput, Alert, StyleSheet, TouchableOpacity, ScrollView,
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TextInputMask } from 'react-native-masked-text';
 import { normalize } from 'react-native-elements';
+import { ExternalLink } from '@/components/ExternalLink';
 
 const Register: React.FC = () => {
   const { signIn } = useSession();
@@ -240,6 +241,13 @@ const Register: React.FC = () => {
           {!isZipValid &&
             (<Text style={{ color: 'red' }}>Proper zip is required.</Text>)}
           
+<View style={{marginVertical:10}}>
+  <Text>By tapping 'REGISTER', you confirm that you have read and agree to our <ExternalLink style={{color: '#007bff',textDecorationLine: 'underline'}} href={'https://app.termly.io/policy-viewer/policy.html?policyUUID=92b8a492-eea6-4e68-9727-7430bc07dac5'}>Privacy Policy</ExternalLink> and 
+  <ExternalLink href={'https://app.termly.io/policy-viewer/policy.html?policyUUID=e7fd608a-64a0-4e12-91b9-e154a15eb707'} style={{color: '#007bff',textDecorationLine: 'underline'}} > Terms and Conditions</ExternalLink>
+  .</Text>
+</View>
+
+         
           <TouchableOpacity onPress={handleRegister} style={styles.button}>
             <Text style={styles.buttonText}>REGISTER</Text>
           </TouchableOpacity>

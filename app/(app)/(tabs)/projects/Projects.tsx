@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     width: normalize(10)
   },
   buttonContainer: {
-    backgroundColor: '#FFF', // Hinge-inspired pastel color
+    backgroundColor: '#FFF',
     borderRadius: 8, // Rounded edges
     height: normalize(50),
     borderWidth: 2,

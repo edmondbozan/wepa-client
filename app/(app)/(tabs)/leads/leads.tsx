@@ -51,9 +51,9 @@ const Leads: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  // useEffect(() => {
+  //   fetchData();
+  // }, []);
 
   const renderItem: ListRenderItem<ProjectLeads> = ({ item }) => (
     <View style={styles.itemContainer}>

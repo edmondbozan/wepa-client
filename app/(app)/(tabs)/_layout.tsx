@@ -4,6 +4,10 @@ import { FontAwesome } from '@expo/vector-icons'
 import { useColorScheme } from 'react-native';
 import { useSession } from '@/context/ctx';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import React from 'react';
+
+const LazyLoadScreen = React.lazy(() => import('./settings/settings'));
+
 
 const TabsLayout = () => {
     const colorScheme = useColorScheme();
@@ -56,9 +60,8 @@ const TabsLayout = () => {
             options={{
                 headerShown:false,
                 title:'settings',
-                tabBarIcon: ({ color }) => <FontAwesome size={28} name="user" color={color} /> }}
-            
-        />  
+                tabBarIcon: ({ color }) => <FontAwesome size={28} name="user" color={color} /> }}>
+          </Tabs.Screen>
                 
             {/* <Slot></Slot> */}
         </Tabs>

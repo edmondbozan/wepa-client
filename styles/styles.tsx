@@ -9,7 +9,7 @@ const GlobalStyles = StyleSheet.create({
         borderColor:'#B87333',
         borderWidth:1.5,
         borderRadius: 15, // Rounded edges
-        paddingHorizontal: normalize(15),    
+        paddingHorizontal: normalize(20),    
         paddingVertical:normalize(8),
         // alignItems: 'center',
         justifyContent: 'center',

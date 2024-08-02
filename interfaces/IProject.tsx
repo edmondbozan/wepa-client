@@ -14,6 +14,7 @@ export interface Images{
 } 
 
 export  interface Project {
+        userId:number;
         userName:string;
         userType:string;
         projectId: number;

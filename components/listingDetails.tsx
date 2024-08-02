@@ -101,7 +101,7 @@ interface DetailProps {
                                 <Animated.Image
                                     source={images[imageIndex]}
                                     style={[styles.image, animatedStyles]}
-                                    resizeMode="cover"
+                                      resizeMode="contain"
                                 />
                             </Animated.View>
                         </TapGestureHandler>
@@ -163,20 +163,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#F0F0F0',
     },
-    // doubleTapIcon: {
-    //     position: 'absolute',
-    //     top: 8,  // Adjust top and left as necessary to position the icon correctly
-    //     left: 30,
-    //     zIndex: 1,  // Ensure the icon is above the image
-    //     // padding:5
-    //   },
-    //   doubleTapIcon2: {
-    //     position: 'absolute',
-    //     top: 10,  // Adjust top and left as necessary to position the icon correctly
-    //     left: 32,
-    //     zIndex: 1,  // Ensure the icon is above the image
-    //     fontWeight:'bold'
-    //   },
       iconBackground: {
         position: 'absolute',
         top: normalize(10), // Adjust top and left as necessary to position the icon correctly
@@ -243,7 +229,8 @@ const styles = StyleSheet.create({
         width: '100%',
         height: normalize(420),
         borderRadius: 18,
-        resizeMode:'contain'
+        
+        // resizeMode:'contain'
     },
     card: {
         borderRadius: 18,

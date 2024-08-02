@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { Alert, Button, Text, TextInput, View, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, ImageBackground } from 'react-native';
+import { Alert, Text, TextInput, View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground, ActivityIndicator } from 'react-native';
 import { useSession } from '@/context/ctx';
 import { useState } from 'react';
 import { BASE_URL } from '@/constants/Endpoints';
@@ -8,19 +8,18 @@ export default function SignIn() {
   const { signIn } = useSession();
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const handleRegister = async () => {
+  const handleRegister = () => {
     router.push('/auth/register');
   };
 
-  // token = await Notifications.getExpoPushTokenAsync({
-  //   projectId: Constants.expoConfig.extra.eas.projectId,
-  // });
-
-  const handleForgot = async () => {
+  const handleForgot = () => {
     router.push('/auth/reset');
   };
+
   const handleLogin = async () => {
+    setIsLoading(true);
     try {
       const response = await fetch(BASE_URL + '/api/auth/login', {
         method: 'POST',
@@ -28,10 +27,11 @@ export default function SignIn() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username: username,
-          password: password,
+          username,
+          password,
         }),
       });
+
       if (response.ok) {
         const data = await response.json();
         await signIn(data.token, JSON.stringify(data.userId), data.userType);
@@ -41,16 +41,13 @@ export default function SignIn() {
       }
     } catch (error) {
       console.error(error);
-      // Check if the error has a response attached with more details
-      if (error.response) {
-        error.response.json().then(body => {
-          Alert.alert('An error occurred', body.message || 'Please try again later');
-        }).catch(() => {
-          Alert.alert('An error occurred', 'Please try again later');
-        });
-      } else {
+      if (error instanceof Error) {
         Alert.alert('An error occurred', error.message || 'Please try again later');
+      } else {
+        Alert.alert('An error occurred', 'Please try again later');
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -59,7 +56,7 @@ export default function SignIn() {
       <ImageBackground source={require('.././../assets/images/background.jpg')} style={styles.background} imageStyle={{ opacity: 0.9 }}>
         <View style={styles.container}>
           <View style={styles.header}>
-            <TouchableOpacity onPress={handleRegister}>
+            <TouchableOpacity onPress={handleRegister} disabled={isLoading}>
               <Text style={styles.signUpText}>Sign Up →</Text>
             </TouchableOpacity>
           </View>
@@ -73,6 +70,7 @@ export default function SignIn() {
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
+            editable={!isLoading}
           />
           <Text style={styles.label}>PASSWORD</Text>
           <TextInput
@@ -82,18 +80,23 @@ export default function SignIn() {
             placeholderTextColor="#FFF"
             secureTextEntry
             style={styles.input}
+            editable={!isLoading}
           />
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>           
-            <Text style={styles.buttonText}>SIGN IN</Text>
+          <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={isLoading}>
+            {isLoading ? (
+              <ActivityIndicator color="#000" />
+            ) : (
+              <Text style={styles.buttonText}>SIGN IN</Text>
+            )}
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={handleForgot}>           
+          <TouchableOpacity style={styles.button} onPress={handleForgot} disabled={isLoading}>
             <Text style={styles.buttonText}>FORGOT PASSWORD</Text>
           </TouchableOpacity>
         </View>
       </ImageBackground>
     </ScrollView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   background: {
@@ -111,11 +114,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     marginBottom: 30,
   },
-  headerText: {
-    color: '#FFF',
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
   signUpText: {
     color: '#FFF',
     fontSize: 16,
@@ -127,7 +125,7 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 50,
-    borderColor: '#FFF',    
+    borderColor: '#FFF',
     borderWidth: 1,
     marginBottom: 10,
     paddingHorizontal: 10,
@@ -142,8 +140,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 8,
     marginTop: 20,
-    borderWidth:2,
-    borderColor:'#B87333'
+    borderWidth: 2,
+    borderColor: '#B87333',
   },
   buttonText: {
     color: '#000',

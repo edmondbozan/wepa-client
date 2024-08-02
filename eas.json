@@ -2,7 +2,7 @@
   "build": {
     "production": {
       "ios": {
-        "simulator": true
+        "simulator": false
       }
     },
     "development": {

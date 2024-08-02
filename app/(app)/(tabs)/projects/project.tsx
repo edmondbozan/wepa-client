@@ -30,6 +30,7 @@ export default function ProjectComponent() {
   const [isProjectNameValid, setProjectNameValid] = useState<boolean>(true);
   const [isCostValid, setCostValid] = useState<boolean>(true);
   const [errors, setErrors] = useState<string[]>([]);
+  const {userType } = useSession();
 
   const validateCategory = (): boolean => {
     if (selectedCategory) {
@@ -197,7 +198,7 @@ export default function ProjectComponent() {
         <FontAwesome name="arrow-left" /> Projects
       </Text>
       <ScrollView style={styles.scrollContainer}>
-        <Text style={{ fontWeight: 'bold' }}>Build a project. Get Dollars. Or just show off.</Text>
+<     Text style={{ fontWeight: '400' , fontSize:normalize(12)}}>{(userType === 'professional') ? 'Build a project to begin generating leads.' : 'Build a project to demonstarte that drip.' }</Text>
         <View style={styles.horizontalRule} />
 
         <View>

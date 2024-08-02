@@ -115,7 +115,7 @@ export default function Project() {
 
 const styles = StyleSheet.create({
   buttonContainer: {
-    backgroundColor: '#e4eaf7', // Hinge-inspired pastel color
+    backgroundColor: '#e4eaf7', 
     borderRadius: 15, // Rounded edges
     paddingHorizontal: 20,
     paddingVertical: 8,

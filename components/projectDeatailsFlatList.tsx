@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Video } from 'expo-av';
 import { ProjectDetails } from '@/interfaces/IProject';
-import { normalize } from 'react-native-elements';
+import { Button, normalize } from 'react-native-elements';
 import GlobalStyles from '@/styles/styles';
 
 interface ItemProps {
@@ -40,14 +40,12 @@ const ListItem: React.FC<ItemProps> = ({ item, onDelete }) => {
   );
 
   return (
-    <><View style={{width:normalize(110)}} >
+    <>
        <TouchableOpacity onPress={() => onDelete(item.projectDetailId)}>
-        <View style={GlobalStyles.buttonContainer}>
-        <Text style={GlobalStyles.button}>Delete Group</Text>
+        <View style={styles.buttonContainer}>
+        <Text style={styles.button}>Delete Group</Text>
         </View>
-
       </TouchableOpacity> 
-    </View>
     <ScrollView
       horizontal
       showsVerticalScrollIndicator={false}
@@ -78,9 +76,7 @@ const ListItem: React.FC<ItemProps> = ({ item, onDelete }) => {
 const styles = StyleSheet.create({
   itemContainer: {
     borderRadius: 10,
-//    padding:10
     margin:normalize(10),
-//     justifyContent:'flex-start'
   },
   image: {
     width: normalize(200),
@@ -106,18 +102,28 @@ const styles = StyleSheet.create({
     borderWidth:1,
     padding:normalize(10),
   },
-  deleteButton: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 10,
-    backgroundColor: 'red',
-    borderRadius: 10,
-    margin: 10,
+  buttonContainer: {
+    backgroundColor: '#e4eaf7',
+    borderColor: '#B87333',
+    borderWidth: 1.5,
+    borderRadius: 15, // Rounded edges
+    paddingHorizontal: normalize(15),
+    paddingVertical: normalize(8),
+     alignItems: 'center',
+     justifyContent: 'space-evenly',
+    shadowColor: '#000', 
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 0,
+    elevation: 5, // For Android shadow
+    color: '#000',
+    width:normalize(200)
   },
-  deleteButtonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
+  button: {
+    fontSize: normalize(12),
+    fontWeight: 'black',
+    color: '#000'
+  }
 });
 
 export default ListItem;
