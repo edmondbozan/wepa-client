@@ -12,6 +12,10 @@ const UserSettings: React.FC = () => {
   const { signOut, userId } = useSession();
   const [isDeleting, setIsDeleting] = useState(false);
 
+const handleHelp = () =>{
+  router.navigate("help/help_0");
+}
+
   const handleSignOut = () => {
     signOut();
     router.navigate("auth/login");
@@ -59,6 +63,13 @@ const UserSettings: React.FC = () => {
     <SafeAreaView style={{ flex: 1 }}>
       <GestureHandlerRootView>
         <View style={styles.itemContainer}>
+        <TouchableOpacity onPress={handleHelp} disabled={isDeleting}>
+            <View style={styles.optionContainer}>
+              <FontAwesome name="question" size={18} color="#B87333" />
+              <Text> Help</Text>
+            </View>
+          </TouchableOpacity>
+          <View style={styles.separator} />
           <TouchableOpacity onPress={handleSignOut} disabled={isDeleting}>
             <View style={styles.optionContainer}>
               <FontAwesome name="lock" size={18} color="#B87333" />

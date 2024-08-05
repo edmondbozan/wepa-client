@@ -30,7 +30,7 @@ const Register: React.FC = () => {
   const [isProfessional, setIsEnabled] = React.useState(false);
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
-  const validateUserName = () : boolean => {
+  const validateUserName = (): boolean => {
     if (username.length > 0) {
       setUsernameValid(true);
       return true;
@@ -40,7 +40,7 @@ const Register: React.FC = () => {
     }
   }
 
-  const validatePassword = () : boolean => {
+  const validatePassword = (): boolean => {
     if (password.length > 6) {
       setPasswordValid(true);
       return true;
@@ -50,7 +50,7 @@ const Register: React.FC = () => {
     }
   }
 
-  const validatePhone = () : boolean => {
+  const validatePhone = (): boolean => {
     const phoneRegex = /^\+1 \(\d{3}\) \d{3}-\d{4}$/; // US phone number format: +1 (123) 456-7890
     if (phoneRegex.test(phone)) {
       setPhoneValid(true);
@@ -61,9 +61,9 @@ const Register: React.FC = () => {
     }
   }
 
-  const validateEmail = () : boolean => {
+  const validateEmail = (): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (emailRegex.test(email)){
+    if (emailRegex.test(email)) {
       setEmailValid(true);
       return true;
     } else {
@@ -72,7 +72,7 @@ const Register: React.FC = () => {
     }
   };
 
-  const  validateZip= () : boolean => {
+  const validateZip = (): boolean => {
     if (zipcode.length == 5) {
       setZipValid(true);
       return true;
@@ -100,61 +100,64 @@ const Register: React.FC = () => {
 
   const handleRegister = async () => {
     const isValid = handleValidation();
-    if (isValid) 
-    {
-    try {
-      const response = await fetch(BASE_URL + '/api/Auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userType: (isProfessional) ? 'professional' : 'user',
-          Username: username,
-          Email: email,
-          Password: password,
-          ZipCode: zipcode,
-          PhoneNumber: phone
-        }),
-      });
+    if (isValid) {
+      try {
+        const response = await fetch(BASE_URL + '/api/Auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userType: (isProfessional) ? 'professional' : 'user',
+            Username: username,
+            Email: email,
+            Password: password,
+            ZipCode: zipcode,
+            PhoneNumber: phone
+          }),
+        });
 
-      const data = await response.json();
-      if (response.ok) {
-        await signIn(data.token, JSON.stringify(data.userId), data.userType);
-        router.replace('/');
-      } else {
-        Alert.alert('Error', data.message || 'Registration failed');
+        const data = await response.json();
+        if (response.ok) {
+          await signIn(data.token, JSON.stringify(data.userId), data.userType);
+          router.replace('/');
+        } else {
+          Alert.alert('Error', data.message || 'Registration failed');
+        }
+      } catch (error) {
+        Alert.alert('Error', 'An error occurred while registering. Please try again.');
       }
-    } catch (error) {
-      Alert.alert('Error', 'An error occurred while registering. Please try again.');
     }
-  }
   }
 
   return (
-    <SafeAreaView>
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }} automaticallyAdjustKeyboardInsets={true}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1, backgroundColor: "rgba(0, 0, 0, 0.1)",}} automaticallyAdjustKeyboardInsets={true}>
+        {/* <ImageBackground
+          source={require('../../assets/images/register-background.jpg')}
+          imageStyle={{ opacity: 1, height: '100%' }}
+        > */}
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.signUpButton} onPress={() => { router.replace('/auth/login'); }}>
+            <Text style={styles.signUpText}>
+              <FontAwesome name="arrow-left" /> login
+            </Text>
+          </TouchableOpacity>
+        </View>
         <View style={styles.container}>
-          <Text style={{ color: "#000", fontSize: 16, marginTop: 10 }} onPress={() => { router.replace('/auth/login'); }}>
-            <FontAwesome name="arrow-left" /> Login
-          </Text>
-          <ImageBackground source={require('.././../assets/images/register-background.jpg')} style={styles.background} imageStyle={{ opacity: 0.45, backgroundColor: "#000" }}>
-            <TypingText text={'Find your forever professional'}></TypingText>
-            {/* <Text style={{color:"#fff", marginLeft:20, fontWeight:'bold'}}></Text> */}
-          </ImageBackground>
-          <View style={{flexDirection:'row', alignItems:'center',marginTop:normalize(20)}}>
-          <Switch
-         trackColor={{ false: "#C0C0C0", true: "#4CAF50" }}
-         thumbColor={isProfessional ? "#FFD700" : "#D2691E"}
-         ios_backgroundColor="#C0C0C0"
-         onValueChange={toggleSwitch}
-         value={isProfessional}
-      />
-      <Text> 
-            <Text style={{fontWeight:'bold', color:'#B87333'}}>{isProfessional?' I am a professional.':' I am not a professional.'}</Text>
-            <Text style={{fontWeight:'bold', color:'red'}}>{isProfessional && `${'\n'} Your phone number will be displayed.` }</Text>
-      </Text>
-      </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: normalize(20) }}>
+            <Switch
+              trackColor={{ false: "#C0C0C0", true: "#C0C0C0" }}
+              thumbColor={isProfessional ? "#B87333" : "#000"}
+              ios_backgroundColor="#C0C0C0"
+              onValueChange={toggleSwitch}
+              value={isProfessional}
+            />
+            <Text>
+              <Text style={{ fontWeight: 'bold', color: '#000' }}>{isProfessional ? ' i am a professional.' : ' i am not a professional.'}</Text>
+              <Text style={{ fontWeight: 'bold', color: 'red' }}>{isProfessional && `${'\n'} your phone number will be displayed.`}</Text>
+            </Text>
+          </View>
           {/* <View style={styles.radioContainer}>
             <TouchableOpacity style={styles.radio} onPress={() => setUserType('professional')}>
               <View style={userType === 'professional' ? styles.radioSelected : styles.radioUnselected} />
@@ -166,7 +169,7 @@ const Register: React.FC = () => {
             </TouchableOpacity>
           </View> */}
 
-          <Text style={styles.label}>Display Name:</Text>
+          <Text style={styles.label}>display name:</Text>
           <TextInput
             value={username}
             onChangeText={setUsername}
@@ -175,18 +178,18 @@ const Register: React.FC = () => {
             onBlur={validateUserName}
           />
           {!isUserNameValid &&
-            (<Text style={{ color: 'red' }}>Display Name is required</Text>)}
-          <Text style={styles.label}>Password:</Text>
+            (<Text style={{ color: 'red' }}>display name is required</Text>)}
+          <Text style={styles.label}>password:</Text>
           <TextInput
             value={password}
-             onChangeText={setPassword}
+            onChangeText={setPassword}
             placeholderTextColor="#000"
             secureTextEntry
             onBlur={validatePassword}
             style={[styles.input, !isPasswordValid && styles.inputError]}
           />
           {!isPasswordValid &&
-            (<Text style={{ color: 'red' }}>Password is required and must be {'>'} 6 charchters </Text>)}
+            (<Text style={{ color: 'red' }}>password is required and must be {'>'} 6 charchters </Text>)}
 
           {/* <Text style={styles.label}>Verify Password:</Text>
           <TextInput
@@ -197,7 +200,7 @@ const Register: React.FC = () => {
             secureTextEntry
             style={[styles.input, validationErrors.verifyPassword && styles.inputError]}
           /> */}
-          <Text style={styles.label}>Phone:</Text>
+          <Text style={styles.label}>phone:</Text>
           <TextInputMask
             type={'custom'}
             options={{
@@ -212,9 +215,9 @@ const Register: React.FC = () => {
             style={[styles.input, !isPhoneValid && styles.inputError]}
           />
           {!isPhoneValid &&
-            (<Text style={{ color: 'red' }}>Proper phone number is required.</Text>)}
+            (<Text style={{ color: 'red' }}>proper phone number is required.</Text>)}
 
-          <Text style={styles.label}>Email:</Text>
+          <Text style={styles.label}>e-mail:</Text>
           <TextInput
             value={email}
             onChangeText={setEmail}
@@ -227,9 +230,9 @@ const Register: React.FC = () => {
 
           />
           {!isEmailValid &&
-            (<Text style={{ color: 'red' }}>Proper email is required.</Text>)}
-          
-          <Text style={styles.label}>Zipcode:</Text>
+            (<Text style={{ color: 'red' }}>proper email is required.</Text>)}
+
+          <Text style={styles.label}>zipcode:</Text>
           <TextInput
             value={zipcode}
             onChangeText={setZipcode}
@@ -240,18 +243,16 @@ const Register: React.FC = () => {
           />
           {!isZipValid &&
             (<Text style={{ color: 'red' }}>Proper zip is required.</Text>)}
-          
-<View style={{marginVertical:10}}>
-  <Text>By tapping 'REGISTER', you confirm that you have read and agree to our <ExternalLink style={{color: '#007bff',textDecorationLine: 'underline'}} href={'https://app.termly.io/policy-viewer/policy.html?policyUUID=92b8a492-eea6-4e68-9727-7430bc07dac5'}>Privacy Policy</ExternalLink> and 
-  <ExternalLink href={'https://app.termly.io/policy-viewer/policy.html?policyUUID=e7fd608a-64a0-4e12-91b9-e154a15eb707'} style={{color: '#007bff',textDecorationLine: 'underline'}} > Terms and Conditions</ExternalLink>
-  .</Text>
-</View>
 
-         
+          <View style={{ marginVertical: 10 }}>
+            <Text>by tapping 'register', you confirm that you have read and agree to our <ExternalLink style={{ color: '#007bff', textDecorationLine: 'underline' }} href={'https://app.termly.io/policy-viewer/policy.html?policyUUID=92b8a492-eea6-4e68-9727-7430bc07dac5'}>privacy policy</ExternalLink> and
+              <ExternalLink href={'https://app.termly.io/policy-viewer/policy.html?policyUUID=e7fd608a-64a0-4e12-91b9-e154a15eb707'} style={{ color: '#007bff', textDecorationLine: 'underline' }} > terms and conditions</ExternalLink>.</Text>
+          </View>
           <TouchableOpacity onPress={handleRegister} style={styles.button}>
-            <Text style={styles.buttonText}>REGISTER</Text>
+            <Text style={styles.buttonText}>register</Text>
           </TouchableOpacity>
         </View>
+        {/* </ImageBackground> */}
       </ScrollView>
     </SafeAreaView>
   );
@@ -267,10 +268,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
   },
   container: {
-    flex: 1,
-    justifyContent: 'center',
+    borderColor: '#B87333',
+    borderWidth: 1,
     padding: 20,
-    backgroundColor: 'rgba(221, 221, 221, 0.5)',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 3,
+    margin: 20,
   },
   radioContainer: {
     flexDirection: 'row',
@@ -282,7 +290,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   label: {
-    color: '#B87333',
+    color: '#000',//'#B87333',
     marginBottom: 5,
     marginTop: 15,
     fontWeight: 'bold'
@@ -290,17 +298,17 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 50,
-    borderColor: '#FFF',
+    borderColor: '#B87333',
     borderWidth: 1,
     marginBottom: 10,
     paddingHorizontal: 10,
-    color: '#000',
-    backgroundColor: 'rgba(255, 255, 255, 0.3)', 
-    borderRadius: 5,
+    color: '#FFF',
+    backgroundColor: 'rgba(111, 111, 111, .1)', // Darker background for inputs
+    borderRadius: 5
   },
   inputError: {
     borderColor: 'red',
-    color: 'red'
+    // color: 'red'
   },
   buttonDisabled: {
     backgroundColor: '#ccc', // Grey background for disabled button
@@ -319,8 +327,35 @@ const styles = StyleSheet.create({
     color: '#000',
     fontSize: 18,
     fontWeight: 'bold',
-  }
+  },
+  signUpButton: {
+    borderColor: '#B87333',
+    borderWidth: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Light background for better contrast
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+  },
+  signUpText: {
+    color: '#000',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textShadowColor: 'rgba(255, 255, 255, 0.8)', // Text shadow for better readability
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 1,
+  },
+  header: {
+    width: 100,
+    //    position: "absolute",
+    //    left: 0,
+    margin: 20
+    //    right:10,
+    //    position:"absolute",
 
+
+    //    flexDirection: 'row',
+    //  marginBottom: 20,
+  },
 });
 
 export default Register;

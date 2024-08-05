@@ -120,7 +120,6 @@ export default function ProjectComponent() {
   }, [projectData]);
 
   const deleteItem = async (id: number) => {
-    console.log(BASE_URL + '/api/upload/projectDetails/' + id);
     try {
       const response = await fetchWithAuth(BASE_URL + '/api/upload/projectDetails/' + id, {
         method: 'DELETE',

@@ -4,9 +4,10 @@ import { SessionProvider, useSession } from '@/context/ctx';
 import fetchWithAuth from '@/context/FetchWithAuth';
 import { BASE_URL } from '@/constants/Endpoints';
 import { Project, ProjectDetails } from '@/interfaces/IProject';
-import { FontAwesome } from '@expo/vector-icons';
- import { normalize } from 'react-native-elements'
-import { router, useFocusEffect } from 'expo-router';
+import { FontAwesome5 } from '@expo/vector-icons';
+import { normalize } from 'react-native-elements'
+
+import { useFocusEffect } from 'expo-router';
 import ProjectModal from '@/components/ProjectModal';
 //import normalize from '@/fonts/fonts';
 
@@ -25,7 +26,7 @@ const Likes: React.FC = () => {
 
   const fetchData = async () => {
     try {
-      const response = await fetchWithAuth(BASE_URL + '/api/Projects/user/' + userId + '/likes');  
+      const response = await fetchWithAuth(BASE_URL + '/api/Projects/user/' + userId + '/likes');
       const result: Project[] = await response.json();
       if (response.ok) {
         setData(result);
@@ -36,22 +37,23 @@ const Likes: React.FC = () => {
       setError(JSON.stringify(err));
     } finally {
       setLoading(false);
-    }};
+    }
+  };
 
 
-    useFocusEffect(
-      useCallback(() => {
-        fetchData();
-        setRefreshKey((prevKey) => prevKey + 1);
-      }, [])
-    );
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+      setRefreshKey((prevKey) => prevKey + 1);
+    }, [])
+  );
 
-  const handleViewProject = (id:number)=>{
-      setProjectId(id);
-      setProjectModalVisible(true);    
+  const handleViewProject = (id: number) => {
+    setProjectId(id);
+    setProjectModalVisible(true);
   }
 
-  
+
 
 
 
@@ -72,7 +74,7 @@ const Likes: React.FC = () => {
     return (
       <View style={styles.errorContainer}>
         <Text>Server Error</Text>
-        <TouchableOpacity onPress={()=>{setError(null); fetchData(); }} style={styles.buttonContainer}>
+        <TouchableOpacity onPress={() => { setError(null); fetchData(); }} style={styles.buttonContainer}>
           <Text>Reload</Text>
         </TouchableOpacity>
       </View>
@@ -84,66 +86,68 @@ const Likes: React.FC = () => {
 
   const renderItem = ({ item }: { item: Project }) => {
     const imageUri = findFirstNonNullAfterImage(item.details);
-  return (
+    return (
 
-    <SafeAreaView style={{flex:1}}>
-   <View style={styles.projectContainer}>
-      <TouchableOpacity onPress={() =>{handleViewProject(item.projectId)} }>
-        <ImageBackground
-        source={
-          imageUri
-            ? { uri: imageUri }
-            : require('../../../../assets/images/background.jpg')
-        }
-          style={styles.backgroundImage}
-          imageStyle={{ borderRadius: 8 }}
-        >
-          <View style={styles.contentContainer}>
-            <Text style={styles.title}>{item.title}</Text>
-            <View >
-              <Text style={styles.category}>Category: {item.categoryName}</Text>
-              <View style={styles.space} />
-              <Text style={styles.cost}>Cost: ${item.cost}</Text>
-            </View>
-            <View style={styles.icon}>
-              <View>
-                <Text ><FontAwesome name="heart" size={normalize(20)} color="#FA9BCF" /> {item.likes}</Text>
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={styles.projectContainer}>
+          <TouchableOpacity onPress={() => { handleViewProject(item.projectId) }}>
+            <ImageBackground
+              source={
+                imageUri
+                  ? { uri: imageUri }
+                  : require('../../../../assets/images/background.jpg')
+              }
+              style={styles.backgroundImage}
+              imageStyle={{ borderRadius: 8 }}
+            >
+              <View style={styles.contentContainer}>
+                <Text style={styles.title}>{item.title}</Text>
+                <View >
+                  <Text style={styles.category}>Category: {item.categoryName}</Text>
+                  <View style={styles.space} />
+                  <Text style={styles.cost}>Cost: ${item.cost}</Text>
+                </View>
+                <View style={styles.icon}>
+                  <View>
+                    <Text ><FontAwesome5 name="heart" size={normalize(20)} color="#FA9BCF" /> {item.likes}</Text>
+                  </View>
+                  <View style={styles.space} />
+                  <View>
+                    <Text ><FontAwesome5 name="comment" size={normalize(20)} color="#000" /> {item.messageCount}</Text>
+                  </View>
+                </View>
               </View>
-              <View style={styles.space} />
-              <View>
-                <Text ><FontAwesome name="comment" size={normalize(20)} color="#000" /> {item.messageCount}</Text>
-              </View>
-            </View>
-          </View>
-        </ImageBackground>
-      </TouchableOpacity>
-      {isProjectModalVisible && (
-      <ProjectModal visible={isProjectModalVisible} projectId={projectId} onClose={() => setProjectModalVisible(false)}>
-     </ProjectModal>
-      )}        
-     </View>
-     </SafeAreaView>
-  );
-};
+            </ImageBackground>
+          </TouchableOpacity>
+          {isProjectModalVisible && (
+            <ProjectModal visible={isProjectModalVisible} projectId={projectId} onClose={() => setProjectModalVisible(false)}>
+            </ProjectModal>
+          )}
+        </View>
+      </SafeAreaView>
+    );
+  };
 
   return (
-    <SafeAreaView style={{flex:1}}>
+    <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
 
         {(data.length > 0) ? (
-          <><Text style={{fontWeight:500,margin:10}}>Your Liked Projects  {'\n'}</Text>
-          <FlatList
-            data={data}
-            keyExtractor={(item) => item.projectId.toString()}
-            renderItem={renderItem} /></>
-         ) :  
-         (
-         <ImageBackground style={{flex:1}} source={require('../../../../assets/images/reset-background.jpeg')} imageStyle={{ opacity: 0.25, height:'100%', justifyContent:'center', alignItems:'center' }}>
-          <View style={{marginTop:100, margin:normalize(20), padding:15, borderRadius:12, backgroundColor:'rgba(211, 211, 211, .35)'}}>
-            <Text style={{color:"#654321", fontSize:20, fontWeight:'700', lineHeight:30}}>Looks like you do not have any likes.{'\n\n'}</Text>
-          </View>
-         </ImageBackground>)}
-      </View>      
+          <><Text style={{ fontWeight: 500, margin: 10 }}>Your Liked Projects  {'\n'}</Text>
+            <FlatList
+              data={data}
+              keyExtractor={(item) => item.projectId.toString()}
+              renderItem={renderItem} /></>
+        ) :
+          (
+            <ImageBackground style={{ flex: 1 }} source={require('../../../../assets/images/reset-background.jpeg')} imageStyle={{ opacity: 1, height: '100%', justifyContent: 'center', alignItems: 'center' }}>
+              <View style={{ marginTop: 90, margin: normalize(20), padding: 15, borderRadius: 12, backgroundColor: 'rgba(211, 211, 211, .80)' }}>
+                <Text style={{ color: "#000", fontSize: 30, fontWeight: '200', lineHeight: 30 }}><FontAwesome5 name="heart-broken" size={30} color="#65432" /> you don't have any likes.
+                  tap <FontAwesome5 name="home" size={20} color="#65432" /> home to begin matching with a professional.
+                </Text>
+              </View>
+            </ImageBackground>)}
+      </View>
     </SafeAreaView>
   );
 };
@@ -160,7 +164,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   container: {
-    flex: 1,    
+    flex: 1,
     backgroundColor: 'rgba(221, 221, 221, 0.5)', // 
     // padding: 10,
   },
@@ -225,9 +229,9 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#B87333',
     color: '#000',
-    justifyContent:'center',
-    alignItems:'center',
-    margin:10
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 10
   },
   button: {
     fontSize: normalize(18),

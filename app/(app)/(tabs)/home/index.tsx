@@ -409,11 +409,12 @@ export default function App() {
         />)}
       {(data.length > 0) ? (<>
         <TouchableOpacity style={styles.floatingButtonLeft} onPress={handleLeftButtonClick}   >
-          <FontAwesome6 name="heart" size={30} color="black" />
+          <FontAwesome5 name="heart" size={30} color="black" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.floatingButtonRight} onPress={() => likeProject(null, false, false)} >
           <FontAwesome5 name="heart-broken" size={30} color="#000" />
-        </TouchableOpacity></>
+        </TouchableOpacity>        
+        </>
       ) : (<></>)}
 
 

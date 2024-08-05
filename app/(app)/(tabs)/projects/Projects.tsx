@@ -133,7 +133,7 @@ const Projects: React.FC = () => {
                   : require('../../../../assets/images/background.jpg')
               }
               style={styles.backgroundImage}
-              imageStyle={{ borderRadius: 8 }}
+              imageStyle={{ borderRadius: 8,  borderColor:"#B87333", borderWidth:1, opacity:.2, shadowColor:"#000" }}
             >
               <View style={styles.contentContainer}>
                 <View style={{ flexDirection:'row' }}>
@@ -191,7 +191,7 @@ const Projects: React.FC = () => {
               renderItem={renderItem} /></>
         ) :
           (
-            <ImageBackground style={{ flex: 1 }} source={require('../../../../assets/images/reset-background.jpeg')} imageStyle={{ opacity: 0.25, height: '100%', justifyContent: 'center', alignItems: 'center' }}>
+            <ImageBackground style={{ flex: 1 }} source={require('../../../../assets/images/projects.jpg')} imageStyle={{ opacity: 0.9, height: '100%', justifyContent: 'center', alignItems: 'center' }}>
               <View style={{ marginTop: 100, margin: normalize(20), padding: 15, borderRadius: 12, backgroundColor: 'rgba(211, 211, 211, .35)' }}>
                 <Text style={{ color: "#654321", fontSize: 20, fontWeight: '700', lineHeight: 30 }}>Looks like you do not have any projects. Click the add new project button below to get started.{'\n\n'}</Text>
                 <View style={{ alignItems: 'center' }}>
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: 'rgba(221, 221, 221, 0.5)', // 
+    backgroundColor: 'rgba(221, 221, 221, 0.1)', // 
     // padding: 10,
   },
   viewRow: {
@@ -257,10 +257,10 @@ const styles = StyleSheet.create({
     width: '100%',
     height: normalize(300),
     borderRadius: 8,
+    backgroundColor:'rgba(221,221,221,.1)'
   },
   contentContainer: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.7)', // Optional: Add a semi-transparent background to improve text readability
     padding: 10,
     borderRadius: 8,
 

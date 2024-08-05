@@ -10,13 +10,13 @@ import fetchWithAuth from '@/context/FetchWithAuth';
 import { normalize } from 'react-native-elements';
 import { formatDate } from '@/functions/stringfunctions';
 
-interface ProjectLeads{
-  id:number;
-  userName:string;
-  phoneNumber:string;
-  email:string;
-  title:string;
-  createDate:string;     
+interface ProjectLeads {
+  id: number;
+  userName: string;
+  phoneNumber: string;
+  email: string;
+  title: string;
+  createDate: string;
 }
 
 const Leads: React.FC = () => {
@@ -35,17 +35,16 @@ const Leads: React.FC = () => {
   const { userId } = useSession();
   const fetchData = async () => {
     try {
-      const url = BASE_URL + '/api/ProjectLeads/users/' + userId;       
-      console.log(url);
+      const url = BASE_URL + '/api/ProjectLeads/users/' + userId;
       const response = await fetchWithAuth(url);
       const result: ProjectLeads[] = await response.json();
-      if (response.ok) {       
+      if (response.ok) {
         setData(result);
       } else {
         Alert.alert('Page Load Error', 'Page Load');
       }
     } catch (err) {
-       setError(JSON.stringify(err));
+      setError(JSON.stringify(err));
     } finally {
       setLoading(false);
     }
@@ -97,12 +96,12 @@ const Leads: React.FC = () => {
           <ImageBackground
             source={require('../../../../assets/images/register-background.jpg')}
             style={styles.backgroundImage}
-            imageStyle={{ opacity: 0.25 }}
+            imageStyle={{ opacity: 1 }}
           >
-            <View style={styles.noLeadsContainer}>
-              <Text style={styles.noLeadsText}>
-                You do not have any Leads. {'\n'}{'\n'}
-                Create projects to generate leads. {'\n\n'}
+            <View style={styles.itemContainer}>
+              <Text style={{ color: "#000", fontSize: normalize(30), fontWeight: '200', lineHeight: normalize(30) }}>
+                you do not have any leads. 
+                create projects to generate leads. {'\n\n'}
               </Text>
             </View>
           </ImageBackground>
@@ -123,8 +122,9 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
+
+    // justifyContent: 'center',
+    // alignItems: 'center',
   },
   noLeadsContainer: {
     marginTop: 100,
@@ -142,9 +142,9 @@ const styles = StyleSheet.create({
   itemContainer: {
     borderColor: '#B87333',
     borderWidth: 1,
-    marginBottom: 15,
     padding: 20,
     backgroundColor: '#fff',
+    opacity: .9,
     borderRadius: 10,
     shadowColor: '#000',
     shadowOpacity: 0.1,
