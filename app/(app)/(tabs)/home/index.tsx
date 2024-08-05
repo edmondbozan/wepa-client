@@ -242,6 +242,7 @@ export default function App() {
       });
 
       const responseText = await response.json();
+      // console.log(responseText);
       if (!response.ok) {
         Alert.alert('Error', responseText.message || 'Like failed');
 //        fetchData();

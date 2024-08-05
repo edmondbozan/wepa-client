@@ -7,7 +7,7 @@ import { Project, ProjectDetails } from '@/interfaces/IProject';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { normalize } from 'react-native-elements'
 
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import ProjectModal from '@/components/ProjectModal';
 //import normalize from '@/fonts/fonts';
 
@@ -141,10 +141,23 @@ const Likes: React.FC = () => {
         ) :
           (
             <ImageBackground style={{ flex: 1 }} source={require('../../../../assets/images/reset-background.jpeg')} imageStyle={{ opacity: 1, height: '100%', justifyContent: 'center', alignItems: 'center' }}>
-              <View style={{ marginTop: 90, margin: normalize(20), padding: 15, borderRadius: 12, backgroundColor: 'rgba(211, 211, 211, .80)' }}>
-                <Text style={{ color: "#000", fontSize: 30, fontWeight: '200', lineHeight: 30 }}><FontAwesome5 name="heart-broken" size={30} color="#65432" /> you don't have any likes.
-                  tap <FontAwesome5 name="home" size={20} color="#65432" /> home to begin matching with a professional.
+               <View style={styles.itemContainer}>
+                <Text style={{ color: "#000", fontSize: 30, fontWeight: '200', lineHeight: 30 }}><FontAwesome5 name="heart-broken" size={30} color="#65432" /> you have not liked any projects.
+                  tap below to begin matching with a professional.
                 </Text>
+                <TouchableOpacity onPress={() => {
+                    router.push(
+                      {
+                        pathname: '/home',
+                        params: { data: null }
+                      }
+                    )
+                  }} >
+                    <View style={styles.buttonContainer}>
+                      <Text style={styles.button}>review projects</Text>
+                    </View>
+                  </TouchableOpacity>
+
               </View>
             </ImageBackground>)}
       </View>
@@ -242,7 +255,21 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
     borderBottomWidth: 1,
     marginVertical: normalize(10),
-  }
+  },
+  itemContainer: {
+    borderColor: '#B87333',
+    borderWidth: 1,
+    padding: 20,
+    backgroundColor: '#fff',
+    opacity: .9,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 2,
+    elevation: 2,
+    margin: 20,
+  },
 });
 
 export default Likes;

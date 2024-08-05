@@ -4,9 +4,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useSession } from '@/context/ctx';
 import { FontAwesome } from '@expo/vector-icons';
-import fetchWithAuth from '@/context/FetchWithAuth';
-import { BASE_URL } from '@/constants/Endpoints';
-import { GestureHandlerRootView, TouchableOpacity } from 'react-native-gesture-handler';
 import { normalize } from 'react-native-elements';
 
 const UserSettings: React.FC = () => {
@@ -16,24 +13,20 @@ const UserSettings: React.FC = () => {
 const handleHelp = () =>{
   router.navigate("help/help_0");
 }
-const handleNext = () =>{
-  router.navigate("/help/help_1");
-}
-
 const handleClose = () =>{
     router.navigate("settings/settings");
   }
-
+  const handleNext = () =>{
+    router.navigate("help/hrlp_1");
+  }
 
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-              <Text onPress={handleClose}>Close</Text>
-        <Text onPress={handleNext}>next</Text>
-
       <ImageBackground style={{ flex: 1 }} source={require('../../assets/images/reset-background.jpeg')} imageStyle={{ opacity: 1, height: '100%', justifyContent: 'center', alignItems: 'center' }}>
-
-        {/* <View style={styles.itemContainer}>
+        <Text onPress={handleClose}>close</Text>
+        <Text onPress={handleNext}>next</Text>
+        <View style={styles.itemContainer}>
             <Text style={{fontSize:normalize(30), fontWeight:200}}>a more moderen approach for matching home professionals and home owners.</Text>       
         </View>
         <View style={styles.itemContainer}>
@@ -41,7 +34,7 @@ const handleClose = () =>{
         </View>
         <View style={styles.itemContainer}>
             <Text style={{fontSize:normalize(30), fontWeight:200}}>home owners: looking for a profesional or just an inspiration we got you.</Text>       
-        </View> */}
+        </View>
         </ImageBackground>
     </SafeAreaView>
   );

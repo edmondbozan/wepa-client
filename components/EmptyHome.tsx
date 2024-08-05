@@ -41,12 +41,12 @@ const EmptyHome: React.FC<EmptyHomeProps> = ({ onUnlike }) => {
       <ImageBackground style={{ flex: 1 }} source={require('../assets/images/background.jpg')} imageStyle={{ opacity: 1, height: '100%' }}>
       <View style={styles.itemContainer}>
           <Text style={{ color: "#000", fontSize: normalize(30), fontWeight: '200', lineHeight: normalize(30) }}>
-            You have viewed all projects.
-            Adjust your criteria above to see more.
+            you have viewed all projects.
+            adjust your criteria above to see more.
           </Text>
           <View style={{ alignItems: 'center' }}>
             <TouchableOpacity style={styles.skippedButton} onPress={unlikeProjects}>
-              <Text style={styles.skippedButtonText}>Review skipped projects</Text>
+              <Text style={styles.skippedButtonText}>review skipped projects</Text>
             </TouchableOpacity>
           </View>
         </View>

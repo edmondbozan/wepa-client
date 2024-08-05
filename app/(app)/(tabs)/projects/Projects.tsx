@@ -133,19 +133,19 @@ const Projects: React.FC = () => {
                   : require('../../../../assets/images/background.jpg')
               }
               style={styles.backgroundImage}
-              imageStyle={{ borderRadius: 8,  borderColor:"#B87333", borderWidth:1, opacity:.2, shadowColor:"#000" }}
+              imageStyle={{ borderRadius: 8, borderColor: "#B87333", borderWidth: 1, opacity: .2, shadowColor: "#000" }}
             >
               <View style={styles.contentContainer}>
-                <View style={{ flexDirection:'row' }}>
-                <Text style={styles.title}>{item.title}</Text>
-                <TouchableOpacity style={{position:'absolute', right:20}}  onPress={() => handleViewProject(item.projectId)}>
-          <View style={{ flexDirection:'row' }}>
-          <Text style={{fontWeight:400, textDecorationLine:'underline'}}>Preview</Text>
-          {/* <FontAwesome  name="eye" size={20} color="#000000" /> */}
-          {/* <Text> Delete Project</Text> */}
-          </View>
-          </TouchableOpacity>
-          </View>
+                <View style={{ flexDirection: 'row' }}>
+                  <Text style={styles.title}>{item.title}</Text>
+                  <TouchableOpacity style={{ position: 'absolute', right: 20 }} onPress={() => handleViewProject(item.projectId)}>
+                    <View style={{ flexDirection: 'row' }}>
+                      <Text style={{ fontWeight: 400, textDecorationLine: 'underline' }}>Preview</Text>
+                      {/* <FontAwesome  name="eye" size={20} color="#000000" /> */}
+                      {/* <Text> Delete Project</Text> */}
+                    </View>
+                  </TouchableOpacity>
+                </View>
 
                 <View >
                   <Text style={styles.category}>Category: {item.categoryName}</Text>
@@ -188,36 +188,40 @@ const Projects: React.FC = () => {
             <FlatList
               data={data}
               keyExtractor={(item) => item.projectId.toString()}
-              renderItem={renderItem} /></>
+              renderItem={renderItem} />
+            <TouchableOpacity onPress={() => {
+              router.push(
+                {
+                  pathname: '/projects/project',
+                  params: { data: null }
+                }
+              )
+            }} >
+              <View style={styles.buttonContainer}>
+                <Text style={styles.button}>Add New Project</Text>
+              </View>
+            </TouchableOpacity>
+
+          </>
         ) :
           (
             <ImageBackground style={{ flex: 1 }} source={require('../../../../assets/images/projects.jpg')} imageStyle={{ opacity: 0.9, height: '100%', justifyContent: 'center', alignItems: 'center' }}>
-              <View style={{ marginTop: 100, margin: normalize(20), padding: 15, borderRadius: 12, backgroundColor: 'rgba(211, 211, 211, .35)' }}>
-                <Text style={{ color: "#654321", fontSize: 20, fontWeight: '700', lineHeight: 30 }}>Looks like you do not have any projects. Click the add new project button below to get started.{'\n\n'}</Text>
-                <View style={{ alignItems: 'center' }}>
-                  <Text style={{ color: "#654321", fontSize: normalize(17), fontWeight: '600', fontStyle: 'italic', lineHeight: 30 }}> Go ahead and Peacock a bit.</Text>
-                </View>
-                <View style={{ alignItems: 'center' }}>
-                  <Text style={{ color: "#654321", fontSize: normalize(17), fontWeight: '600', fontStyle: 'italic' }}>
-                    We wont judge.</Text>
-                </View>
+              <View style={styles.itemContainer}>
+                  <Text style={{ color: "#000000", fontSize: normalize(30), fontWeight: '200', lineHeight: 30 }}>create projects to start generating leads getting likes. </Text>
+                  <TouchableOpacity onPress={() => {
+                    router.push(
+                      {
+                        pathname: '/projects/project',
+                        params: { data: null }
+                      }
+                    )
+                  }} >
+                    <View style={styles.buttonContainer}>
+                      <Text style={styles.button}>add new project</Text>
+                    </View>
+                  </TouchableOpacity>
               </View>
             </ImageBackground>)}
-
-
-
-        <TouchableOpacity onPress={() => {
-          router.push(
-            {
-              pathname: '/projects/project',
-              params: { data: null }
-            }
-          )
-        }} >
-          <View style={styles.buttonContainer}>
-            <Text style={styles.button}>Add New Project</Text>
-          </View>
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -257,7 +261,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: normalize(300),
     borderRadius: 8,
-    backgroundColor:'rgba(221,221,221,.1)'
+    backgroundColor: 'rgba(221,221,221,.1)'
   },
   contentContainer: {
     flex: 1,
@@ -302,13 +306,28 @@ const styles = StyleSheet.create({
     color: '#000',
     justifyContent: 'center',
     alignItems: 'center',
-    margin: 10
+    margin: 10,
   },
   button: {
     fontSize: normalize(18),
     fontWeight: 'bold',
     color: '#000',
-  }
+  },
+  itemContainer: {
+    borderColor: '#B87333',
+    borderWidth: 1,
+    padding: 20,
+    backgroundColor: '#fff',
+    opacity: .9,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 2,
+    elevation: 2,
+    margin: 20,
+  },
+
 });
 
 export default Projects;

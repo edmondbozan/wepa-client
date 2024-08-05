@@ -101,7 +101,7 @@ const Leads: React.FC = () => {
             <View style={styles.itemContainer}>
               <Text style={{ color: "#000", fontSize: normalize(30), fontWeight: '200', lineHeight: normalize(30) }}>
                 you do not have any leads. 
-                create projects to generate leads. {'\n\n'}
+                create projects to generate leads. 
               </Text>
             </View>
           </ImageBackground>

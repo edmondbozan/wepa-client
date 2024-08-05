@@ -9,6 +9,7 @@ export default function AuthLayout() {
   return (
     <Stack>
     <Stack.Screen name="help_0" options={{ title: 'help', headerShown : false }} />
+    <Stack.Screen name="help_1" options={{ title: 'help_1', headerShown : false }} />
   </Stack>
   );
 }
