@@ -57,7 +57,7 @@ const App: React.FC = () => {
 
     const addItem = async () => {
         console.log(description);
-        if (afterImage == null && videoUri == null && description.length == 0){
+        if (afterImage == null && videoUri == null && description.length == 0) {
             Alert.alert("Please add media.");
             return;
         }
@@ -98,10 +98,10 @@ const App: React.FC = () => {
             const responseText = await response.json(); // Read response as text
 
             if (!response.ok) {
-                Alert.alert("Error",responseText.message)
+                Alert.alert("Error", responseText.message)
                 return;
             }
-            
+
             const responseData = responseText;
 
             const updatedProjectData = projectData;
@@ -127,13 +127,13 @@ const App: React.FC = () => {
 
     if (loading) {
         return (
-          <View style={styles.loadingContainer}>
-            <Text>Saving Media{'\n'}</Text>
-            <ActivityIndicator size="large" color="#0000ff" />
-          </View>
+            <View style={styles.loadingContainer}>
+                <Text>Saving Media{'\n'}</Text>
+                <ActivityIndicator size="large" color="#0000ff" />
+            </View>
         );
-      }
-    
+    }
+
 
     return (
         <SafeAreaView style={styles.container}>
@@ -167,7 +167,7 @@ const App: React.FC = () => {
                         </View>
                         <View style={{ margin: 10 }}>
                             <TextInput
-                                placeholder="Give it some life..."
+                                placeholder="Project Description ..."
                                 value={description}
                                 onChangeText={setDescription}
                                 style={styles.input}
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-      },
+    },
     container: {
         flex: 1,
         backgroundColor: 'rgba(221, 221, 221, 1)',
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         width: null,
         justifyContent: 'space-evenly',
-        
+
     },
     buttonContainer: {
         backgroundColor: '#FFF',
@@ -238,13 +238,13 @@ const styles = StyleSheet.create({
         padding: normalize(5),
         borderRadius: 10,
         marginBottom: normalize(10),
-        borderColor:"#fff",
-        
+        borderColor: "#fff",
+
     },
     videoBox: {
         margin: normalize(10),
         borderWidth: 2,
-        borderColor:"#fff",
+        borderColor: "#fff",
         padding: normalize(5),
         borderRadius: 10,
         marginBottom: normalize(10),
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         shadowColor: '#000',
         color: '#000',
-        padding:10,
+        padding: 10,
         // elevation: 5,
         borderWidth: normalize(1),
     },

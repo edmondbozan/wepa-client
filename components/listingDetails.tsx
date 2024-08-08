@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cardDescription: {
-    fontSize: normalize(19),
+    fontSize: normalize(16),
     fontWeight: '500',
   },
   fullImageContainer: {

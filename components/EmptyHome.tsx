@@ -38,7 +38,7 @@ const EmptyHome: React.FC<EmptyHomeProps> = ({ onUnlike }) => {
   }
   return (
 
-      <ImageBackground style={{ flex: 1 }} source={require('../assets/images/background.jpg')} imageStyle={{ opacity: 1, height: '100%' }}>
+      <ImageBackground style={{ flex: 1 }} source={require('../assets/images/backgrounds/login.jpg')} imageStyle={{ opacity: 1, height: '100%' }}>
       <View style={styles.itemContainer}>
           <Text style={{ color: "#000", fontSize: normalize(30), fontWeight: '200', lineHeight: normalize(30) }}>
             you have viewed all projects.

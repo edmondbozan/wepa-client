@@ -95,7 +95,7 @@ const Likes: React.FC = () => {
               source={
                 imageUri
                   ? { uri: imageUri }
-                  : require('../../../../assets/images/background.jpg')
+                  : require('../../../../assets/images/backgrounds/login.jpg')
               }
               style={styles.backgroundImage}
               imageStyle={{ borderRadius: 8 }}
@@ -140,7 +140,7 @@ const Likes: React.FC = () => {
               renderItem={renderItem} /></>
         ) :
           (
-            <ImageBackground style={{ flex: 1 }} source={require('../../../../assets/images/reset-background.jpeg')} imageStyle={{ opacity: 1, height: '100%', justifyContent: 'center', alignItems: 'center' }}>
+            <ImageBackground style={{ flex: 1 }} source={require('../../../../assets/images/backgrounds/reset-background.jpeg')} imageStyle={{ opacity: 1, height: '100%', justifyContent: 'center', alignItems: 'center' }}>
                <View style={styles.itemContainer}>
                 <Text style={{ color: "#000", fontSize: 30, fontWeight: '200', lineHeight: 30 }}><FontAwesome5 name="heart-broken" size={30} color="#65432" /> you have not liked any projects.
                   tap below to begin matching with a professional.

@@ -1,9 +1,10 @@
-import { router } from 'expo-router';
-import { Alert, Text, TextInput, View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground, ActivityIndicator, SafeAreaView } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { Alert, Text, TextInput, View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSession } from '@/context/ctx';
-import { useRef, useState } from 'react';
 import { BASE_URL } from '@/constants/Endpoints';
 import { normalize } from 'react-native-elements';
+import { router } from 'expo-router';
 
 export default function SignIn() {
   const { signIn } = useSession();
@@ -54,12 +55,11 @@ export default function SignIn() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} automaticallyAdjustKeyboardInsets={true}>
         <ImageBackground
           style={styles.backgroundImage}
-          source={require('../../assets/images/background.jpg')}
-          imageStyle={{ opacity: 1, height: '100%' }}
+          source={require('../../assets/images/backgrounds/login.jpg')}
         >
           <View style={styles.header}>
             <TouchableOpacity onPress={handleRegister} disabled={isLoading} style={styles.signUpButton}>
@@ -67,7 +67,7 @@ export default function SignIn() {
             </TouchableOpacity>
           </View>
           <View style={{ marginTop: normalize(100), marginStart: normalize(20), backgroundColor: 'rgba(0,0,0,.25)' }}>
-            <Text style={{ color: "white", fontSize: normalize(60) }}>find{'\n'}your{'\n'}forever{'\n'}pro</Text>
+            <Text style={styles.headerText}>find your{'\n'}forever pro</Text>
           </View>
           <View style={styles.formContainer}>
             <View style={styles.itemContainer}>
@@ -82,7 +82,7 @@ export default function SignIn() {
                 autoCapitalize="none"
                 autoCorrect={false}
                 editable={!isLoading}
-                onBlur={() => { usernameInputRef.current.focus(); }}
+                onBlur={() => { usernameInputRef.current?.focus(); }}
               />
               <Text style={styles.label}>password</Text>
               <TextInput
@@ -114,20 +114,16 @@ export default function SignIn() {
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   backgroundImage: {
     flex: 1,
-    //    justifyContent: 'center', // Align content to the bottom
   },
   header: {
     position: "absolute",
     right: 0,
-    margin: 20
-    //    right:10,
-    //    position:"absolute",
-
-
-    //    flexDirection: 'row',
-    //  marginBottom: 20,
+    margin: 20,
   },
   signUpButton: {
     borderColor: '#B87333',
@@ -146,9 +142,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 1,
   },
   formContainer: {
-    //    justifyContent:'Star',
     height: '100%',
-    marginTop: normalize(40), // Padding to ensure the form is not flush with the bottom
   },
   itemContainer: {
     borderColor: '#B87333',
@@ -207,5 +201,9 @@ const styles = StyleSheet.create({
     color: '#000',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  headerText: {
+    color: "white",
+    fontSize: normalize(60),
   },
 });

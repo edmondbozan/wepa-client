@@ -1,287 +1,109 @@
-import { router } from 'expo-router';
-import { Alert, Button, Text, TextInput, View, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, FlatList, Image } from 'react-native';
-import { useSession } from '@/context/ctx';
-import { useEffect, useState } from 'react';
-import { BASE_URL } from '@/constants/Endpoints';
+import { router, useLocalSearchParams } from 'expo-router';
+import { Text,  View, StyleSheet, SafeAreaView, TouchableOpacity, Animated } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
 import normalize from '@/fonts/fonts';
-import DropdownInput, { DropdownItem } from '@/components/DropDowmList';
-import { useLocalSearchParams } from 'expo-router';
-import ListItem from '@/components/projectDeatailsFlatList';
 import fetchWithAuth from '@/context/FetchWithAuth';
-import { FontAwesome } from '@expo/vector-icons';
 import { ProjectDetails, Project } from '@/interfaces/IProject';
-import GlobalStyles from '@/styles/styles';
-import { formatNumber } from '@/functions/stringfunctions';
-import SliderModal from '@/components/Slider';
+
+import MediaComponent from '@/components/MediaComponent';
+import ProjectEditComponent from '@/components/ProjectEdit';
+import { FontAwesome } from '@expo/vector-icons';
+
 
 export default function ProjectComponent() {
-  const [projectId, setProjectId] = useState(0);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [categories, setCategories] = useState<DropdownItem[]>([]);
   const { data } = useLocalSearchParams();
   const initialData = data ? JSON.parse(data as string) : null;
   const [projectData, setProjectData] = useState<Project>(initialData);
-  const [cost, setProjectCost] = useState<number>(0);
-  const [title, setProjectTitle] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<DropdownItem | null>(null);
-  const { userId } = useSession();
-  const [isBudgetModalVisible, setBudgetModalVisible] = useState(false);
-  const [isCategoryValid, setCategoryValid] = useState<boolean>(true);
-  const [isProjectNameValid, setProjectNameValid] = useState<boolean>(true);
-  const [isCostValid, setCostValid] = useState<boolean>(true);
-  const [errors, setErrors] = useState<string[]>([]);
-  const {userType } = useSession();
 
-  const validateCategory = (): boolean => {
-    if (selectedCategory) {
-      setCategoryValid(true);
-      return true;
-    } else {
-      setCategoryValid(false);
-      return false;
-    }
-  };
+//   const [data, setProjectData] = useState<Project>();
+  const animation = useRef(new Animated.Value(0)).current;
+  const blinkAnimationRef = useRef<any>(null);
+  const [showDetails, setShowDetails] = useState<Boolean>(true);
 
-  const validateProjectName = (): boolean => {
-    if (title.length > 0) {
-      setProjectNameValid(true);
-      return true;
-    } else {
-      setProjectNameValid(false);
-      return false;
-    }
-  };
 
-  const validateCost = (): boolean => {
-    if (cost > 0) {
-      setCostValid(true);
-      return true;
-    } else {
-      setCostValid(false);
-      return false;
-    }
-  };
-
-  const handleValidation = (): boolean => {
-    const validationErrors: string[] = [];
-
-    if (!validateCategory()) validationErrors.push('Invalid category');
-    if (!validateProjectName()) validationErrors.push('Invalid project name');
-    if (!validateCost()) validationErrors.push('Invalid cost');
-
-    setErrors(validationErrors);
-
-    return validationErrors.length === 0;
-  };
-
-  const handleBudgetButtonClick = () => {
-    setBudgetModalVisible(!isBudgetModalVisible);
-  };
-
-  const handleBudgetChange = (value: number) => {
-    setProjectCost(value);
-  };
-
+   
+  // Adjust useEffect to animate only when projectData.details is empty
   useEffect(() => {
-    if (projectData) {
-      if (projectData.cost !== undefined) {
-        setProjectCost(parseInt(projectData.cost));
+    if (projectData && projectData.details.length === 0) {
+      // Start the blinking animation if the array is empty
+      blinkAnimationRef.current = Animated.loop(
+        Animated.sequence([
+          Animated.timing(animation, {
+            toValue: 1,
+            duration: 500,
+            useNativeDriver: false,
+          }),
+          Animated.timing(animation, {
+            toValue: 0,
+            duration: 500,
+            useNativeDriver: false,
+          }),
+        ])
+      );
+      blinkAnimationRef.current.start();
+    } else {
+      // Stop the animation if the array is not empty
+      if (blinkAnimationRef.current) {
+        blinkAnimationRef.current.stop();
+        animation.setValue(0); // Reset animation to ensure it doesn't leave the view in the last animated state
       }
-      setProjectTitle(projectData.title);
-      setProjectId(projectData.projectId);
     }
-  }, []);
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch(BASE_URL + '/Category');
-        const data = await response.json();
-        setCategories(data);
-
-        if (projectData) {
-          const initialCategory = {
-            description: projectData.categoryName,
-            id: projectData.categoryId
-          };
-          setSelectedCategory(initialCategory);
-        }
-      } catch (error) {
-        Alert.alert('Error fetching categories.');
+    // Cleanup on unmount
+    return () => {
+      if (blinkAnimationRef.current) {
+        blinkAnimationRef.current.stop();
       }
     };
+  }, [data, animation]);
 
-    fetchCategories();
-  }, []);
-
-  useEffect(() => {
-    //    console.log('Project Data Updated:', projectData);
-    setProjectId(projectData?.projectId);
-  }, [projectData]);
-
-  const deleteItem = async (id: number) => {
-    try {
-      const response = await fetchWithAuth(BASE_URL + '/api/upload/projectDetails/' + id, {
-        method: 'DELETE',
-      });
-      const responseText = await response.text(); // Read response as text
-
-      if (!response.ok) {
-        Alert.alert("There was an issue trying to delete the media")
-        return;
-      }
-      const updatedDetails = projectData.details.filter(detail => detail.projectDetailId !== id);
-      setProjectData({ ...projectData, details: updatedDetails });
-    }
-    catch (error) {
-      Alert.alert('Server Error. Please try again');
-    }
-  }
-
-
-
-  const AddProject = async () => {
-
-    const isValid = handleValidation();
-    if (isValid) {
-      const json = {
-        id: projectId,
-        categoryId: selectedCategory?.id,
-        title: title,
-        cost: cost.toString(),
-        categoryName: selectedCategory?.description,
-        userId: userId
-      };
-
-      try {
-        const response = await fetchWithAuth(BASE_URL + '/api/projects', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(json),
-        });
-        const result: Project = await response.json();
-
-        if (response.ok) {
-          setProjectData(result);
-
-        } else {
-          Alert.alert('Page Load Error', 'Page Load');
-        }
-
-        if (!response.ok) {
-          throw new Error(`Network response was not ok: ${result.message}`);
-        }
-
-        setProjectData(result);
-        console.log(projectData);
-      } catch (error) {
-        console.error('Failed to add project:', error);
-      }
-    }
-  };
-
-  const renderItem = ({ item }: { item: any }) => (
-    <ListItem
-      item={item}
-      onDelete={(id: number) => {
-        deleteItem(id);
-      }}
-    />
-  );
+  const interpolatedBorderColor = animation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['#B87333', '#FFFFFF'], // Bronze to white
+  });
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <Text style={{ marginLeft: 20 }} onPress={() => { router.replace('/projects/Projects'); }}>
-        <FontAwesome name="arrow-left" /> Projects
-      </Text>
-      <ScrollView style={styles.scrollContainer}>
-<     Text style={{ fontWeight: '400' , fontSize:normalize(12)}}>{(userType === 'professional') ? 'Build a project to begin generating leads.' : 'Build a project to demonstarte that drip.' }</Text>
-        <View style={styles.horizontalRule} />
+      {/* Top Navigation */}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
+        <TouchableOpacity onPress={() => { router.replace('/projects/Projects'); }} style={styles.signUpButton}>
+          <Text style={{fontSize:normalize(16)}}>← Projects</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => { setShowDetails(true); }} style={[styles.signUpButton, showDetails && styles.selected]}>
+          <Text style={[styles.signUpText, styles.selected]}>details</Text>
+        </TouchableOpacity>
 
-        <View>
-          <Text style={styles.label}>Category</Text>
-          <DropdownInput
-            data={categories}
-            setValue={selectedCategory}
-            onSelect={item => {
-              setSelectedCategory(item);
-            }}
-          />
-          {!isCategoryValid && (<Text style={{ color: 'red' }}>Please choose a category.</Text>)}
 
-          <Text style={styles.label}>Project Name</Text>
-          <TextInput
-            placeholder="Project Name"
-            value={title}
-            onChangeText={setProjectTitle}
-            onBlur={() => { validateProjectName(); }}
-            style={[styles.input, !isProjectNameValid && styles.inputError]}
-          />
-          {!isProjectNameValid && (<Text style={{ color: 'red' }}>Project Name is required.</Text>)}
+        {data &&
 
-          <Text style={styles.label}>Cost</Text>
-          <TouchableOpacity onPress={() => setBudgetModalVisible(true)}>
-            <TextInput
-              placeholder="Project Cost"
-              keyboardType='number-pad'
-              value={"$" + formatNumber(cost)}
-              editable={false}
-              pointerEvents="none"
-              style={[styles.input, !isCostValid && styles.inputError]}
-            />
-            {!isCostValid && (<Text style={{ color: 'red' }}>Project cost must be {'>'} 0.</Text>)}
+          <TouchableOpacity onPress={() => {
+            setShowDetails(false);
+          }}>
+            <Animated.View style={[styles.signUpButton, { borderColor: interpolatedBorderColor }, !showDetails && styles.selected]}>
+              <Text style={styles.signUpText}><FontAwesome name="plus" /> media</Text>
+            </Animated.View>
           </TouchableOpacity>
-        </View>
+        }
+      </View>
+      <View style={styles.horizontalRule} />
 
-        <View style={{ flexDirection: 'row', width: '100%', justifyContent: 'space-evenly' }}>
-          <TouchableOpacity onPress={AddProject} style={{ flex: 1 }}>
-            <View style={styles.buttonContainer}>
-              <Text style={styles.button}>Save</Text>
-            </View>
-          </TouchableOpacity>
-          {projectData &&
-
-            <TouchableOpacity style={{ flex: 1 }} onPress={() => {
-              router.push({
-                pathname: '/projects/media',
-                params: { data: JSON.stringify(projectData) }
-              });
-            }}>
-              <View style={styles.buttonContainer}>
-                <Text style={styles.button}>Add Media</Text>
-              </View>
-            </TouchableOpacity>
-          }
-        </View>
-
-        <View style={[styles.horizontalRule, { height: 20 }]} />
-
-        {projectData ? (
-          <>
-            <Text>Media</Text>
-            <FlatList
-              scrollEnabled={false}
-              data={projectData.details}
-              keyExtractor={(item) => item.projectDetailId.toString()}
-              renderItem={renderItem}
-              contentContainerStyle={styles.verticalFlatListContainer}
-            />
-          </>
-        ) : (
-          <><Text>Give your project some details to start getting noticed. </Text></>
+      {showDetails &&
+        (
+          <ProjectEditComponent></ProjectEditComponent>
         )}
-      </ScrollView>
-      <SliderModal type="dollars" onValueChange={handleBudgetChange} visible={isBudgetModalVisible} userradius={cost} onClose={() => { setBudgetModalVisible(false); validateCost(); }} />
+      {!showDetails &&
+        (
+          <MediaComponent data={projectData} visible={false}/>
+         
+        )}
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: {
-    flex: 1,
-    backgroundColor: 'rgba(221, 221, 221, .5)',
+     flex: 1,
+    backgroundColor: 'rgba(0,0,0,.1)'
   },
   FLImage: {
     width: 100,
@@ -292,9 +114,11 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     padding: 10,
+    //    backgroundColor: 'rgba(0, 0, 0, .1)',
+
   },
   horizontalRule: {
-    borderBottomColor: '#ccc',
+    borderBottomColor: '#B87333',
     borderBottomWidth: 1,
     marginVertical: 10,
   },
@@ -326,14 +150,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   label: {
-    color: '#B87333',
+    color: '#000000',
     marginBottom: 5,
     marginTop: 15,
-    fontWeight: 'bold'
+    fontWeight: '200'
   },
   input: {
-    height: normalize(40),
-    borderColor: '#fff',
+    height: normalize(50),
+    borderColor: '#B87333',
     borderRadius: 10,
     shadowColor: '#000',
     color: "#000",
@@ -342,7 +166,8 @@ const styles = StyleSheet.create({
     marginBottom: normalize(10),
     paddingHorizontal: normalize(10),
     width: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.3)'
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+
   },
   space: {
     width: normalize(7),
@@ -391,4 +216,41 @@ const styles = StyleSheet.create({
     borderColor: 'red',
     color: 'red'
   },
+  signUpButton: {
+    //borderColor: '#B87333',
+    //borderWidth: 1,
+    //backgroundColor: 'rgba(255, 255, 255, 0.8)', // Light background for better contrast
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    // width:100
+  },
+  selected: {
+    borderBottomColor: '#B87333',
+    borderBottomWidth: 2,
+  },
+  signUpText: {
+    color: '#000',
+    fontSize: normalize(12),
+    fontWeight: 'bold',
+    textShadowColor: 'rgba(255, 255, 255, 0.8)', // Text shadow for better readability
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 1,
+  },
+  container: {
+    borderColor: '#B87333',
+    borderWidth: 1,
+    padding: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 3,
+    margin: 20,
+  },
+
+
 });

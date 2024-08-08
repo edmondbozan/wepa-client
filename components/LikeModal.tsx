@@ -47,8 +47,8 @@ const LikeModal: React.FC<LikeModalProps> = ({ visible, onClose, message, userTy
             {userType=="professional"  && 
            (<View style={{flexDirection:'row', alignItems:'center', marginRight:20}}>
         <Switch
-        trackColor={{ false: "#767577", true: "#81b0ff" }}
-         thumbColor={share ? "#f5dd4b" : "#f4f3f4"}
+         trackColor={{ false: "#C0C0C0", true: "#C0C0C0" }}
+         thumbColor={share ? "#B87333" : "#000"}
          ios_backgroundColor="#a7abb5"
          onValueChange={toggleSwitch}
          value={share}
@@ -61,7 +61,7 @@ const LikeModal: React.FC<LikeModalProps> = ({ visible, onClose, message, userTy
             )}
           <TextInput
             style={styles.textInput}
-            placeholder="Leave a comments"
+            placeholder="leave a comment."
             multiline
             value={feedback}
             maxLength={500}

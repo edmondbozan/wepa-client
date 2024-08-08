@@ -133,10 +133,6 @@ const Register: React.FC = () => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={{ flexGrow: 1, backgroundColor: "rgba(0, 0, 0, 0.1)",}} automaticallyAdjustKeyboardInsets={true}>
-        {/* <ImageBackground
-          source={require('../../assets/images/register-background.jpg')}
-          imageStyle={{ opacity: 1, height: '100%' }}
-        > */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.signUpButton} onPress={() => { router.replace('/auth/login'); }}>
             <Text style={styles.signUpText}>
@@ -154,21 +150,10 @@ const Register: React.FC = () => {
               value={isProfessional}
             />
             <Text>
-              <Text style={{ fontWeight: 'bold', color: '#000' }}>{isProfessional ? ' i am a professional.' : ' i am not a professional.'}</Text>
-              <Text style={{ fontWeight: 'bold', color: 'red' }}>{isProfessional && `${'\n'} your phone number will be displayed.`}</Text>
+              <Text style={{ fontWeight: 'bold', fontSize:normalize(12), color: '#000' }}>{isProfessional ? ' i am a professional.' : ' i am not a professional.'}</Text>
+              <Text style={{ fontWeight: 'bold', fontSize:normalize(12), color: 'red' }}>{isProfessional && `${'\n'} your phone number will be displayed.`}</Text>
             </Text>
           </View>
-          {/* <View style={styles.radioContainer}>
-            <TouchableOpacity style={styles.radio} onPress={() => setUserType('professional')}>
-              <View style={userType === 'professional' ? styles.radioSelected : styles.radioUnselected} />
-              <Text style={styles.label}>Professional</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.radio} onPress={() => setUserType('consumer')}>
-              <View style={userType === 'consumer' ? styles.radioSelected : styles.radioUnselected} />
-              <Text style={styles.label}>Consumer</Text>
-            </TouchableOpacity>
-          </View> */}
-
           <Text style={styles.label}>display name:</Text>
           <TextInput
             value={username}
@@ -232,7 +217,7 @@ const Register: React.FC = () => {
           {!isEmailValid &&
             (<Text style={{ color: 'red' }}>proper email is required.</Text>)}
 
-          <Text style={styles.label}>zipcode:</Text>
+          <Text style={styles.label}>zip code:</Text>
           <TextInput
             value={zipcode}
             onChangeText={setZipcode}
@@ -245,8 +230,7 @@ const Register: React.FC = () => {
             (<Text style={{ color: 'red' }}>Proper zip is required.</Text>)}
 
           <View style={{ marginVertical: 10 }}>
-            <Text>by tapping 'register', you confirm that you have read and agree to our <ExternalLink style={{ color: '#007bff', textDecorationLine: 'underline' }} href={'https://app.termly.io/policy-viewer/policy.html?policyUUID=92b8a492-eea6-4e68-9727-7430bc07dac5'}>privacy policy</ExternalLink> and
-              <ExternalLink href={'https://app.termly.io/policy-viewer/policy.html?policyUUID=e7fd608a-64a0-4e12-91b9-e154a15eb707'} style={{ color: '#007bff', textDecorationLine: 'underline' }} > terms and conditions</ExternalLink>.</Text>
+            <Text>by tapping 'register', you confirm that you have read and agree to our <ExternalLink style={{ color: '#007bff', textDecorationLine: 'underline' }} href={'https://app.termly.io/policy-viewer/policy.html?policyUUID=92b8a492-eea6-4e68-9727-7430bc07dac5'}>privacy policy</ExternalLink> and <ExternalLink href={'https://app.termly.io/policy-viewer/policy.html?policyUUID=e7fd608a-64a0-4e12-91b9-e154a15eb707'} style={{ color: '#007bff', textDecorationLine: 'underline' }} >terms and conditions</ExternalLink>.</Text>
           </View>
           <TouchableOpacity onPress={handleRegister} style={styles.button}>
             <Text style={styles.buttonText}>register</Text>
@@ -280,20 +264,11 @@ const styles = StyleSheet.create({
     elevation: 3,
     margin: 20,
   },
-  radioContainer: {
-    flexDirection: 'row',
-    marginBottom: 20,
-  },
-  radio: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 10,
-  },
   label: {
     color: '#000',//'#B87333',
     marginBottom: 5,
     marginTop: 15,
-    fontWeight: 'bold'
+    fontWeight: '200'
 
   },
   input: {
@@ -302,7 +277,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 10,
     paddingHorizontal: 10,
-    color: '#FFF',
+    color: '#000',
     backgroundColor: 'rgba(111, 111, 111, .1)', // Darker background for inputs
     borderRadius: 5
   },
@@ -345,7 +320,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 1,
   },
   header: {
-    width: 100,
+    width: normalize(100),
     //    position: "absolute",
     //    left: 0,
     margin: 20

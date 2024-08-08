@@ -13,7 +13,7 @@ const UserSettings: React.FC = () => {
   const [isDeleting, setIsDeleting] = useState(false);
 
 const handleHelp = () =>{
-  router.navigate("help/help_0");
+  router.navigate("help/help");
 }
 
   const handleSignOut = () => {

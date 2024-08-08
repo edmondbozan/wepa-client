@@ -3,6 +3,7 @@ import { View, Text, StyleSheet,  TouchableOpacity } from 'react-native';
 import Slider from '@react-native-community/slider';
 import Modal from 'react-native-modal';
 import { BASE_URL } from '@/constants/Endpoints';
+import { normalize } from 'react-native-elements';
 
 
   interface SliderModalProps {
@@ -68,12 +69,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   text: {
-    fontSize: 24,
+    fontSize: normalize(24),
     marginBottom: 20,
   },
   slider: {
-    width: 300,
-    height: 40,
+    width: normalize(300),
+    height: normalize(40),
   },
   modal: {
     justifyContent: 'flex-end',

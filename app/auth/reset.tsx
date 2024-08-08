@@ -100,7 +100,7 @@ const ResetPassword: React.FC = () => {
   return (
     <SafeAreaView style={{ height: '100%' }}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <ImageBackground source={require('.././../assets/images/reset-background.jpeg')} style={styles.background} imageStyle={{ opacity: 0.5 }}>
+        <ImageBackground source={require('.././../assets/images/backgrounds/reset-background.jpeg')} style={styles.background} imageStyle={{ opacity: 0.5 }}>
           <Text style={{ color: "#fff", fontSize: 16, marginTop: 10, marginLeft: 10 }} onPress={() => { router.replace('/auth/login'); }}>
             <FontAwesome name="arrow-left" /> Login
           </Text>

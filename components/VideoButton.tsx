@@ -34,7 +34,7 @@ const VideoButton: React.FC<VideoButtonProps> = ({ label, onPress, videoUri }) =
                                         onPlaybackStatusUpdate={status => setStatus(() => status)}
                                       />
         ) : (
-          <IconButton icon="video" size={50}  style={styles.iconButton} />
+          <IconButton icon="video" size={50}  style={styles.iconButton} iconColor='#B87333' />
         )}
       </TouchableOpacity>
     </View>
@@ -43,8 +43,8 @@ const VideoButton: React.FC<VideoButtonProps> = ({ label, onPress, videoUri }) =
 
 const styles = StyleSheet.create({
   buttonContainer: {
-    width: normalize(110),
-    height: normalize(110),
+    width: normalize(90),
+    height: normalize(90),
     borderWidth: 2,
     borderColor: 'gray',
     borderStyle: 'dashed',

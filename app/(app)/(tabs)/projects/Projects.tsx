@@ -8,10 +8,6 @@ import { FontAwesome } from '@expo/vector-icons';
 import { normalize } from 'react-native-elements'
 import { router } from 'expo-router';
 import ProjectModal from '@/components/ProjectModal';
-//import normalize from '@/fonts/fonts';
-
-// Define the types for your data
-
 
 const Projects: React.FC = () => {
   const [data, setData] = useState<Project[]>([]);
@@ -119,7 +115,7 @@ const Projects: React.FC = () => {
     const imageUri = findFirstNonNullAfterImage(item.details);
     return (
 
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor:'rgba(255,255,255,.9)' }}>
         <View style={styles.projectContainer}>
           <TouchableOpacity onPress={() => router.push({
             pathname: '/projects/project',
@@ -130,24 +126,28 @@ const Projects: React.FC = () => {
               source={
                 imageUri
                   ? { uri: imageUri }
-                  : require('../../../../assets/images/background.jpg')
+                  : require('../../../../assets/images/backgrounds/login.jpg')
               }
               style={styles.backgroundImage}
-              imageStyle={{ borderRadius: 8, borderColor: "#B87333", borderWidth: 1, opacity: .2, shadowColor: "#000" }}
+              imageStyle={{ borderRadius: 8, borderColor: "#B87333", opacity: 1, shadowColor: "#000" }}
             >
               <View style={styles.contentContainer}>
-                <View style={{ flexDirection: 'row' }}>
-                  <Text style={styles.title}>{item.title}</Text>
-                  <TouchableOpacity style={{ position: 'absolute', right: 20 }} onPress={() => handleViewProject(item.projectId)}>
+              <TouchableOpacity style={{ zIndex:999, position: 'absolute', right: 20, top:20 }} onPress={() => handleViewProject(item.projectId)}>
                     <View style={{ flexDirection: 'row' }}>
                       <Text style={{ fontWeight: 400, textDecorationLine: 'underline' }}>Preview</Text>
                       {/* <FontAwesome  name="eye" size={20} color="#000000" /> */}
                       {/* <Text> Delete Project</Text> */}
                     </View>
                   </TouchableOpacity>
-                </View>
+                  <TouchableOpacity style={{zIndex:999, position: 'absolute', right: 20, bottom: 20 }} onPress={() => handleDeleteProject(item.projectId)}>
+                  <View style={{ flexDirection: 'row' }}>
+                    <FontAwesome name="trash" size={20} color="#000000" />
+                    {/* <Text> Delete Project</Text> */}
+                  </View>
+                </TouchableOpacity>
 
-                <View >
+
+                  <Text style={styles.title}>{item.title}</Text>                  
                   <Text style={styles.category}>Category: {item.categoryName}</Text>
                   <View style={styles.space} />
                   <Text style={styles.cost}>Cost: ${item.cost}</Text>
@@ -161,13 +161,6 @@ const Projects: React.FC = () => {
                     <Text ><FontAwesome name="comment" size={normalize(20)} color="#000" /> {item.messageCount}</Text>
                   </View>
                 </View>
-                <TouchableOpacity style={{ position: 'absolute', right: 10, bottom: 10 }} onPress={() => handleDeleteProject(item.projectId)}>
-                  <View style={{ flexDirection: 'row' }}>
-                    <FontAwesome name="trash" size={20} color="#000000" />
-                    {/* <Text> Delete Project</Text> */}
-                  </View>
-                </TouchableOpacity>
-              </View>
             </ImageBackground>
           </TouchableOpacity>
           {isProjectModalVisible && (
@@ -184,7 +177,7 @@ const Projects: React.FC = () => {
       <View style={styles.container}>
 
         {(data.length > 0) ? (
-          <><Text style={{ fontWeight: 500, margin: 10 }}>Your Projects {'\n'}</Text>
+          <><Text style={{ fontWeight: 400, margin: 10, fontSize:normalize(16) }}>Your Projects {'\n'}</Text>
             <FlatList
               data={data}
               keyExtractor={(item) => item.projectId.toString()}
@@ -240,7 +233,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: 'rgba(221, 221, 221, 0.1)', // 
+    backgroundColor: 'rgba(255, 255, 255, 1)', // 
     // padding: 10,
   },
   viewRow: {
@@ -251,9 +244,9 @@ const styles = StyleSheet.create({
     marginBottom: normalize(20),
     padding: 10,
     borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowColor: '#B87333',
+    shadowOffset: { width: 1, height: 2 },
+    shadowOpacity: 1,
     shadowRadius: 8,
     elevation: 5,
   },
@@ -264,9 +257,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(221,221,221,.1)'
   },
   contentContainer: {
-    flex: 1,
     padding: 10,
     borderRadius: 8,
+    backgroundColor:"rgba(255,255,255,1)",
+
 
   },
   title: {

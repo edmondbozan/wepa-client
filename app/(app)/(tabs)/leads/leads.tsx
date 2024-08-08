@@ -94,7 +94,7 @@ const Leads: React.FC = () => {
           />
         ) : (
           <ImageBackground
-            source={require('../../../../assets/images/register-background.jpg')}
+            source={require('../../../../assets/images/backgrounds/leads.jpg')}
             style={styles.backgroundImage}
             imageStyle={{ opacity: 1 }}
           >

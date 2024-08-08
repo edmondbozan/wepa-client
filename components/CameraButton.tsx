@@ -19,7 +19,7 @@ const CameraButton: React.FC<CameraButtonProps> = ({ label, onPress, imageUri })
         {imageUri ? (
           <Image source={{ uri: imageUri }} style={styles.image} />
         ) : (
-          <IconButton icon="camera" size={normalize(50)}  style={styles.iconButton} />
+          <IconButton icon="camera" size={normalize(50)} iconColor='#B87333'  style={styles.iconButton} />
         )}
       </TouchableOpacity>
     </View>
@@ -28,8 +28,8 @@ const CameraButton: React.FC<CameraButtonProps> = ({ label, onPress, imageUri })
 
 const styles = StyleSheet.create({
   buttonContainer: {
-    width: normalize(110),
-    height: normalize(110),
+    width: normalize(90),
+    height: normalize(90),
     borderWidth: 2,
     borderColor: 'gray',
     borderStyle: 'dashed',
@@ -39,8 +39,8 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   iconButton: {
-    margin: 0,
-  },
+    margin: 0
+    },
   touchable: {
     justifyContent: 'center',
     alignItems: 'center',

@@ -90,17 +90,20 @@ const styles = StyleSheet.create({
      flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#fff',
+    borderColor: '#B87333',
     borderRadius: 10,
     paddingHorizontal: 10,
-    marginBottom:10
+    marginBottom:10,
+    color:"#fff",
+    backgroundColor: 'rgba(255, 255, 255, .3)'
 //    margin:10
 //    height: 40,
   },
   input: {
     flex: 1,
     paddingVertical: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)'
+    // backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    height:50,
   },
   icon: {
     marginLeft: 5,
