@@ -98,7 +98,7 @@ const Likes: React.FC = () => {
                   : require('../../../../assets/images/backgrounds/login.jpg')
               }
               style={styles.backgroundImage}
-              imageStyle={{ borderRadius: 8 }}
+              imageStyle={{ borderRadius: 8, borderColor: "#B87333", opacity: 1, shadowColor: "#000" }}
             >
               <View style={styles.contentContainer}>
                 <Text style={styles.title}>{item.title}</Text>
@@ -140,7 +140,7 @@ const Likes: React.FC = () => {
               renderItem={renderItem} /></>
         ) :
           (
-            <ImageBackground style={{ flex: 1 }} source={require('../../../../assets/images/backgrounds/reset-background.jpeg')} imageStyle={{ opacity: 1, height: '100%', justifyContent: 'center', alignItems: 'center' }}>
+            <ImageBackground style={{ flex: 1 }} source={require('../../../../assets/images/backgrounds/reset-background.jpeg')} imageStyle={{ opacity: .9, height: '100%', justifyContent: 'center', alignItems: 'center' }}>
                <View style={styles.itemContainer}>
                 <Text style={{ color: "#000", fontSize: 30, fontWeight: '200', lineHeight: 30 }}><FontAwesome5 name="heart-broken" size={30} color="#65432" /> you have not liked any projects.
                   tap below to begin matching with a professional.
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: 'rgba(221, 221, 221, 0.5)', // 
+    backgroundColor: 'rgba(255, 255, 255, 1)', // 
     // padding: 10,
   },
   viewRow: {
@@ -189,9 +189,9 @@ const styles = StyleSheet.create({
     marginBottom: normalize(20),
     padding: 10,
     borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowColor: '#B87333',
+    shadowOffset: { width: 1, height: 2 },
+    shadowOpacity: 1,
     shadowRadius: 8,
     elevation: 5,
   },
@@ -199,12 +199,13 @@ const styles = StyleSheet.create({
     width: '100%',
     height: normalize(300),
     borderRadius: 8,
+    backgroundColor: 'rgba(221,221,221,.1)'
   },
   contentContainer: {
-    flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.7)', // Optional: Add a semi-transparent background to improve text readability
     padding: 10,
     borderRadius: 8,
+    backgroundColor:"rgba(255,255,255,1)",
+
 
   },
   title: {
@@ -244,17 +245,12 @@ const styles = StyleSheet.create({
     color: '#000',
     justifyContent: 'center',
     alignItems: 'center',
-    margin: 10
+    margin: 10,
   },
   button: {
     fontSize: normalize(18),
     fontWeight: 'bold',
     color: '#000',
-  },
-  horizontalRule: {
-    borderBottomColor: '#ccc',
-    borderBottomWidth: 1,
-    marginVertical: normalize(10),
   },
   itemContainer: {
     borderColor: '#B87333',
@@ -270,6 +266,7 @@ const styles = StyleSheet.create({
     elevation: 2,
     margin: 20,
   },
+
 });
 
 export default Likes;

@@ -1,42 +1,58 @@
-import { router } from 'expo-router';
-import { Alert, Text, TextInput, View, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, FlatList, Animated } from 'react-native';
+import { Alert, Text, TextInput, View, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, KeyboardAvoidingView, Platform, Switch } from 'react-native';
 import { useSession } from '@/context/ctx';
 import { useEffect, useRef, useState } from 'react';
 import { BASE_URL } from '@/constants/Endpoints';
 import normalize from '@/fonts/fonts';
 import DropdownInput, { DropdownItem } from '@/components/DropDowmList';
-import { useLocalSearchParams } from 'expo-router';
-import ListItem from '@/components/projectDeatailsFlatList';
 import fetchWithAuth from '@/context/FetchWithAuth';
-import { FontAwesome } from '@expo/vector-icons';
 import { ProjectDetails, Project } from '@/interfaces/IProject';
 import SliderModal from '@/components/Slider';
 import { formatNumber } from '@/functions/stringfunctions';
-import MediaModal from '@/components/MediaModal';
+import MediaPicker from './mediaTest';
+import CategoryModal from './CategorySelectModal';
+import { FontAwesome6 } from '@expo/vector-icons';
+import InputModal from './InputModal';
 
+interface ProjectProps {
+  data: Project;
+  onValueChange: (data: Project) => void;
+}
 
-export default function ProjectEditComponent() {
+const ProjectEditComponent: React.FC<ProjectProps> = ({ data, onValueChange }) => {
+  const [projectVisible, setProjectEnabled] = useState<boolean>(false);
   const [projectId, setProjectId] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
   const [categories, setCategories] = useState<DropdownItem[]>([]);
-  const { data } = useLocalSearchParams();
-  const initialData = data ? JSON.parse(data as string) : null;
-  const [projectData, setProjectData] = useState<Project>(initialData);
+  const [projectData, setProjectData] = useState<Project>(data);
   const [cost, setProjectCost] = useState<number>(0);
   const [title, setProjectTitle] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<DropdownItem | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<DropdownItem>();
   const { userId, userType } = useSession();
   const [isBudgetModalVisible, setBudgetModalVisible] = useState(false);
-  const [isMediaModalVisible, setMediaModalVisible] = useState(false);
-
   const [isCategoryValid, setCategoryValid] = useState<boolean>(true);
   const [isProjectNameValid, setProjectNameValid] = useState<boolean>(true);
   const [isCostValid, setCostValid] = useState<boolean>(true);
   const [errors, setErrors] = useState<string[]>([]);
-  const animation = useRef(new Animated.Value(0)).current;
-  const blinkAnimationRef = useRef<any>(null);
-  const [showDetails, setShowDetails] = useState<Boolean>(true);
+  const toggleSwitch = () => setProjectEnabled(previousState => !previousState);
+  const [isInputModeVisible, setInputModeVisible] = useState<boolean>(false);
 
+
+  useEffect(() => {
+    projectData
+  }, []);
+
+
+
+  useEffect(() => {
+    onValueChange(projectData);
+  }, [projectData]);
+
+
+  const handleMediaChange = (value: ProjectDetails[]) => {
+    setProjectData(prevdata => ({
+      ...prevdata, details: value
+    }));
+  }
 
   const validateCategory = (): boolean => {
     if (selectedCategory) {
@@ -123,6 +139,13 @@ export default function ProjectEditComponent() {
     setProjectId(projectData?.projectId);
   }, [projectData]);
 
+  useEffect(() => {
+    setProjectData(prevdata => ({
+      ...prevdata, title: title
+    }));
+  }
+    , [title]);
+
   const AddProject = async () => {
     const isValid = handleValidation();
     if (isValid) {
@@ -164,212 +187,101 @@ export default function ProjectEditComponent() {
 
 
   return (
-    <SafeAreaView style={styles.safeArea}>       
-            <View>
-              <Text style={styles.label}>category</Text>
-              <DropdownInput
-                data={categories}
-                setValue={selectedCategory}
-                onSelect={item => {
-                  setSelectedCategory(item);
-                }}
-              />
-              {!isCategoryValid && (<Text style={{ color: 'red' }}>Please choose a category.</Text>)}
+    <SafeAreaView style={styles.safeArea}>   
+    <ScrollView showsVerticalScrollIndicator={false}>   
+        <View style={[styles.container, { flexDirection: 'row' }]}>
+          <Switch
+            trackColor={{ false: "#C0C0C0", true: "#C0C0C0" }}
+            thumbColor={projectVisible ? "#B87333" : "#000"}
+            ios_backgroundColor="#C0C0C0"
+            value={projectVisible}
+            onValueChange={toggleSwitch}
+          />
+          <Text style={{ alignSelf: 'center' }}> Project Visible</Text>
+        </View>
 
-              <Text style={styles.label}>project name</Text>
-              <TextInput
-                placeholder="project name"
-                value={title}
-                onChangeText={setProjectTitle}
-                onBlur={() => { validateProjectName(); }}
-                style={[styles.input, !isProjectNameValid && styles.inputError]}
-              />
-              {!isProjectNameValid && (<Text style={{ color: 'red' }}>Project Name is required.</Text>)}
 
-              <Text style={styles.label}>Cost</Text>
-              <TouchableOpacity onPress={() => setBudgetModalVisible(true)}>
-                <TextInput
-                  placeholder="Project Cost"
-                  keyboardType="number-pad"
-                  value={"$" + formatNumber(cost)}
-                  editable={false}
-                  pointerEvents="none"
-                  style={[styles.input, !isCostValid && styles.inputError]}
-                />
-                {!isCostValid && (<Text style={{ color: 'red' }}>Project cost must be {'>'} 0.</Text>)}
-              </TouchableOpacity>
-            </View>
-
-            <View style={{ flexDirection: 'row', width: '100%', justifyContent: 'space-evenly' }}>
-              <TouchableOpacity onPress={AddProject} style={{ flex: 1 }}>
-                <View style={styles.buttonContainer}>
-                  <Text style={styles.button}>save</Text>
-                </View>
-              </TouchableOpacity>
-            </View>
-
-            <View style={[styles.horizontalRule, { height: 20 }]} />
-
-            {/* {(projectData && projectData.details.length > 0) ? ( */}
-              <View style={styles.container}><Text style={{ fontSize: normalize(20) }}>
-                {projectData ? 'give your project some details to start getting noticed. tap \'+media\' to begin adding photos, videos, and text.' : 'fill out the above attributes and tap \'save\''} </Text></View>
-            {/* )} */}
-        <SliderModal type="dollars" onValueChange={handleBudgetChange} visible={isBudgetModalVisible} userradius={cost} onClose={() => { setBudgetModalVisible(false); validateCost(); }} />
+        <View style={styles.horizontalRule}></View>
+        <TouchableOpacity onPress={() => { setModalVisible(true) }}>
+          <View style={styles.container}>
+            <Text style={styles.label}>Category:  </Text>
+            <Text>{selectedCategory?.description} <FontAwesome6 name="chevron-right" /></Text>
+            
+          </View>
+        </TouchableOpacity>
+        <View style={styles.horizontalRule}></View>
+        {/* {!isCategoryValid && (<Text style={{ color: 'red' }}>Please choose a category.</Text>)} */}
+        <TouchableOpacity onPress={() => setInputModeVisible(true)} style={{ width: '100%' }}>
+        <View style={styles.container}>
+            <Text style={styles.label}>Title:  </Text>
+            <View style={{ justifyContent: 'space-between' }}>
+              <Text>{title.length > 40 ? title.slice(0, 40) + '...' : title} <FontAwesome6 name="chevron-right" /></Text>              
+            </View>          
+        </View>
+        </TouchableOpacity>
+        {/* {!isProjectNameValid && (<Text style={{ color: 'red' }}>Project Name is required.</Text>)} */}
+        <View style={styles.horizontalRule}></View>
+        <TouchableOpacity onPress={() => setBudgetModalVisible(true)} style={{ width: '100%' }}>
+          <View style={styles.container}>
+            <Text style={styles.label}>Cost:  </Text>
+            <Text>{"$" + formatNumber(cost)} <FontAwesome6 name="chevron-right" /></Text>
+          </View>
+        </TouchableOpacity>
+        {!isCostValid && (<Text style={{ color: 'red' }}>Project cost must be {'>'} 0.</Text>)}
+        <View style={styles.horizontalRule}></View>
+        <MediaPicker data={projectData.details} onValueChange={handleMediaChange}></MediaPicker>
+      <SliderModal type="dollars" onValueChange={handleBudgetChange} visible={isBudgetModalVisible} userradius={cost} onClose={() => { setBudgetModalVisible(false); validateCost(); setProjectData(prevdata => ({ ...prevdata, cost: cost.toString() })); }} />
+      <CategoryModal isVisible={modalVisible} data={categories} onClose={() => { console.log("close"); setModalVisible(false); }} onSelect={item => {
+        setSelectedCategory(item);
+        setProjectData(prevdata => ({ ...prevdata, categoryName: item.description, categoryId: parseInt(item.id) }));
+        setModalVisible(false)
+      }} />
+      { isInputModeVisible &&
+      <InputModal isVisible={isInputModeVisible} title="Project Title" initialValue={title} onClose={() => setInputModeVisible(false)} onSave={(text) => {
+        setProjectTitle(text);
+        setProjectData(prevdata => ({ ...prevdata, title: text}));
+        setInputModeVisible(false)}} maxLength={50} />
+      }
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: {
-     flex: 1,
-    backgroundColor: 'rgba(0,0,0,.1)'
-  },
-  FLImage: {
-    width: 100,
-    height: 100,
-  },
-  detailContainer: {
-    flexDirection: 'row'
-  },
-  scrollContainer: {
-    padding: 10,
-    //    backgroundColor: 'rgba(0, 0, 0, .1)',
-
+    flex: 1,
+    margin:20
   },
   horizontalRule: {
-    borderBottomColor: '#B87333',
+    borderBottomColor: 'rgba(0,0,0,.1)',
     borderBottomWidth: 1,
     marginVertical: 10,
   },
-  buttonContainer: {
-    backgroundColor: '#FFF',
-    borderRadius: 8,
-    height: 50,
-    borderWidth: 2,
-    borderColor: '#B87333',
-    color: '#000',
-    justifyContent: 'center',
-    alignItems: 'center',
-    margin: 10
-
-  },
-  button: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  separator: {
-    width: '100%',
-    backgroundColor: 'black',
-    alignSelf: 'stretch',
-  },
-  photos: {
-    height: '50%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   label: {
     color: '#000000',
-    marginBottom: 5,
-    marginTop: 15,
-    fontWeight: '200'
-  },
-  input: {
-    height: normalize(50),
-    borderColor: '#B87333',
-    borderRadius: 10,
-    shadowColor: '#000',
-    color: "#000",
-    elevation: 5,
-    borderWidth: normalize(1),
-    marginBottom: normalize(10),
-    paddingHorizontal: normalize(10),
-    width: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-
-  },
-  space: {
-    width: normalize(7),
-    height: 1,
-  },
-  picker: {
-    height: normalize(1),
-    width: normalize(200),
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  pickerContainer: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-  },
-  pickerText: {
-    fontSize: 16,
-    color: 'blue',
-    padding: 10,
-    borderWidth: 1,
-    borderColor: 'gray',
-    borderRadius: 5,
-  },
-  verticalFlatListContainer: {
-    paddingVertical: 10,
-    justifyContent: 'flex-start',
-  },
-  rowContainer: {
-    marginVertical: 10,
-  },
-  rowTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginLeft: 10,
-    marginBottom: 5,
-  },
-  horizontalFlatListContainer: {
-    paddingHorizontal: 10,
+    //    marginBottom: 5,
+    //  marginTop: 15,
+    fontWeight: '300',
+    fontSize: normalize(14)
   },
   inputError: {
     borderColor: 'red',
     color: 'red'
   },
-  signUpButton: {
-    //borderColor: '#B87333',
-    //borderWidth: 1,
-    //backgroundColor: 'rgba(255, 255, 255, 0.8)', // Light background for better contrast
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-    // width:100
-  },
-  selected: {
-    borderBottomColor: '#B87333',
-    borderBottomWidth: 2,
-  },
-  signUpText: {
-    color: '#000',
-    fontSize: normalize(12),
-    fontWeight: 'bold',
-    textShadowColor: 'rgba(255, 255, 255, 0.8)', // Text shadow for better readability
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 1,
-  },
   container: {
-    borderColor: '#B87333',
-    borderWidth: 1,
-    padding: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderWidth: 0,
+    borderLeftWidth: 0,
+    borderRightWidth: 0,
+    padding: 5,
+    backgroundColor: 'white',
     borderRadius: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 3,
-    margin: 20,
+    margin: 5,
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent:'space-between'
+    //    alignItems:'flex-start'
   },
 
 
 });
+export default ProjectEditComponent

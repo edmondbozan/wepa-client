@@ -29,8 +29,10 @@ export  interface Project {
         details: ProjectDetails[]
       }
 
-      export interface ProjectDetails {
+      export interface ProjectDetails {        
+        key:string,
         projectDetailId: number;
+        rank: number;
         description: string | null;
         afterImage: string | null;
         beforeImage:string | null;

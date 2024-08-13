@@ -1,109 +1,63 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { Text,  View, StyleSheet, SafeAreaView, TouchableOpacity, Animated } from 'react-native';
-import { useEffect, useRef, useState } from 'react';
+import { Text,  View, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
+import {useEffect, useState } from 'react';
 import normalize from '@/fonts/fonts';
-import fetchWithAuth from '@/context/FetchWithAuth';
-import { ProjectDetails, Project } from '@/interfaces/IProject';
-
-import MediaComponent from '@/components/MediaComponent';
+import { Project } from '@/interfaces/IProject';
 import ProjectEditComponent from '@/components/ProjectEdit';
-import { FontAwesome } from '@expo/vector-icons';
+import ProjectModal from '@/components/ProjectModal';
+import { ScrollView } from 'react-native-gesture-handler';
 
 
 export default function ProjectComponent() {
   const { data } = useLocalSearchParams();
   const initialData = data ? JSON.parse(data as string) : null;
   const [projectData, setProjectData] = useState<Project>(initialData);
-
-//   const [data, setProjectData] = useState<Project>();
-  const animation = useRef(new Animated.Value(0)).current;
-  const blinkAnimationRef = useRef<any>(null);
-  const [showDetails, setShowDetails] = useState<Boolean>(true);
+  const [isProjectModalVisible, setProjectModeVisible]= useState<boolean>(false);
 
 
-   
-  // Adjust useEffect to animate only when projectData.details is empty
+
   useEffect(() => {
-    if (projectData && projectData.details.length === 0) {
-      // Start the blinking animation if the array is empty
-      blinkAnimationRef.current = Animated.loop(
-        Animated.sequence([
-          Animated.timing(animation, {
-            toValue: 1,
-            duration: 500,
-            useNativeDriver: false,
-          }),
-          Animated.timing(animation, {
-            toValue: 0,
-            duration: 500,
-            useNativeDriver: false,
-          }),
-        ])
-      );
-      blinkAnimationRef.current.start();
-    } else {
-      // Stop the animation if the array is not empty
-      if (blinkAnimationRef.current) {
-        blinkAnimationRef.current.stop();
-        animation.setValue(0); // Reset animation to ensure it doesn't leave the view in the last animated state
-      }
-    }
+  }, [projectData]);
 
-    // Cleanup on unmount
-    return () => {
-      if (blinkAnimationRef.current) {
-        blinkAnimationRef.current.stop();
-      }
-    };
-  }, [data, animation]);
-
-  const interpolatedBorderColor = animation.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['#B87333', '#FFFFFF'], // Bronze to white
-  });
-
-  return (
+  const handleProjectChange = (value: Project) =>{
+    setProjectData(value);    
+  }
+   
+ 
+ return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Top Navigation */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
-        <TouchableOpacity onPress={() => { router.replace('/projects/Projects'); }} style={styles.signUpButton}>
-          <Text style={{fontSize:normalize(16)}}>← Projects</Text>
+      <View style={{flexDirection:'row', justifyContent:'space-evenly', backgroundColor:"#fff"}}>
+        <TouchableOpacity>
+          <Text>save</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => { setShowDetails(true); }} style={[styles.signUpButton, showDetails && styles.selected]}>
-          <Text style={[styles.signUpText, styles.selected]}>details</Text>
-        </TouchableOpacity>
-
-
-        {data &&
-
-          <TouchableOpacity onPress={() => {
-            setShowDetails(false);
-          }}>
-            <Animated.View style={[styles.signUpButton, { borderColor: interpolatedBorderColor }, !showDetails && styles.selected]}>
-              <Text style={styles.signUpText}><FontAwesome name="plus" /> media</Text>
-            </Animated.View>
+          <TouchableOpacity onPress={()=> 
+              {setProjectModeVisible(true);}
+          }>
+          <Text style={{color:'#B87333'}}>preview</Text>
           </TouchableOpacity>
-        }
-      </View>
-      <View style={styles.horizontalRule} />
+          <TouchableOpacity onPress={()=> 
+           {              router.navigate({
+            pathname: '/projects/Projects',
+          })}
+          }>
+          <Text>cancel</Text>
+          </TouchableOpacity>
 
-      {showDetails &&
-        (
-          <ProjectEditComponent></ProjectEditComponent>
-        )}
-      {!showDetails &&
-        (
-          <MediaComponent data={projectData} visible={false}/>
-         
-        )}
+      </View>            
+      <View style={styles.horizontalRule} />
+    <ProjectEditComponent onValueChange={handleProjectChange} data={projectData}></ProjectEditComponent>
+    {isProjectModalVisible &&
+    <ProjectModal visible={isProjectModalVisible} projectId={0} project={projectData} onClose={()=>setProjectModeVisible(false)}></ProjectModal>  
+    }
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: {
-     flex: 1,
-    backgroundColor: 'rgba(0,0,0,.1)'
+    flex: 1,
+    backgroundColor: '#fff',
+//    margin:10
   },
   FLImage: {
     width: 100,
@@ -120,7 +74,7 @@ const styles = StyleSheet.create({
   horizontalRule: {
     borderBottomColor: '#B87333',
     borderBottomWidth: 1,
-    marginVertical: 10,
+    marginVertical: 15,
   },
   buttonContainer: {
     backgroundColor: '#FFF',

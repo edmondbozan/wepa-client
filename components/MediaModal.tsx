@@ -31,12 +31,13 @@ const MediaModal: React.FC<MediaModalProps> = ({ visible, project, onClose, onSa
   const pickImage = async (setImage: React.Dispatch<React.SetStateAction<ImagePicker.ImagePickerAsset | null>>, mediaType: ImagePicker.MediaTypeOptions) => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: mediaType,
-      allowsEditing: false,
-      aspect: [1, 1],
+      allowsEditing: true,
+      aspect: [4,5],
       quality: 1,
     });
 
     if (!result.canceled) {
+      console.log(result);
       setImage(result.assets[0]);
     }
   };
@@ -108,28 +109,16 @@ const MediaModal: React.FC<MediaModalProps> = ({ visible, project, onClose, onSa
     setBeforeImage(null);
     setAfterImage(null);
     onSave(projectData);
-    // router.replace({
-    //   pathname: '/projects/project',
-    //   params: { data: JSON.stringify(projectData) }
-    // });
   };
 
-  // if (loading) {
-  //   return (
-  //     <View style={styles.loadingContainer}>
-  //       <Text>Saving Media{'\n'}</Text>
-  //       <ActivityIndicator size="large" color="#0000ff" />
-  //     </View>
-  //   );
-  // }
-
+ 
   return (
     <Modal isVisible={visible} style={styles.modal} >
       <KeyboardAvoidingView style={styles.modalContent} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <View style={styles.photoBox}>
           {/* <Text style={{ marginBottom: normalize(10) }}>Before and after pics </Text> */}
           <View style={styles.photoRow}>
-            <CameraButton label="After" onPress={() => pickImage(setAfterImage, ImagePicker.MediaTypeOptions.Images)} imageUri={afterImage?.uri || null} />
+            <CameraButton label="After" onPress={() => pickImage(setAfterImage, ImagePicker.MediaTypeOptions.All)} imageUri={afterImage?.uri || null} />
             <CameraButton label="Before" onPress={() => {
               if (!afterImage) { Alert.alert("please upload finished picture first."); return; }
               pickImage(setBeforeImage, ImagePicker.MediaTypeOptions.Images)

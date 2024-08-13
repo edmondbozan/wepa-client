@@ -14,11 +14,12 @@ import MessagesModal from './Messages';
 interface ProjectModalProps {
   visible: boolean;
   projectId:number;
+  project:Project;
   onClose: () => void;
 }
 
 
-const ProjectModal: React.FC<ProjectModalProps> = ({ visible, projectId, onClose}) => {
+const ProjectModal: React.FC<ProjectModalProps> = ({ visible, projectId, onClose, project}) => {
   const [data, setData] = useState<Project>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -52,7 +53,13 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ visible, projectId, onClose
   };
 
   useEffect(() => {
+    if (project == null){     
     fetchData();
+    } else {
+      console.log("what");
+      setData(project);
+      setLoading(false);
+    }
   }, []);
 
   const onViewableItemsChanged = ({ viewableItems }) => {

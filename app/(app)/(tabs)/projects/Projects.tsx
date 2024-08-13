@@ -151,7 +151,6 @@ const Projects: React.FC = () => {
                   <Text style={styles.category}>Category: {item.categoryName}</Text>
                   <View style={styles.space} />
                   <Text style={styles.cost}>Cost: ${item.cost}</Text>
-                </View>
                 <View style={styles.icon}>
                   <View>
                     <Text ><FontAwesome name="heart" size={normalize(20)} color="#FA9BCF" /> {item.likes}</Text>
@@ -161,10 +160,11 @@ const Projects: React.FC = () => {
                     <Text ><FontAwesome name="comment" size={normalize(20)} color="#000" /> {item.messageCount}</Text>
                   </View>
                 </View>
+                </View>
             </ImageBackground>
           </TouchableOpacity>
           {isProjectModalVisible && (
-            <ProjectModal visible={isProjectModalVisible} projectId={projectId} onClose={() => setProjectModalVisible(false)}>
+            <ProjectModal visible={isProjectModalVisible} projectId={projectId} onClose={() => setProjectModalVisible(false)} project={null}>
             </ProjectModal>
           )}
         </View>
@@ -183,10 +183,27 @@ const Projects: React.FC = () => {
               keyExtractor={(item) => item.projectId.toString()}
               renderItem={renderItem} />
             <TouchableOpacity onPress={() => {
+              const emptyProject: Project = {
+                userId: 0,
+                userName: '',
+                userType: '',
+                projectId: 0,
+                title: '',
+                cost: '0',
+                categoryId: 0,
+                categoryName: '',
+                likes: 0,
+                messageCount: 0,
+                phoneNumber: '',
+                message: '',
+                details: [], // Empty array for ProjectDetails
+              };
               router.push(
                 {
                   pathname: '/projects/project',
-                  params: { data: null }
+                  params: { data: JSON.stringify(emptyProject) }
+
+                  
                 }
               )
             }} >

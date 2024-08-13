@@ -17,41 +17,25 @@ export interface DropdownItem {
 
 interface DropdownInputProps {
   data: DropdownItem[];
-  placeholder: string;
-  setValue: DropdownItem;
-  label:string;
+  isVisible:boolean;
   onSelect: (item: DropdownItem) => void;
+  onClose:()=> void;
 }
 
-const DropdownInput: React.FC<DropdownInputProps> = ({ data, placeholder, setValue, onSelect, label }) => {
-  const [selectedValue, setSelectedValue] = useState<DropdownItem>(setValue);
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
+const CategoryModal: React.FC<DropdownInputProps> = ({ data,  onSelect, onClose, isVisible }) => {
 
-  useEffect(() => {
-    setSelectedValue(setValue);
-  }, [setValue]);
 
   const handleSelect = (item: DropdownItem) => {
-    setSelectedValue(item);
-    setModalVisible(false);
     onSelect(item);  // Pass the selected item to the parent component
   };
 
   return (
     <View  >
-      <View style={{width:'100%'}}>
-      {/* <TouchableOpacity style={{  flexDirection:'row'}}
-        onPress={() => setModalVisible(true)}>
-        <Text>{label} </Text>
-        <Text>{(selectedValue) ? selectedValue.description : ''}</Text>
-        <Text style={{justifyContent:'flex-end'}}>{'>'}</Text>
-      </TouchableOpacity> */}
-      </View>
       <Modal
         animationType="slide"
         transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}>
+        visible={isVisible}
+        onRequestClose={() => onClose}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <FlatList
@@ -67,10 +51,9 @@ const DropdownInput: React.FC<DropdownInputProps> = ({ data, placeholder, setVal
               )}
             />
             <TouchableOpacity
-              onPress={() => setModalVisible(false)}
-              style={styles.closeButton}
-            >
-              <Text style={styles.closeButtonText}>Close</Text>
+              onPress={onClose}
+              style={styles.closeButton}>
+              <Text style={styles.closeButtonText}>close</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -93,10 +76,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, .8)', 
   },
   modalContent: {
     width: '80%',
-    backgroundColor: 'rgba(221, 221, 221, 1)', 
+    backgroundColor: 'rgba(255, 255, 255, 1)', 
     borderRadius: 10,
     padding: 20,
     shadowColor: '#000',
@@ -125,9 +109,9 @@ const styles = StyleSheet.create({
 
   },
   closeButtonText: {
-    color: '#B87333',
+    color: '#000',
     textAlign: 'center',
   },
 });
 
-export default DropdownInput;
+export default CategoryModal;
