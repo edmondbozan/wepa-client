@@ -42,8 +42,8 @@ export default function App() {
   const flatListRef = React.useRef<FlatList>(null)
   const [visibleItems, setVisibleItems] = useState([]);
   const isFocused = useIsFocused();
-  const [radius, setRadius] = useState<number>(100);
-  const [budget, setBudget] = useState<number>(50000);
+  const [radius, setRadius] = useState<number>(4000);
+  const [budget, setBudget] = useState<number>(250000);
   const [bind, setBind] = useState<boolean>(false);
   const [modalMessageVisible, setModalMessageVisible] = useState(false);
   const [modalBlockVisible, setModalBlockVisible] = useState(false);
@@ -87,12 +87,10 @@ export default function App() {
   
     if (Device.isDevice) {
       const { status: existingStatus } = await Notifications.getPermissionsAsync();
-      console.log('existing status ' + existingStatus);
 
       let finalStatus = existingStatus;
       if (existingStatus !== 'granted') {
         const { status } = await Notifications.requestPermissionsAsync();
-        console.log(status);
         finalStatus = status;
       }
       if (finalStatus !== 'granted') {
@@ -101,7 +99,6 @@ export default function App() {
       }
       const projectId =
         Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
-        console.log(projectId);
       if (!projectId) {
         handleRegistrationError('Project ID not found');
       }
@@ -162,7 +159,6 @@ export default function App() {
 
   useEffect(() => {
     if (expoPushToken && Device.isDevice) {
-      console.log(expoPushToken);
       updatePush();
     }
   }, [expoPushToken]);
@@ -182,7 +178,6 @@ export default function App() {
     });
 
     responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log(response);
     });
 
     return () => {
@@ -196,7 +191,6 @@ export default function App() {
 
 
   const onViewableItemsChanged = ({ viewableItems }) => {
-    // console.log
     // (data[0].details.map((item, index) => ({
     //   id: `${item.projectDetailId}-${index}`, // Ensuring unique key
     //   afterImage: item.afterImage,
@@ -204,7 +198,6 @@ export default function App() {
     //   description: item.description,
     // })));
     setVisibleItems(viewableItems.map((item: { key: any; }) => item.key));
-    // console.log(viewableItems);
   };
 
   const viewabilityConfig = {
@@ -242,7 +235,6 @@ export default function App() {
       });
 
       const responseText = await response.json();
-      // console.log(responseText);
       if (!response.ok) {
         Alert.alert('Error', responseText.message || 'Like failed');
 //        fetchData();
@@ -337,22 +329,6 @@ export default function App() {
               <Text style={styles.button} >Budget</Text>
             </View>
           </TouchableOpacity>
-          {/* <TouchableOpacity >
-            <View style={[styles.buttonContainer]}>
-              <Text style={styles.button}>Pros</Text>
-            </View>
-          </TouchableOpacity> */}
-
-          {/* <TouchableOpacity onPress={handleCategoryButtonClick}   >
-              <FontAwesome name="filter" size={normalize(26)} color="#000" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleRadiusButtonClick}>
-            <FontAwesome name="bullseye" size={normalize(26)} color="#000" />
-          </TouchableOpacity> */}
-          {/* <Button
-        title="Go to Add Item"
-        onPress={() => router.replace("/Projects")}
-      /> */}
         </View>
         <View style={styles.horizontalRule}></View>
       </View>
@@ -361,16 +337,20 @@ export default function App() {
           <View style={styles.projectTitle}>
             <Text style={styles.title}>{data[0].title}</Text>
           </View>
-          <View style={{ flexDirection: 'row', marginTop: normalize(10), alignItems: 'center' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text style={{ fontSize: normalize(14), }}>By {data[0].userName}</Text>
+            <MaterialCommunityIcons name="professional-hexagon" size={normalize(30)} color="#B87333" />
+            </View>
             {(data[0].userType == "professional") &&
-              (<>
-                <MaterialCommunityIcons name="professional-hexagon" size={normalize(30)} color="#B87333" />
+              (<View style={{ flexDirection: 'row', justifyContent:'space-between', marginRight:normalize(20)}}>
                 <Text>{data[0].phoneNumber}</Text>
-                </>
+                <Text>
+                <Text style={{fontWeight:'500'}}>License#</Text> <Text>{data[0].licenseNumber}</Text>
+                </Text>
+                </View>
               )
             }
-          </View>
+
           <View style={styles.header2}>
             <View style={styles.header2heart}>
               <Text style={styles.category}><FontAwesome name="heart" size={normalize(20)} color="#FA9BCF" /> {data[0].likes}</Text>
@@ -432,8 +412,8 @@ export default function App() {
       //        onSubmit={(feedback) => likeProject(feedback, true)} // Pass the callback function with additional parameter
 
       />
-      <SliderModal type="radius" onValueChange={handleRadiusChange} visible={isRadiusModalVisible} userradius={25} onClose={() => { setRadiusModalVisible(false); setBind(!bind); }} />
-      <SliderModal type="dollars" onValueChange={handleBudgetChange} visible={isBudgetModalVisible} userradius={100000} onClose={() => { setBudgetModalVisible(false); setBind(!bind); }} />
+      <SliderModal type="radius" onValueChange={handleRadiusChange} visible={isRadiusModalVisible} userradius={4000} onClose={() => { setRadiusModalVisible(false); setBind(!bind); }} />
+      <SliderModal type="dollars" onValueChange={handleBudgetChange} visible={isBudgetModalVisible} userradius={250000} onClose={() => { setBudgetModalVisible(false); setBind(!bind); }} />
       <CheckboxList
         isVisible={isCategoriesModalVisible}
         onClose={handleCategoryButtonClick}

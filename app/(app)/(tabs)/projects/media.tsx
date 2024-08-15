@@ -56,7 +56,6 @@ const App: React.FC = () => {
 
 
     const addItem = async () => {
-        console.log(description);
         if (afterImage == null && videoUri == null && description.length == 0) {
             Alert.alert("Please add media.");
             return;

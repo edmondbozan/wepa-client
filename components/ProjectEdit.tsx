@@ -35,7 +35,7 @@ const ProjectEditComponent: React.FC<ProjectProps> = ({ data, onValueChange }) =
   const [errors, setErrors] = useState<string[]>([]);
   const toggleSwitch = () => setProjectEnabled(previousState => !previousState);
   const [isInputModeVisible, setInputModeVisible] = useState<boolean>(false);
-
+  const [isDragging, setIsDragging] = useState<boolean>(false);
 
   useEffect(() => {
     projectData
@@ -187,8 +187,8 @@ const ProjectEditComponent: React.FC<ProjectProps> = ({ data, onValueChange }) =
 
 
   return (
-    <SafeAreaView style={styles.safeArea}>   
-    <ScrollView showsVerticalScrollIndicator={false}>   
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView showsVerticalScrollIndicator={false} scrollEnabled={!isDragging} >
         <View style={[styles.container, { flexDirection: 'row' }]}>
           <Switch
             trackColor={{ false: "#C0C0C0", true: "#C0C0C0" }}
@@ -206,18 +206,18 @@ const ProjectEditComponent: React.FC<ProjectProps> = ({ data, onValueChange }) =
           <View style={styles.container}>
             <Text style={styles.label}>Category:  </Text>
             <Text>{selectedCategory?.description} <FontAwesome6 name="chevron-right" /></Text>
-            
+
           </View>
         </TouchableOpacity>
         <View style={styles.horizontalRule}></View>
         {/* {!isCategoryValid && (<Text style={{ color: 'red' }}>Please choose a category.</Text>)} */}
         <TouchableOpacity onPress={() => setInputModeVisible(true)} style={{ width: '100%' }}>
-        <View style={styles.container}>
+          <View style={styles.container}>
             <Text style={styles.label}>Title:  </Text>
             <View style={{ justifyContent: 'space-between' }}>
-              <Text>{title.length > 40 ? title.slice(0, 40) + '...' : title} <FontAwesome6 name="chevron-right" /></Text>              
-            </View>          
-        </View>
+              <Text>{title.length > 40 ? title.slice(0, 40) + '...' : title} <FontAwesome6 name="chevron-right" /></Text>
+            </View>
+          </View>
         </TouchableOpacity>
         {/* {!isProjectNameValid && (<Text style={{ color: 'red' }}>Project Name is required.</Text>)} */}
         <View style={styles.horizontalRule}></View>
@@ -229,19 +229,20 @@ const ProjectEditComponent: React.FC<ProjectProps> = ({ data, onValueChange }) =
         </TouchableOpacity>
         {!isCostValid && (<Text style={{ color: 'red' }}>Project cost must be {'>'} 0.</Text>)}
         <View style={styles.horizontalRule}></View>
-        <MediaPicker data={projectData.details} onValueChange={handleMediaChange}></MediaPicker>
-      <SliderModal type="dollars" onValueChange={handleBudgetChange} visible={isBudgetModalVisible} userradius={cost} onClose={() => { setBudgetModalVisible(false); validateCost(); setProjectData(prevdata => ({ ...prevdata, cost: cost.toString() })); }} />
-      <CategoryModal isVisible={modalVisible} data={categories} onClose={() => { console.log("close"); setModalVisible(false); }} onSelect={item => {
-        setSelectedCategory(item);
-        setProjectData(prevdata => ({ ...prevdata, categoryName: item.description, categoryId: parseInt(item.id) }));
-        setModalVisible(false)
-      }} />
-      { isInputModeVisible &&
-      <InputModal isVisible={isInputModeVisible} title="Project Title" initialValue={title} onClose={() => setInputModeVisible(false)} onSave={(text) => {
-        setProjectTitle(text);
-        setProjectData(prevdata => ({ ...prevdata, title: text}));
-        setInputModeVisible(false)}} maxLength={50} />
-      }
+       <MediaPicker data={projectData?.details} onValueChange={handleMediaChange} isDragging={drag => { setIsDragging(drag) }}></MediaPicker>
+        <SliderModal type="dollars" onValueChange={handleBudgetChange} visible={isBudgetModalVisible} userradius={cost} onClose={() => { setBudgetModalVisible(false); validateCost(); setProjectData(prevdata => ({ ...prevdata, cost: cost.toString() })); }} />
+        <CategoryModal isVisible={modalVisible} data={categories} onClose={() => { setModalVisible(false); }} onSelect={item => {
+          setSelectedCategory(item);
+          setProjectData(prevdata => ({ ...prevdata, categoryName: item.description, categoryId: parseInt(item.id) }));
+          setModalVisible(false)
+        }} />
+        {isInputModeVisible &&
+          <InputModal isVisible={isInputModeVisible} title="Project Title" initialValue={title} onClose={() => setInputModeVisible(false)} onSave={(text) => {
+            setProjectTitle(text);
+            setProjectData(prevdata => ({ ...prevdata, title: text }));
+            setInputModeVisible(false)
+          }} maxLength={50} />
+        }
       </ScrollView>
     </SafeAreaView>
   );
@@ -250,7 +251,7 @@ const ProjectEditComponent: React.FC<ProjectProps> = ({ data, onValueChange }) =
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    margin:20
+    margin: 20
   },
   horizontalRule: {
     borderBottomColor: 'rgba(0,0,0,.1)',
@@ -278,7 +279,7 @@ const styles = StyleSheet.create({
     margin: 5,
     width: '100%',
     flexDirection: 'row',
-    justifyContent:'space-between'
+    justifyContent: 'space-between'
     //    alignItems:'flex-start'
   },
 

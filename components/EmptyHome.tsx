@@ -17,7 +17,6 @@ const EmptyHome: React.FC<EmptyHomeProps> = ({ onUnlike }) => {
   const { userId } = useSession();
   const unlikeProjects = async () => {
     try {
-      console.log(`${BASE_URL}/api/projects/users/${userId}/unlike`);
       const response = await fetchWithAuth(`${BASE_URL}/api/projects/users/${userId}/unlike`, {
         method: 'PUT',
         headers: {

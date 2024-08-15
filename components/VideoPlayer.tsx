@@ -23,7 +23,6 @@ const VideoPlayer = ({ uri, isFocused, scrollY }: { uri: string; isFocused: bool
   }, [scrollY, layoutY]);
 
   useEffect(() => {
-    console.log(isInView);
     if (isFocused && isInView) {
       videoRef.current?.playAsync();
     } else {

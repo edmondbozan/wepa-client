@@ -3,10 +3,11 @@ import { View, Text, Alert, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useSession } from '@/context/ctx';
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import fetchWithAuth from '@/context/FetchWithAuth';
 import { BASE_URL } from '@/constants/Endpoints';
 import { GestureHandlerRootView, TouchableOpacity } from 'react-native-gesture-handler';
+import { ExternalLink } from '@/components/ExternalLink';
 
 const UserSettings: React.FC = () => {
   const { signOut, userId } = useSession();
@@ -61,14 +62,17 @@ const handleHelp = () =>{
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <GestureHandlerRootView>
         <View style={styles.itemContainer}>
-        <TouchableOpacity onPress={handleHelp} disabled={isDeleting}>
             <View style={styles.optionContainer}>
-              <FontAwesome name="question" size={18} color="#B87333" />
-              <Text> Help</Text>
+              <MaterialIcons name="privacy-tip" size={18} color="#B87333" />
+              <Text><ExternalLink href={'https://app.termly.io/policy-viewer/policy.html?policyUUID=92b8a492-eea6-4e68-9727-7430bc07dac5'}> Privacy Policy</ExternalLink></Text>
             </View>
-          </TouchableOpacity>
+          <View style={styles.separator} />
+          
+            <View style={styles.optionContainer}>
+              <FontAwesome name="info" size={18} color="#B87333" />
+              <Text><ExternalLink href={'https://app.termly.io/policy-viewer/policy.html?policyUUID=e7fd608a-64a0-4e12-91b9-e154a15eb707'}> Terms of Service</ExternalLink></Text>
+            </View>
           <View style={styles.separator} />
           <TouchableOpacity onPress={handleSignOut} disabled={isDeleting}>
             <View style={styles.optionContainer}>
@@ -84,7 +88,6 @@ const handleHelp = () =>{
             </View>
           </TouchableOpacity>
         </View>
-      </GestureHandlerRootView>
     </SafeAreaView>
   );
 };

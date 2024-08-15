@@ -43,9 +43,6 @@ const MessagesModal: React.FC<MessagesModalProps> = ({ projectId, visible, onClo
     }
   }, [projectId, visible]);
 
-//   useEffect(()=>{
-//     console.log(BASE_URL + {projectId} + "/messages");        
-//   }, [])
 
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>

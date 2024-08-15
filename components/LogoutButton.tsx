@@ -8,7 +8,6 @@ import { FontAwesome } from '@expo/vector-icons';
 const LogoutButton: React.FC = () => {
   const { isAuthenticated, signOut } = useSession();
 
-  console.log("logout");
   if (!isAuthenticated) return null;
 
   return (

@@ -14,6 +14,7 @@ import { ExternalLink } from '@/components/ExternalLink';
 const Register: React.FC = () => {
   const { signIn } = useSession();
   const [userType, setUserType] = useState<'professional' | 'consumer' | null>('consumer');
+  const [license, setLicense] = useState<string>('');  
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [phone, setPhone] = useState<string>('');
@@ -21,6 +22,7 @@ const Register: React.FC = () => {
   const [displayName, setDisplayName] = useState<string>('');
   const [zipcode, setZipcode] = useState<string>('');
   const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
+  const [isLicenseValid, setLicenseValid] = useState<boolean>(true);
   const [isUserNameValid, setUsernameValid] = useState<boolean>(true);
   const [isPasswordValid, setPasswordValid] = useState<boolean>(true);
   const [isPhoneValid, setPhoneValid] = useState<boolean>(true);
@@ -40,8 +42,23 @@ const Register: React.FC = () => {
     }
   }
 
+  const validateLicense = (): boolean => {
+    if (!isProfessional){
+      setLicenseValid(true);
+      return true;
+    }
+    if (license.length > 0) {
+      setLicenseValid(true);
+      return true;
+    } else {
+      setLicenseValid(false);
+      return false;
+    }
+  }
+
+
   const validatePassword = (): boolean => {
-    if (password.length > 6) {
+    if (password.length > 5) {
       setPasswordValid(true);
       return true;
     } else {
@@ -89,7 +106,8 @@ const Register: React.FC = () => {
     if (!validateEmail()) validationErrors.push('Invalid email');
     if (!validatePassword()) validationErrors.push('Invalid password');
     if (!validatePhone()) validationErrors.push('Invalid phone number');
-    if (!validateZip()) validationErrors.push('Invalid ZIP code');
+    if (!validateZip()) validationErrors.push('Invalid Zip code');
+    if (!validateLicense()) validationErrors.push('Invalid License');
 
     setErrors(validationErrors);
 
@@ -113,7 +131,8 @@ const Register: React.FC = () => {
             Email: email,
             Password: password,
             ZipCode: zipcode,
-            PhoneNumber: phone
+            PhoneNumber: phone,
+            LicenseNumber: license
           }),
         });
 
@@ -150,11 +169,27 @@ const Register: React.FC = () => {
               value={isProfessional}
             />
             <Text>
-              <Text style={{ fontWeight: 'bold', fontSize:normalize(12), color: '#000' }}>{isProfessional ? ' i am a professional.' : ' i am not a professional.'}</Text>
-              <Text style={{ fontWeight: 'bold', fontSize:normalize(12), color: 'red' }}>{isProfessional && `${'\n'} your phone number will be displayed.`}</Text>
+              <Text style={{ fontWeight: 'bold', fontSize:normalize(12), color: '#000' }}>{isProfessional ? ' I am a professional.' : ' I am not a professional.'}</Text>
+              <Text style={{ fontWeight: 'bold', fontSize:normalize(12), color: 'red' }}>{isProfessional && `${'\n'} Your phone number will be displayed.`}</Text>
             </Text>
           </View>
-          <Text style={styles.label}>display name:</Text>
+          {isProfessional && 
+          <>
+          <Text style={styles.label}>License Number:</Text>
+          <TextInput
+            value={license}
+            onChangeText={setLicense}
+            placeholderTextColor="#000"
+            style={[styles.input]}
+             onBlur={validateLicense}
+          />
+            {!isLicenseValid &&
+            (<Text style={{ color: 'red' }}>license is required</Text>)}
+          </>
+          }
+
+
+          <Text style={styles.label}>Display Name:</Text>
           <TextInput
             value={username}
             onChangeText={setUsername}
@@ -164,7 +199,7 @@ const Register: React.FC = () => {
           />
           {!isUserNameValid &&
             (<Text style={{ color: 'red' }}>display name is required</Text>)}
-          <Text style={styles.label}>password:</Text>
+          <Text style={styles.label}>Password:</Text>
           <TextInput
             value={password}
             onChangeText={setPassword}
@@ -174,7 +209,7 @@ const Register: React.FC = () => {
             style={[styles.input, !isPasswordValid && styles.inputError]}
           />
           {!isPasswordValid &&
-            (<Text style={{ color: 'red' }}>password is required and must be {'>'} 6 charchters </Text>)}
+            (<Text style={{ color: 'red' }}>password is required and must be {'>'} 5 charchters </Text>)}
 
           {/* <Text style={styles.label}>Verify Password:</Text>
           <TextInput
@@ -185,7 +220,7 @@ const Register: React.FC = () => {
             secureTextEntry
             style={[styles.input, validationErrors.verifyPassword && styles.inputError]}
           /> */}
-          <Text style={styles.label}>phone:</Text>
+          <Text style={styles.label}>Phone:</Text>
           <TextInputMask
             type={'custom'}
             options={{
@@ -202,7 +237,7 @@ const Register: React.FC = () => {
           {!isPhoneValid &&
             (<Text style={{ color: 'red' }}>proper phone number is required.</Text>)}
 
-          <Text style={styles.label}>e-mail:</Text>
+          <Text style={styles.label}>Email:</Text>
           <TextInput
             value={email}
             onChangeText={setEmail}
@@ -217,7 +252,7 @@ const Register: React.FC = () => {
           {!isEmailValid &&
             (<Text style={{ color: 'red' }}>proper email is required.</Text>)}
 
-          <Text style={styles.label}>zip code:</Text>
+          <Text style={styles.label}>Zip code:</Text>
           <TextInput
             value={zipcode}
             onChangeText={setZipcode}

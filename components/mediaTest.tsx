@@ -1,36 +1,42 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, View, Image, Dimensions, TouchableOpacity, Alert, Modal, TextInput, Platform, KeyboardAvoidingView, ScrollView } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, View, Image, Dimensions, TouchableOpacity, Alert, Modal, TextInput, Platform, KeyboardAvoidingView } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { DragSortableView } from 'react-native-drag-sort';
 import 'react-native-reanimated';
 import { FontAwesome, FontAwesome5, FontAwesome6, MaterialIcons } from '@expo/vector-icons';
 import { Button, normalize } from 'react-native-elements';
-import { ProjectDetails } from '@/interfaces/IProject';
+import { ProjectDetails, uploadfile } from '@/interfaces/IProject';
 import { ResizeMode, Video } from 'expo-av';
+import * as ImageManipulator from 'expo-image-manipulator';
 
 
 interface MediaComponentProps {
   data: ProjectDetails[];
   onValueChange: (value: ProjectDetails[]) => void;
+  isDragging: (drag:boolean) => void;
 }
 
 
 
-
-const MediaPicker: React.FC<MediaComponentProps> = ({ data, onValueChange }) => {
+const MediaPicker: React.FC<MediaComponentProps> = ({ data = [], onValueChange, isDragging }) => {
   const [media, setMedia] = useState<ProjectDetails[]>(data);
   const [selectedItem, setSelectedItem] = useState<ProjectDetails | null>(null);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [description, setDescription] = useState<string | null>(null);
   const [beforeImage, setBeforeImage] = useState<string | null>(null);
+  const [hideAdd, setHideAdd] = useState<boolean>(false);
+
 
   useEffect(() => {
     onValueChange(media);
   }, [media]);
 
 
-  useEffect(() => {
-    if (media.filter(f => f.key == "-1").length === 0) {
+  const handleDrag = (drag:boolean) =>{
+    if (drag){
+      setMedia((prevMedia) => prevMedia.filter((item) => item.key !== "-1"));
+    }
+    else {
       const newMedia = ({
         key: "-1",
         rank: 0, // Ensure unique key
@@ -39,16 +45,86 @@ const MediaPicker: React.FC<MediaComponentProps> = ({ data, onValueChange }) => 
         beforeImage: '',
         video: '',
         description: '',
+        files:[]
       });
-      setMedia((prevMedia) => [
-        ...prevMedia,
-        newMedia,
-      ]);
+      setMedia((prevMedia) => [...prevMedia,newMedia,]);
+    }
+    isDragging(drag);
+  }
+
+
+
+  useEffect(() => {
+    if (media?.filter(f => f.key == "-1").length === 0) {
+      const newMedia = ({
+        key: "-1",
+        rank: 0, // Ensure unique key
+        projectDetailId: 0,
+        afterImage: 'add', // Assuming all selected items are images
+        beforeImage: '',
+        video: '',
+        description: '', 
+        files:[]       
+      });      
+      setMedia((prevMedia) => [...prevMedia,newMedia]);
     }
 
   }, []);
 
-  const pickMedia = async (beforePic: boolean = false) => {
+  const resizeImage = async (image: ImagePicker.ImagePickerAsset) => {
+    const targetAspectRatio = 4 / 5;
+    const originalWidth = image.width || 0;
+    const originalHeight = image.height || 0;
+  
+    let cropWidth = originalWidth;
+    let cropHeight = originalHeight;
+    let cropX = 0;
+    let cropY = 0;
+  
+    // Determine whether to crop width or height to fit the target aspect ratio
+    const originalAspectRatio = originalWidth / originalHeight;
+    
+    if (originalAspectRatio > targetAspectRatio) {
+      // Image is wider than 4:5, so crop the width
+      cropWidth = originalHeight * targetAspectRatio;
+      cropX = (originalWidth - cropWidth) / 2; // Center the crop horizontally
+    } else if (originalAspectRatio < targetAspectRatio) {
+      // Image is taller than 4:5, so crop the height
+      cropHeight = originalWidth / targetAspectRatio;
+      cropY = (originalHeight - cropHeight) / 2; // Center the crop vertically
+    }
+  
+    // Perform the crop operation
+    const cropResult = await ImageManipulator.manipulateAsync(
+      image.uri,
+      [{
+        crop: {
+          originX: cropX,
+          originY: cropY,
+          width: cropWidth,
+          height: cropHeight
+        },
+      }],
+      { compress: 1, format: ImageManipulator.SaveFormat.JPEG } // No compression yet
+    );
+  
+    // Then resize the cropped image
+    const targetWidth = 500; // Target width for profile image
+    const targetHeight = Math.floor(targetWidth * (5 / 4)); // Adjust height for 4:5 aspect ratio
+  
+    const manipResult = await ImageManipulator.manipulateAsync(
+      cropResult.uri,
+      [{ resize: { width: targetWidth, height: targetHeight } }],
+      { compress: 0.5, format: ImageManipulator.SaveFormat.JPEG } // Compress with 50% quality
+    );
+  
+    const type = 'image/jpeg';
+    const name = image.uri.split('/').pop() || 'image.jpg';
+  
+    return { uri: manipResult.uri, type, name };
+  };
+    
+  const pickMedia = async (beforePic: boolean = false, mediaType: ImagePicker.MediaTypeOptions) => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (!permissionResult.granted) {
@@ -57,92 +133,146 @@ const MediaPicker: React.FC<MediaComponentProps> = ({ data, onValueChange }) => 
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: mediaType,
       allowsEditing: true,
       quality: 1,
+      aspect: [4,5]
     });
 
-    if (!result.canceled) {
-      if (beforePic) {
-        setSelectedItem({ ...selectedItem, beforeImage: result.assets[0].uri });
-        // setSelectedItem({...selectedItem,key:beforeImage: result.assets[0].uri});
-      } else {
-        const newMedia = result.assets.map((asset, index) => ({
-          key: `${media.length + index}`,
-          rank: index, // Ensure unique key
-          projectDetailId: 0,
-          //        uri: asset.uri,
-          afterImage: asset.uri, // Assuming all selected items are images
-          beforeImage: '',
-          video: '',
-          description: '',
+    if (!result.canceled && result.assets.length > 0) {
+      const asset = result.assets[0]; // Since only one image/video is selected
+  
+      if (asset.type === 'image') {
+        const resizedUri = await resizeImage(asset); // Resize image to 1000px width with 4:5 aspect ratio
+        if (beforePic) {
 
-        }));
-        setMedia([...media.slice(0, -1), ...newMedia, media[media.length - 1]]);
+          const newFile: uploadfile = {
+            uri: resizedUri.uri,
+            type: resizedUri.type || 'image/jpeg', // Assign a default type if not provided
+            name: `before.jpg`, // Generate a name if not provided
+        };
+    
+        setSelectedItem({
+            ...selectedItem,
+            beforeImage: resizedUri.uri, // Update the beforeImage URI
+            files: [...(selectedItem?.files || []), newFile], // Append the new file to the existing array
+        });
+        } else {
+          const newFile: uploadfile = {
+            uri: resizedUri.uri,
+            type: resizedUri.type || 'image/jpeg', // Assign a default type if not provided
+            name: `after.jpg`, // Generate a name if not provided
+        };
+          const newMedia = {
+            key: `${media.length}`,
+            rank: media.length, // Ensure unique key
+            projectDetailId: 0,
+            afterImage: resizedUri.uri,
+            beforeImage: null,
+            video: null,
+            description: '',
+            files: [newFile]
+          };
+          setMedia([...media.slice(0, -1), newMedia, media[media.length - 1]]);
+        }
+      } else if (asset.type === 'video') {
+        if (beforePic) {
+          Alert.alert("Cannot select a video as the before image.");
+        } else {
+          const newFile: uploadfile = {
+            uri: asset.uri,
+            type: asset.type, 
+            name: asset.fileName, 
+        };
+          const newMedia = {
+            key: `${media.length}`,
+            rank: media.length, // Ensure unique key
+            projectDetailId: 0,
+            afterImage: null,
+            beforeImage: null,
+            video: asset.uri,
+            description: '',
+            files: [newFile]
+          };
+          setMedia([...media.slice(0, -1), newMedia, media[media.length - 1]]);
+        }
       }
     }
+
+    
   };
   const deleteMedia = (key: string) => {
     setMedia(media.filter(item => item.key.toString() !== key));
   };
 
   const openModal = (item: ProjectDetails) => {
-
     setSelectedItem(item);
     setDescription(item.description);
     setBeforeImage(item.afterImage);
     setIsModalVisible(true);
   };
   const saveDescription = () => {
-    if (selectedItem) {
-      setMedia(media.map(item => item.key === selectedItem.key ? { ...item, description, beforeImage } : item));
+    if (selectedItem) {      
+      selectedItem.description = description;
+      setMedia(media.map(item => item.key === selectedItem.key ? selectedItem : item));
       setIsModalVisible(false);
     }
   };
 
-  const deleteBeforeImage = () =>{
+  const deleteBeforeImage = () => {
     if (selectedItem) {
-      setBeforeImage(null);
-      setSelectedItem({ ...selectedItem, beforeImage: null});
-
-  }
+      setBeforeImage(null);      
+      setSelectedItem({ ...selectedItem, beforeImage: null,
+      files: selectedItem.files?.filter(file => file.name !== "before.jpg") || []
+    });
+    }
   }
   const renderItem = (item: ProjectDetails, index: number) => {
-    if (item.afterImage === 'add') {
+    if (item.afterImage === 'add' && hideAdd) {
       return (
-        <TouchableOpacity style={styles.mediaTile} onPress={() => { pickMedia(false) }}>
-          <FontAwesome name="camera" size={normalize(50)} color="#B87333" />
-        </TouchableOpacity> 
+      <></>        
       );
     }
 
-    if(item.video){
-      return(
-      <Image source={{ uri: item.video }} style={styles.mediaTile} />
-      )}
-      //   <Video
-      //   ref={item.video}
-      //   style={styles.mediaTile}
-      //   source={{
-      //     uri: item.video,
-      //   }}
-      //   useNativeControls
-      //   playsInSilentLockedModeIOS={true}
-      //   resizeMode={ResizeMode.COVER}
-      //   isLooping
-      //   onPlaybackStatusUpdate={(status) => setStatus(() => status)}
-      // />
-      
-    
+    if (item.afterImage === 'add' && !hideAdd) {
+      return (
+        <TouchableOpacity style={styles.mediaTile} onPress={() => { pickMedia(false, ImagePicker.MediaTypeOptions.All) }}>
+          <FontAwesome name="camera" size={normalize(50)} color="#B87333" />
+        </TouchableOpacity>
+        
+      );
+    }
+
+    if (item.video) {
+      return (
+        <View key={item.rank}>
+          <Video
+            style={styles.mediaTile}
+            source={{
+              uri: item.video,
+            }}
+            useNativeControls
+            resizeMode={ResizeMode.COVER}
+            isLooping={false}
+          />
+          <TouchableOpacity style={styles.deleteButton} onPress={() => deleteMedia(item.key.toString())}>
+            <FontAwesome style={styles.deleteButtonText} name="times"></FontAwesome>
+          </TouchableOpacity>
+          <TouchableOpacity key={item.rank} onPress={() => openModal(item)} style={styles.editButton} >
+            <FontAwesome6 style={styles.editButtonText} size={normalize(3)} name="pencil"></FontAwesome6>
+          </TouchableOpacity>
+        </View>
+      )
+    }
 
     return (
-      <View key={item.rank}>        
+      <View key={item.rank}>
         <Image source={{ uri: item.afterImage?.toString() }} style={[styles.mediaTile]} />
         <TouchableOpacity style={styles.deleteButton} onPress={() => deleteMedia(item.key.toString())}>
           <FontAwesome style={styles.deleteButtonText} name="times"></FontAwesome>
         </TouchableOpacity>
         <TouchableOpacity key={item.rank} onPress={() => openModal(item)} style={styles.editButton} >
-          <FontAwesome6 style={styles.editButtonText} size={3} name="pencil"></FontAwesome6>
+          <FontAwesome6 style={styles.editButtonText} size={normalize(3)} name="pencil"></FontAwesome6>
         </TouchableOpacity>
       </View>
     );
@@ -152,6 +282,7 @@ const MediaPicker: React.FC<MediaComponentProps> = ({ data, onValueChange }) => 
     <>
       <Text style={styles.mediaTitle}>Project Media</Text>
       <Text style={styles.subTitle}>Long Press an tile to re-order. Tap <FontAwesome6 style={styles.editButtonText} name="pencil"></FontAwesome6> to add additonal attributes.</Text>
+      {media &&
       <DragSortableView
         dataSource={media}
         parentWidth={Dimensions.get('window').width}
@@ -160,36 +291,52 @@ const MediaPicker: React.FC<MediaComponentProps> = ({ data, onValueChange }) => 
         onDataChange={(data) => setMedia(data)}
         renderItem={renderItem}
         keyExtractor={(item) => item.key}
-        delayLongPress={200} />    
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={isModalVisible}
-      onRequestClose={() => setIsModalVisible(false)}>      
+        delayLongPress={200} 
+        onDragStart={()=>{handleDrag(true)}}
+        onDragEnd={()=>{handleDrag(false)}}
+        />
+        }
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isModalVisible}
+        onRequestClose={() => setIsModalVisible(false)}>
         <KeyboardAvoidingView style={styles.modalContainer} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
           <View style={styles.modalContent}>
             {selectedItem && (
               <>
-                <Text>Add a description and or a before image.</Text>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
+            {selectedItem.video && (<><Text>Add a description to your video.</Text><Video
+                  style={styles.mediaTile}
+                  source={{
+                    uri: selectedItem.video,
+                  }}
+                  useNativeControls
+                  resizeMode={ResizeMode.COVER}
+                  isLooping={false} /></>
+            )}
+            {selectedItem.afterImage && (
+                <>
+                <Text>Add a description and (or) a before image.</Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>                                                    
                   <Image source={{ uri: selectedItem.afterImage?.toString() }} style={styles.mediaTile} />
                   {!selectedItem.beforeImage ?
                     (
-                      <TouchableOpacity style={styles.mediaTile} onPress={() => { pickMedia(true); } }>
+                      <TouchableOpacity style={styles.mediaTile} onPress={() => { pickMedia(true, ImagePicker.MediaTypeOptions.Images); }}>
                         <FontAwesome name="camera" size={normalize(50)} color="#B87333" />
                       </TouchableOpacity>
                     )
                     :
                     (
-                      <View>
+                      <View>                        
                         <Image source={{ uri: selectedItem.beforeImage?.toString() }} style={styles.mediaTile} />
                         <TouchableOpacity style={styles.deleteButton} onPress={deleteBeforeImage}>
                           <FontAwesome style={styles.deleteButtonText} name="times"></FontAwesome>
                         </TouchableOpacity>
                       </View>
                     )}
-                </View>
-
+                    </View>
+                    </>
+                    )}
                 <TextInput
                   style={styles.input}
                   placeholder="Enter description"
@@ -226,15 +373,11 @@ const styles = StyleSheet.create({
   mediaTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-//    marginLeft: 20,
+    //    marginLeft: 20,
     marginTop: 20,
     color: "black"
   },
   subTitle: {
-    //    fontSize: 18,
-    //    fontWeight: 'bold',
-    //    margin: 20,
-//    marginLeft: 20,
     marginTop: 10,
     marginBottom: normalize(20),
     color: "black"

@@ -27,7 +27,7 @@ const MediaModal: React.FC<MediaModalProps> = ({ visible, project, onClose, onSa
   const [afterImage, setAfterImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
   const [projectData, setProjectData] = useState<Project>(project);
   const [loading, setLoading] = useState(false);
-
+ 
   const pickImage = async (setImage: React.Dispatch<React.SetStateAction<ImagePicker.ImagePickerAsset | null>>, mediaType: ImagePicker.MediaTypeOptions) => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: mediaType,
@@ -37,7 +37,6 @@ const MediaModal: React.FC<MediaModalProps> = ({ visible, project, onClose, onSa
     });
 
     if (!result.canceled) {
-      console.log(result);
       setImage(result.assets[0]);
     }
   };

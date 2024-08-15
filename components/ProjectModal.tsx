@@ -56,7 +56,6 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ visible, projectId, onClose
     if (project == null){     
     fetchData();
     } else {
-      console.log("what");
       setData(project);
       setLoading(false);
     }

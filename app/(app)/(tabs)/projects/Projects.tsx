@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, ImageBackground, Alert, SafeAreaView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SessionProvider, useSession } from '@/context/ctx';
 import fetchWithAuth from '@/context/FetchWithAuth';
@@ -6,7 +6,7 @@ import { BASE_URL } from '@/constants/Endpoints';
 import { Project, ProjectDetails } from '@/interfaces/IProject';
 import { FontAwesome } from '@expo/vector-icons';
 import { normalize } from 'react-native-elements'
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import ProjectModal from '@/components/ProjectModal';
 
 const Projects: React.FC = () => {
@@ -16,6 +16,8 @@ const Projects: React.FC = () => {
   const { userId } = useSession();
   const [isProjectModalVisible, setProjectModalVisible] = useState(false);
   const [projectId, setProjectId] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
+
 
   const fetchData = async () => {
     try {
@@ -34,9 +36,14 @@ const Projects: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+      setRefreshKey((prevKey) => prevKey + 1);
+    }, [])
+  );
 
 
   const deleteProject = async (projectId: number) => {
@@ -196,7 +203,8 @@ const Projects: React.FC = () => {
                 messageCount: 0,
                 phoneNumber: '',
                 message: '',
-                details: [], // Empty array for ProjectDetails
+                licenseNumber:'',
+                details: [], 
               };
               router.push(
                 {

@@ -17,6 +17,7 @@ export  interface Project {
         userId:number;
         userName:string;
         userType:string;
+        licenseNumber:string;
         projectId: number;
         title: string;
         cost: string;
@@ -36,7 +37,24 @@ export  interface Project {
         description: string | null;
         afterImage: string | null;
         beforeImage:string | null;
-        video:string | null
+        video:string | null;
+        files: uploadfile[] | null;
+      }
+
+      export interface uploadfile{
+        uri:string,
+        type: string;
+        name: string;
+      }
+
+
+      export interface User{
+        userId : number,
+        userName: string,
+        email: string,
+        userType: string
+        licenseNumber: string,
+        phoneNumber: string 
       }
     
 

@@ -66,8 +66,8 @@ export default function SignIn() {
               <Text style={styles.signUpText}>sign up →</Text>
             </TouchableOpacity>
           </View>
-          <View style={{ marginTop: normalize(100), marginStart: normalize(20), backgroundColor: 'rgba(0,0,0,.25)' }}>
-            <Text style={styles.headerText}>find your{'\n'}forever pro</Text>
+          <View style={{ marginTop: normalize(100), marginStart: normalize(20), backgroundColor: 'rgba(0,0,0,.15)' }}>
+            <Text style={styles.headerText}>find your{'\n'}forever pro{'\n'}</Text>
           </View>
           <View style={styles.formContainer}>
             <View style={styles.itemContainer}>
@@ -205,5 +205,6 @@ const styles = StyleSheet.create({
   headerText: {
     color: "white",
     fontSize: normalize(60),
+    fontWeight:'300'
   },
 });
