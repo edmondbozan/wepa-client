@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
 import { FontAwesome, FontAwesome6 } from '@expo/vector-icons';
 import { GestureHandlerRootView, TouchableOpacity } from 'react-native-gesture-handler';
@@ -7,6 +7,14 @@ import { normalize } from 'react-native-elements';
 import { BASE_URL } from '@/constants/Endpoints';
 import fetchWithAuth from '@/context/FetchWithAuth';
 import { useSession } from '@/context/ctx';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  Easing,
+  withDelay,
+  withRepeat,
+} from 'react-native-reanimated';
 
 interface EmptyHomeProps {
   onUnlike: () => void;
@@ -15,6 +23,22 @@ interface EmptyHomeProps {
 
 const EmptyHome: React.FC<EmptyHomeProps> = ({ onUnlike }) => {
   const { userId } = useSession();
+  const translateX = useSharedValue(500); // Start off-screen to the right
+  const opacity = useSharedValue(0);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+    opacity: opacity.value,
+  }));
+
+  useEffect(() => {
+    translateX.value = withTiming(0, { duration: 1200 });
+    opacity.value = withTiming(1, { duration: 1200 });
+  }, []);
+
+
+
+
   const unlikeProjects = async () => {
     try {
       const response = await fetchWithAuth(`${BASE_URL}/api/projects/users/${userId}/unlike`, {
@@ -38,18 +62,18 @@ const EmptyHome: React.FC<EmptyHomeProps> = ({ onUnlike }) => {
   return (
 
       <ImageBackground style={{ flex: 1 }} source={require('../assets/images/backgrounds/login.jpg')} imageStyle={{ opacity: 1, height: '100%' }}>
-      <View style={styles.itemContainer}>
+      <Animated.View style={[styles.itemContainer, animatedStyle]}>
           <Text style={{ color: "#000", fontSize: normalize(30), fontWeight: '200', lineHeight: normalize(30) }}>
-            you have viewed all projects.
-            adjust your criteria above to see more.
+            You have viewed all projects.
+            Adjust your criteria above to see more.
           </Text>
           <View style={{ alignItems: 'center' }}>
             <TouchableOpacity style={styles.skippedButton} onPress={unlikeProjects}>
               <Text style={styles.skippedButtonText}>review skipped projects</Text>
             </TouchableOpacity>
           </View>
-        </View>
-      </ImageBackground>
+        </Animated.View>
+              </ImageBackground>
   );
 };
 

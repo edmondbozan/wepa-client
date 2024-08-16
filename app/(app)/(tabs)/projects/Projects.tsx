@@ -8,6 +8,15 @@ import { FontAwesome } from '@expo/vector-icons';
 import { normalize } from 'react-native-elements'
 import { router, useFocusEffect } from 'expo-router';
 import ProjectModal from '@/components/ProjectModal';
+import { formatNumber } from '@/functions/stringfunctions';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  Easing,
+  withDelay,
+  withRepeat,
+} from 'react-native-reanimated';
 
 const Projects: React.FC = () => {
   const [data, setData] = useState<Project[]>([]);
@@ -17,6 +26,36 @@ const Projects: React.FC = () => {
   const [isProjectModalVisible, setProjectModalVisible] = useState(false);
   const [projectId, setProjectId] = useState(0);
   const [refreshKey, setRefreshKey] = useState(0);
+  const {userType } = useSession();
+
+
+
+  const translateX = useSharedValue(500); // Start off-screen to the right
+  const opacity = useSharedValue(0);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+    opacity: opacity.value,
+  }));
+
+  // const translateY = useSharedValue(100);
+  // const opacity = useSharedValue(0);
+
+
+
+
+  // // Animated style
+  // const animatedStyle = useAnimatedStyle(() => ({
+  //   transform: [{ translateY: translateY.value }],
+  //   opacity: opacity.value,
+  // }));
+
+  // Trigger the animation
+  // useEffect(() => {
+  //   translateY.value = withTiming(0, { duration: 800 });
+  //   opacity.value = withTiming(1, { duration: 800 });
+  // }, []);
+
 
 
   const fetchData = async () => {
@@ -42,7 +81,13 @@ const Projects: React.FC = () => {
     useCallback(() => {
       fetchData();
       setRefreshKey((prevKey) => prevKey + 1);
-    }, [])
+      translateX.value = 300; // Set to the initial state
+      opacity.value = 0;      // Set to the initial state 
+      translateX.value = withTiming(0, { duration: 1200 });
+      opacity.value = withTiming(1, { duration: 1200 });
+      translateX.value = withTiming(0, { duration: 1200 });
+      opacity.value = withTiming(1, { duration: 1200 });
+    }, [translateX, opacity])
   );
 
 
@@ -89,8 +134,6 @@ const Projects: React.FC = () => {
     );
   }
 
-
-
   const findFirstNonNullAfterImage = (details: ProjectDetails[]): string | null => {
     const detail = details.find(detail => detail.afterImage !== null);
     return detail?.afterImage || null;
@@ -122,7 +165,7 @@ const Projects: React.FC = () => {
     const imageUri = findFirstNonNullAfterImage(item.details);
     return (
 
-      <SafeAreaView style={{ flex: 1, backgroundColor:'rgba(255,255,255,.9)' }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: 'rgba(255,255,255,.9)' }}>
         <View style={styles.projectContainer}>
           <TouchableOpacity onPress={() => router.push({
             pathname: '/projects/project',
@@ -139,14 +182,14 @@ const Projects: React.FC = () => {
               imageStyle={{ borderRadius: 8, borderColor: "#B87333", opacity: 1, shadowColor: "#000" }}
             >
               <View style={styles.contentContainer}>
-              <TouchableOpacity style={{ zIndex:999, position: 'absolute', right: 20, top:20 }} onPress={() => handleViewProject(item.projectId)}>
-                    <View style={{ flexDirection: 'row' }}>
-                      <Text style={{ fontWeight: 400, textDecorationLine: 'underline' }}>Preview</Text>
-                      {/* <FontAwesome  name="eye" size={20} color="#000000" /> */}
-                      {/* <Text> Delete Project</Text> */}
-                    </View>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={{zIndex:999, position: 'absolute', right: 20, bottom: 20 }} onPress={() => handleDeleteProject(item.projectId)}>
+                <TouchableOpacity style={{ zIndex: 999, position: 'absolute', right: 20, top: 20 }} onPress={() => handleViewProject(item.projectId)}>
+                  <View style={{ flexDirection: 'row' }}>
+                    <Text style={{ fontWeight: 400, textDecorationLine: 'underline' }}>Preview</Text>
+                    {/* <FontAwesome  name="eye" size={20} color="#000000" /> */}
+                    {/* <Text> Delete Project</Text> */}
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity style={{ zIndex: 999, position: 'absolute', right: 20, bottom: 20 }} onPress={() => handleDeleteProject(item.projectId)}>
                   <View style={{ flexDirection: 'row' }}>
                     <FontAwesome name="trash" size={20} color="#000000" />
                     {/* <Text> Delete Project</Text> */}
@@ -154,10 +197,10 @@ const Projects: React.FC = () => {
                 </TouchableOpacity>
 
 
-                  <Text style={styles.title}>{item.title}</Text>                  
-                  <Text style={styles.category}>Category: {item.categoryName}</Text>
-                  <View style={styles.space} />
-                  <Text style={styles.cost}>Cost: ${item.cost}</Text>
+                <Text style={styles.title}>{item.title}</Text>
+                <Text style={styles.category}>Category: {item.categoryName}</Text>
+                <View style={styles.space} />
+                <Text style={styles.cost}>Cost: ${formatNumber(parseFloat(item.cost))}</Text>
                 <View style={styles.icon}>
                   <View>
                     <Text ><FontAwesome name="heart" size={normalize(20)} color="#FA9BCF" /> {item.likes}</Text>
@@ -167,7 +210,7 @@ const Projects: React.FC = () => {
                     <Text ><FontAwesome name="comment" size={normalize(20)} color="#000" /> {item.messageCount}</Text>
                   </View>
                 </View>
-                </View>
+              </View>
             </ImageBackground>
           </TouchableOpacity>
           {isProjectModalVisible && (
@@ -184,7 +227,7 @@ const Projects: React.FC = () => {
       <View style={styles.container}>
 
         {(data.length > 0) ? (
-          <><Text style={{ fontWeight: 400, margin: 10, fontSize:normalize(16) }}>Your Projects {'\n'}</Text>
+          <><Text style={{ fontWeight: 400, margin: 10, fontSize: normalize(16) }}>Your Projects {'\n'}</Text>
             <FlatList
               data={data}
               keyExtractor={(item) => item.projectId.toString()}
@@ -196,22 +239,23 @@ const Projects: React.FC = () => {
                 userType: '',
                 projectId: 0,
                 title: '',
-                cost: '0',
+                cost: '5000',
                 categoryId: 0,
                 categoryName: '',
                 likes: 0,
                 messageCount: 0,
                 phoneNumber: '',
                 message: '',
-                licenseNumber:'',
-                details: [], 
+                licenseNumber: '',
+                enabled: true,
+                details: [],
               };
               router.push(
                 {
                   pathname: '/projects/project',
                   params: { data: JSON.stringify(emptyProject) }
 
-                  
+
                 }
               )
             }} >
@@ -219,26 +263,46 @@ const Projects: React.FC = () => {
                 <Text style={styles.button}>Add New Project</Text>
               </View>
             </TouchableOpacity>
-
           </>
         ) :
           (
-            <ImageBackground style={{ flex: 1 }} source={require('../../../../assets/images/projects.jpg')} imageStyle={{ opacity: 0.9, height: '100%', justifyContent: 'center', alignItems: 'center' }}>
-              <View style={styles.itemContainer}>
-                  <Text style={{ color: "#000000", fontSize: normalize(30), fontWeight: '200', lineHeight: 30 }}>create projects to start generating leads getting likes. </Text>
-                  <TouchableOpacity onPress={() => {
-                    router.push(
-                      {
-                        pathname: '/projects/project',
-                        params: { data: null }
-                      }
-                    )
-                  }} >
-                    <View style={styles.buttonContainer}>
-                      <Text style={styles.button}>add new project</Text>
-                    </View>
-                  </TouchableOpacity>
-              </View>
+            <ImageBackground style={{ flex: 1, justifyContent: 'space-between' }} source={require('../../../../assets/images/backgrounds/leads.jpg')} imageStyle={{ opacity: 0.9, height: '100%', justifyContent: 'center', alignItems: 'center' }}>
+              <Animated.View style={[styles.itemContainer, animatedStyle]}>
+                <Text style={{ color: "#000000", fontSize: normalize(30), fontWeight: '200', lineHeight: 30 }}>
+                  {(userType?.toString() != "professional") ? "Add a project to start getting some love.  We will not display your personal information.  So go ahead and show your style." : "Create a project to start generating leads"} </Text>
+                <TouchableOpacity onPress={() => {
+                  const emptyProject: Project = {
+                    userId: 0,
+                    userName: '',
+                    userType: '',
+                    projectId: 0,
+                    title: '',
+                    cost: '0',
+                    categoryId: 0,
+                    categoryName: '',
+                    likes: 0,
+                    messageCount: 0,
+                    phoneNumber: '',
+                    message: '',
+                    licenseNumber: '',
+                    enabled: true,
+                    details: [],
+                  };
+                  router.push(
+                    {
+                      pathname: '/projects/project',
+                      params: { data: JSON.stringify(emptyProject) }
+
+
+                    }
+                  )
+                }} >
+
+                  <View style={styles.buttonContainer}>
+                    <Text style={styles.button}>add new project</Text>
+                  </View>
+                </TouchableOpacity>
+              </Animated.View>
             </ImageBackground>)}
       </View>
     </SafeAreaView>
@@ -284,7 +348,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: 10,
     borderRadius: 8,
-    backgroundColor:"rgba(255,255,255,1)",
+    backgroundColor: "rgba(255,255,255,1)",
 
 
   },

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, Alert, FlatList, ImageBackground, ListRenderItem } from 'react-native';
+import { View, Text, Image, StyleSheet, Alert, FlatList, ImageBackground, ListRenderItem, TouchableOpacity } from 'react-native';
 import { ProjectDetails } from '@/interfaces/IProject';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useFocusEffect } from 'expo-router';
@@ -9,6 +9,15 @@ import { BASE_URL } from '@/constants/Endpoints';
 import fetchWithAuth from '@/context/FetchWithAuth';
 import { normalize } from 'react-native-elements';
 import { formatDate } from '@/functions/stringfunctions';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  Easing,
+  withDelay,
+  withRepeat,
+} from 'react-native-reanimated';
+
 
 interface ProjectLeads {
   id: number;
@@ -24,12 +33,27 @@ const Leads: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const translateX = useSharedValue(500); // Start off-screen to the right
+  const opacity = useSharedValue(0);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+    opacity: opacity.value,
+  }));
+
 
   useFocusEffect(
     useCallback(() => {
       fetchData();
       setRefreshKey((prevKey) => prevKey + 1);
-    }, [])
+      translateX.value = 300; // Set to the initial state
+      opacity.value = 0;      // Set to the initial state 
+      translateX.value = withTiming(0, { duration: 1200 });
+      opacity.value = withTiming(1, { duration: 1200 });
+      translateX.value = withTiming(0, { duration: 1200 });
+      opacity.value = withTiming(1, { duration: 1200 });
+
+    }, [translateX, opacity])
   );
 
   const { userId } = useSession();
@@ -94,16 +118,45 @@ const Leads: React.FC = () => {
           />
         ) : (
           <ImageBackground
-            source={require('../../../../assets/images/backgrounds/leads.jpg')}
+            source={require('../../../../assets/images/projects.jpg')}
             style={styles.backgroundImage}
             imageStyle={{ opacity: 1 }}
           >
-            <View style={styles.itemContainer}>
-              <Text style={{ color: "#000", fontSize: normalize(30), fontWeight: '200', lineHeight: normalize(30) }}>
-                you do not have any leads. 
-                create projects to generate leads. 
-              </Text>
-            </View>
+              <Animated.View style={[styles.itemContainer, animatedStyle]}>
+                <Text style={{ color: "#000000", fontSize: normalize(30), fontWeight: '200', lineHeight: 30 }}>You do not have any leads.  Create a project to start generating leads.</Text>
+                <TouchableOpacity onPress={() => {
+                  const emptyProject: Project = {
+                    userId: 0,
+                    userName: '',
+                    userType: '',
+                    projectId: 0,
+                    title: '',
+                    cost: '0',
+                    categoryId: 0,
+                    categoryName: '',
+                    likes: 0,
+                    messageCount: 0,
+                    phoneNumber: '',
+                    message: '',
+                    licenseNumber: '',
+                    enabled: true,
+                    details: [],
+                  };
+                  router.push(
+                    {
+                      pathname: '/projects/project',
+                      params: { data: JSON.stringify(emptyProject) }
+
+
+                    }
+                  )
+                }} >
+
+                  <View style={styles.buttonContainer}>
+                    <Text style={styles.button}>add new project</Text>
+                  </View>
+                </TouchableOpacity>
+              </Animated.View>
           </ImageBackground>
         )}
       </View>
@@ -157,6 +210,22 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
     borderBottomWidth: 1,
     marginVertical: 10,
+  },
+  buttonContainer: {
+    backgroundColor: '#FFF',
+    borderRadius: 8, // Rounded edges
+    height: normalize(50),
+    borderWidth: 2,
+    borderColor: '#B87333',
+    color: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 10,
+  },
+  button: {
+    fontSize: normalize(18),
+    fontWeight: 'bold',
+    color: '#000',
   },
 });
 

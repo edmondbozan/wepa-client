@@ -104,16 +104,21 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ visible, projectId, onClose
           <View>
             <Text style={styles.title}>{data?.title}</Text>
           </View>
-          <View style={{ flexDirection: 'row', marginTop: normalize(10), alignItems: 'center' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text style={{ fontSize: normalize(14), }}>By {data?.userName}</Text>
             {(data?.userType == "professional") &&
-              (<>
-                <MaterialCommunityIcons name="professional-hexagon" size={normalize(30)} color="#B87333" />
-                <Text>{data?.phoneNumber}</Text>
-                </>
-              )
+            <MaterialCommunityIcons name="professional-hexagon" size={normalize(30)} color="#B87333" />
             }
           </View>
+          {(data?.userType == "professional") &&
+            (<View style={{ flexDirection: 'row', justifyContent: 'space-between', marginRight: normalize(20) }}>
+              <Text>{data.phoneNumber}</Text>
+              <Text>
+                <Text style={{ fontWeight: '500' }}>License#</Text> <Text>{data.licenseNumber}</Text>
+              </Text>
+            </View>
+            )
+          }         
           <View style={styles.header2}>
             <View style={styles.header2heart}>
               <Text style={styles.category}><FontAwesome name="heart" size={normalize(20)} color="#FA9BCF" /> {data?.likes}</Text>

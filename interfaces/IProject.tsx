@@ -14,6 +14,7 @@ export interface Images{
 } 
 
 export  interface Project {
+        enabled:boolean;
         userId:number;
         userName:string;
         userType:string;

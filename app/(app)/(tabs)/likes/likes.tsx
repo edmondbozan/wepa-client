@@ -9,6 +9,15 @@ import { normalize } from 'react-native-elements'
 
 import { router, useFocusEffect } from 'expo-router';
 import ProjectModal from '@/components/ProjectModal';
+import { formatNumber } from '@/functions/stringfunctions';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  Easing,
+  withDelay,
+  withRepeat,
+} from 'react-native-reanimated';
 //import normalize from '@/fonts/fonts';
 
 // Define the types for your data
@@ -22,6 +31,13 @@ const Likes: React.FC = () => {
   const [isProjectModalVisible, setProjectModalVisible] = useState(false);
   const [projectId, setProjectId] = useState(0);
   const [refreshKey, setRefreshKey] = useState(0);
+  const translateX = useSharedValue(500); // Start off-screen to the right
+  const opacity = useSharedValue(0);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+    opacity: opacity.value,
+  }));
 
 
   const fetchData = async () => {
@@ -45,7 +61,14 @@ const Likes: React.FC = () => {
     useCallback(() => {
       fetchData();
       setRefreshKey((prevKey) => prevKey + 1);
-    }, [])
+      translateX.value = 300; 
+      opacity.value = 0;   
+      translateX.value = withTiming(0, { duration: 1200 });
+      opacity.value = withTiming(1, { duration: 1200 });
+      translateX.value = withTiming(0, { duration: 1200 });
+      opacity.value = withTiming(1, { duration: 1200 });
+
+    }, [translateX, opacity])
   );
 
   const handleViewProject = (id: number) => {
@@ -105,7 +128,7 @@ const Likes: React.FC = () => {
                 <View >
                   <Text style={styles.category}>Category: {item.categoryName}</Text>
                   <View style={styles.space} />
-                  <Text style={styles.cost}>Cost: ${item.cost}</Text>
+                  <Text style={styles.cost}>Cost: ${formatNumber(parseFloat(item.cost))}</Text>
                 </View>
                 <View style={styles.icon}>
                   <View>
@@ -120,7 +143,7 @@ const Likes: React.FC = () => {
             </ImageBackground>
           </TouchableOpacity>
           {isProjectModalVisible && (
-            <ProjectModal visible={isProjectModalVisible} projectId={projectId} onClose={() => setProjectModalVisible(false)}>
+            <ProjectModal visible={isProjectModalVisible} projectId={projectId} onClose={() => setProjectModalVisible(false)} project={null}>
             </ProjectModal>
           )}
         </View>
@@ -133,7 +156,7 @@ const Likes: React.FC = () => {
       <View style={styles.container}>
 
         {(data.length > 0) ? (
-          <><Text style={{ fontWeight: 500, margin: 10 }}>Your Liked Projects  {'\n'}</Text>
+          <><Text style={{fontWeight: 400, margin: 10, fontSize:normalize(16)  }}>Your Liked Projects  {'\n'}</Text>
             <FlatList
               data={data}
               keyExtractor={(item) => item.projectId.toString()}
@@ -141,9 +164,9 @@ const Likes: React.FC = () => {
         ) :
           (
             <ImageBackground style={{ flex: 1 }} source={require('../../../../assets/images/backgrounds/reset-background.jpeg')} imageStyle={{ opacity: .9, height: '100%', justifyContent: 'center', alignItems: 'center' }}>
-               <View style={styles.itemContainer}>
-                <Text style={{ color: "#000", fontSize: 30, fontWeight: '200', lineHeight: 30 }}><FontAwesome5 name="heart-broken" size={30} color="#65432" /> you have not liked any projects.
-                  tap below to begin matching with a professional.
+                <Animated.View style={[styles.itemContainer, animatedStyle]}>
+                <Text style={{ color: "#000", fontSize: 30, fontWeight: '200', lineHeight: 30 }}><FontAwesome5 name="heart-broken" size={30} color="#65432" /> You have not liked any projects.
+                  Tap below to begin matching with a professional.
                 </Text>
                 <TouchableOpacity onPress={() => {
                     router.push(
@@ -158,7 +181,7 @@ const Likes: React.FC = () => {
                     </View>
                   </TouchableOpacity>
 
-              </View>
+              </Animated.View>
             </ImageBackground>)}
       </View>
     </SafeAreaView>

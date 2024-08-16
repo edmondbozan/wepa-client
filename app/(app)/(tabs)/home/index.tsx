@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { SafeAreaView, StyleSheet, View, Text, ScrollView, ImageSourcePropType, TouchableOpacity, Alert, ActivityIndicator, TextInput, Button, FlatList, ImageBackground, Platform, Pressable } from 'react-native';
-import { AntDesign, FontAwesome, FontAwesome5, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons'
-import { GestureHandlerRootView, TapGestureHandler, State, TapGestureHandlerStateChangeEvent } from 'react-native-gesture-handler';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { SafeAreaView, StyleSheet, View, Text, ScrollView,  TouchableOpacity, Alert, ActivityIndicator, FlatList,  Platform} from 'react-native';
+import { FontAwesome, FontAwesome5, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons'
+import { useSharedValue, useAnimatedStyle,  } from 'react-native-reanimated';
 import LikeModal from '@/components/LikeModal';
 import ListingDetails from '@/components/listingDetails';
 import {normalize} from 'react-native-elements'
@@ -12,7 +11,7 @@ import { BASE_URL } from '@/constants/Endpoints'
 import { useSession } from '@/context/ctx';
 import fetchWithAuth from '@/context/FetchWithAuth'
 import { Project } from '@/interfaces/IProject';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useIsFocused } from '@react-navigation/native';
 import MessagesModal from '@/components/Messages';
 import EmptyHome from '@/components/EmptyHome';
@@ -20,7 +19,6 @@ import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import BlockModal from '@/components/BlockModal';
-import { Checkbox } from 'react-native-paper';
 
 
 interface QueryParams {
@@ -52,6 +50,7 @@ export default function App() {
   const [notification, setNotification] = useState<Notifications.Notification | undefined>(undefined);
   const notificationListener = useRef<Notifications.Subscription>();
   const responseListener = useRef<Notifications.Subscription>();
+  const [refreshKey, setRefreshKey] = useState(0);
 
 
 
@@ -164,9 +163,16 @@ export default function App() {
   }, [expoPushToken]);
 
   useEffect(() => {
-
     fetchData();
   }, [selectedItems, bind]);
+
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+      setRefreshKey((prevKey) => prevKey + 1);
+    }, [])
+  );
 
   useEffect(() => {
     registerForPushNotificationsAsync()
@@ -191,12 +197,6 @@ export default function App() {
 
 
   const onViewableItemsChanged = ({ viewableItems }) => {
-    // (data[0].details.map((item, index) => ({
-    //   id: `${item.projectDetailId}-${index}`, // Ensuring unique key
-    //   afterImage: item.afterImage,
-    //   video: item.video,
-    //   description: item.description,
-    // })));
     setVisibleItems(viewableItems.map((item: { key: any; }) => item.key));
   };
 
@@ -297,7 +297,7 @@ export default function App() {
         </TouchableOpacity>
       </View>
     );
-  }
+  } 
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -339,7 +339,9 @@ export default function App() {
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text style={{ fontSize: normalize(14), }}>By {data[0].userName}</Text>
+            {(data[0].userType == "professional") &&
             <MaterialCommunityIcons name="professional-hexagon" size={normalize(30)} color="#B87333" />
+            }
             </View>
             {(data[0].userType == "professional") &&
               (<View style={{ flexDirection: 'row', justifyContent:'space-between', marginRight:normalize(20)}}>

@@ -19,11 +19,11 @@ interface ProjectProps {
 }
 
 const ProjectEditComponent: React.FC<ProjectProps> = ({ data, onValueChange }) => {
-  const [projectVisible, setProjectEnabled] = useState<boolean>(false);
   const [projectId, setProjectId] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
   const [categories, setCategories] = useState<DropdownItem[]>([]);
   const [projectData, setProjectData] = useState<Project>(data);
+  const [projectVisible, setProjectEnabled] = useState<boolean>(projectData?.enabled);
   const [cost, setProjectCost] = useState<number>(0);
   const [title, setProjectTitle] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<DropdownItem>();
@@ -33,13 +33,16 @@ const ProjectEditComponent: React.FC<ProjectProps> = ({ data, onValueChange }) =
   const [isProjectNameValid, setProjectNameValid] = useState<boolean>(true);
   const [isCostValid, setCostValid] = useState<boolean>(true);
   const [errors, setErrors] = useState<string[]>([]);
-  const toggleSwitch = () => setProjectEnabled(previousState => !previousState);
   const [isInputModeVisible, setInputModeVisible] = useState<boolean>(false);
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
-  useEffect(() => {
-    projectData
-  }, []);
+
+
+  const toggleSwitch = () => {
+    setProjectData(prev=>({...prev, enabled: !projectVisible }));
+    setProjectEnabled(previousState => !previousState);
+  }
+
 
 
 
@@ -143,8 +146,7 @@ const ProjectEditComponent: React.FC<ProjectProps> = ({ data, onValueChange }) =
     setProjectData(prevdata => ({
       ...prevdata, title: title
     }));
-  }
-    , [title]);
+  }, [title]);
 
   const AddProject = async () => {
     const isValid = handleValidation();

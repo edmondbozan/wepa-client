@@ -16,30 +16,31 @@ export default function ProjectComponent() {
   const { data } = useLocalSearchParams();
   const initialData = data ? JSON.parse(data as string) : null;
   const [projectData, setProjectData] = useState<Project>(initialData);
-  const [isProjectModalVisible, setProjectModeVisible] = useState<boolean>(false);
+  const [isProjectModalVisible, setProjectModeVisible] = useState<boolean>();
   const { userId } = useSession();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
 
 
 
-  useEffect(() => {
-  }, [projectData]);
+  // useEffect(() => {
+  // }, [projectData]);
 
   const handleProjectChange = (value: Project) => {
     setProjectData(value);
   }
 
   const handleSaveProject = async () => {
+    try { 
     setIsLoading(true);
-
     const formData = new FormData();
     formData.append("id", (projectData.projectId) ? projectData.projectId.toString() : "0");
     formData.append("userId", userId.toString());
     formData.append("title", projectData.title);
     formData.append("cost", projectData.cost);
     formData.append("categoryId", projectData.categoryId.toString());
-//    formData.append("enabled", projectData.en)
+    formData.append("enabled", projectData.enabled.toString())
 
 
     projectData.details.forEach((detail, index) => {
@@ -76,7 +77,15 @@ export default function ProjectComponent() {
     } else {
       console.log(response);
       console.error("Failed to save project:", response.statusText);
+      setIsLoading(false);  
+
     }
+  }catch (err) {
+    console.error(err);
+    setError(JSON.stringify(err));
+  } finally {
+    setIsLoading(false);
+  }
   }
 
 
@@ -87,6 +96,17 @@ export default function ProjectComponent() {
       </View>
     );
   }
+
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text>Server Error</Text>
+        <TouchableOpacity onPress={()=>{setError(null);  }} style={styles.buttonContainer}>
+          <Text>Reload</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  } 
 
 
 
@@ -105,7 +125,7 @@ export default function ProjectComponent() {
               details: prevProjectData.details.filter((item) => item.key !== "-1"),
             }));
 
-            if (projectData.phoneNumber == null) {
+            // if (projectData.phoneNumber == null) {
               try {
                 // Fetch user data
                 const user: User = await fetchUserData(userId);
@@ -122,7 +142,7 @@ export default function ProjectComponent() {
               } catch (error) {
                 console.error('Failed to fetch user data:', error);
               }
-            }
+            // }
 
             // Set project mode visible
             setProjectModeVisible(true);
@@ -305,6 +325,11 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
     margin: 20,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
 
