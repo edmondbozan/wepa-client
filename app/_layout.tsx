@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { Text } from 'react-native';
 import * as Font from 'expo-font';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Toast from 'react-native-toast-message';
+import { MyCustomErrorToast, MyCustomToast } from '@/components/CustomToast';
 
 const loadFonts = async () => {
   await Font.loadAsync({
@@ -27,6 +29,11 @@ export default function Root() {
     <SessionProvider>
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Slot />
+      <Toast config={{
+        success: (props) => <MyCustomToast {...props} />,
+        error: (props) => <MyCustomErrorToast {...props} />,
+        // You can add more custom toast types here
+      }} />
     </GestureHandlerRootView>
   </SessionProvider>
   );

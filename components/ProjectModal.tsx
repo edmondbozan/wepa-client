@@ -35,7 +35,6 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ visible, projectId, onClose
 
   const fetchData = async () => {
     try {
-      console.log(BASE_URL + '/api/Projects/'+projectId);
       const url = BASE_URL + '/api/Projects/'+projectId;
       const response = await fetchWithAuth(url);
       const result: Project = await response.json();

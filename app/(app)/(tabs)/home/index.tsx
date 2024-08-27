@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { SafeAreaView, StyleSheet, View, Text, ScrollView,  TouchableOpacity, Alert, ActivityIndicator, FlatList,  Platform} from 'react-native';
+import { SafeAreaView, StyleSheet, View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator, FlatList, Platform } from 'react-native';
 import { FontAwesome, FontAwesome5, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons'
-import { useSharedValue, useAnimatedStyle,  } from 'react-native-reanimated';
+import { useSharedValue, useAnimatedStyle, } from 'react-native-reanimated';
 import LikeModal from '@/components/LikeModal';
 import ListingDetails from '@/components/listingDetails';
-import {normalize} from 'react-native-elements'
+import { normalize } from 'react-native-elements'
 import CheckboxList, { Item } from '@/components/test'
 import SliderModal from '@/components/Slider';
 import { BASE_URL } from '@/constants/Endpoints'
@@ -19,6 +19,8 @@ import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import BlockModal from '@/components/BlockModal';
+import PleaseLoginModal from '@/components/PleaseLogin';
+import Toast from 'react-native-toast-message';
 
 
 interface QueryParams {
@@ -36,7 +38,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedItems, setSelectedItems] = useState<Item[]>([]);
-  const { signOut, userId } = useSession();
+  const { signOut, userId, userType } = useSession();
   const flatListRef = React.useRef<FlatList>(null)
   const [visibleItems, setVisibleItems] = useState([]);
   const isFocused = useIsFocused();
@@ -45,6 +47,7 @@ export default function App() {
   const [bind, setBind] = useState<boolean>(false);
   const [modalMessageVisible, setModalMessageVisible] = useState(false);
   const [modalBlockVisible, setModalBlockVisible] = useState(false);
+  //const [pleaseLoginModalVisisble, setPleaseLoginModalVisisble] = useState(false);
   const opacity = useSharedValue<number>(1);
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notification, setNotification] = useState<Notifications.Notification | undefined>(undefined);
@@ -71,7 +74,6 @@ export default function App() {
 
 
   function handleRegistrationError(errorMessage: string) {
-    alert(errorMessage);
     throw new Error(errorMessage);
   }
   async function registerForPushNotificationsAsync() {
@@ -83,7 +85,7 @@ export default function App() {
         lightColor: '#FF231F7C',
       });
     }
-  
+
     if (Device.isDevice) {
       const { status: existingStatus } = await Notifications.getPermissionsAsync();
 
@@ -93,7 +95,7 @@ export default function App() {
         finalStatus = status;
       }
       if (finalStatus !== 'granted') {
-//        handleRegistrationError('Permission not granted to get push token for push notification!');
+        //        handleRegistrationError('Permission not granted to get push token for push notification!');
         return;
       }
       const projectId =
@@ -115,15 +117,17 @@ export default function App() {
       handleRegistrationError('Must use physical device for push notifications');
     }
   }
-  
- const updatePush = async () => {
-      const response = await fetch(BASE_URL + '/api/Auth/expoToken', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: userId,   
-          expoToken: expoPushToken })
-      },
-      );
+
+  const updatePush = async () => {
+    const response = await fetch(BASE_URL + '/api/Auth/expoToken', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId: userId,
+        expoToken: expoPushToken
+      })
+    },
+    );
   }
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat('en-US').format(num);
@@ -163,6 +167,7 @@ export default function App() {
   }, [expoPushToken]);
 
   useEffect(() => {
+    console.log("use effect")
     fetchData();
   }, [selectedItems, bind]);
 
@@ -194,6 +199,19 @@ export default function App() {
     };
   }, []);
 
+  useEffect(() => {
+    if (userType === 'guest') {
+
+    Toast.show({
+      type: 'success',
+      text1: 'Guest Mode',
+      text2: '👋 Hello and welcome to Wepa. Tap here to login or create a free account to unlock functionality.',
+      position: 'top',
+      visibilityTime: 4000,
+      onPress: () => { Toast.hide(); router.navigate("/auth/login") }
+    });
+  }
+  }, []);
 
 
   const onViewableItemsChanged = ({ viewableItems }) => {
@@ -218,6 +236,20 @@ export default function App() {
   });
 
   const likeProject = async (comment: string | null, like: boolean, isLead: boolean) => {
+    if (userType === 'guest') {
+
+      Toast.show({
+        type: 'success',
+        text1: 'Guest Mode.  Feature Locked',
+        text2: '🚀 Tap here to login or create a free account to unlock full functionality.',
+        position: 'top',
+        visibilityTime: 2000,
+        onPress: () => { Toast.hide(); router.navigate("/auth/login") }
+      });
+
+      // setPleaseLoginModalVisisble(true);
+      return;
+    }
     const json = {
       userId: userId,
       projectId: data[0].projectId,
@@ -237,29 +269,93 @@ export default function App() {
       const responseText = await response.json();
       if (!response.ok) {
         Alert.alert('Error', responseText.message || 'Like failed');
-//        fetchData();
+        //        fetchData();
       }
       fetchData();
     } catch (error) {
       Alert.alert('Failed to send like:', 'Please try agin.');
     }
   }
-  const handleSettingsClick = () => {
-    signOut();
-    router.navigate("auth/login");
-  }
-  const handleLeftButtonClick = () => {
+
+  const handleBanClick = () => {
+    if (userType === 'guest') {
+
+      Toast.show({
+        type: 'success',
+        text1: 'Guest Mode.  Feature Locked',
+        text2: '🚀 Tap here to login or create a free account to unlock full functionality.',
+        position: 'top',
+        visibilityTime: 2000,
+        onPress: () => { Toast.hide(); router.navigate("/auth/login") }
+      });
+
+      // setPleaseLoginModalVisisble(true);
+      return;
+    }
+    setModalBlockVisible(true);
+  };
+
+  const handLikeButtonClick = () => {
+    if (userType === 'guest') {
+      Toast.show({
+        type: 'success',
+        text1: 'Guest Mode.  Feature Locked',
+        text2: '🚀 Tap here to login or create a free account to unlock full functionality.',
+        position: 'top',
+        visibilityTime: 2000,
+        onPress: () => { Toast.hide(); router.navigate("/auth/login") }
+      });
+      return;
+    }
     setLeftModalVisible(true);
   };
 
   const handleRadiusButtonClick = () => {
+    if (userType === 'guest') {
+      Toast.show({
+        type: 'success',
+        text1: 'Guest Mode.  Feature Locked',
+        text2: '🚀 Tap here to login or create a free account to unlock full functionality.',
+        position: 'top',
+        visibilityTime: 2000,
+        onPress: () => { Toast.hide(); router.navigate("/auth/login") }
+      });
+
+      return;
+    }
     setRadiusModalVisible(!isRadiusModalVisible);
   };
   const handleBudgetButtonClick = () => {
+    if (userType === 'guest') {
+      Toast.show({
+        type: 'success',
+        text1: 'Guest Mode.  Feature Locked',
+        text2: '🚀 Tap here to login or create a free account to unlock full functionality.',
+        position: 'top',
+        visibilityTime: 2000,
+        onPress: () => { Toast.hide(); router.navigate("/auth/login") }
+      });
+
+      return;
+    }
+
     setBudgetModalVisible(!isBudgetModalVisible);
   };
 
   const handleCategoryButtonClick = () => {
+    if (userType === 'guest') {
+      Toast.show({
+        type: 'success',
+        text1: 'Guest Mode.  Feature Locked',
+        text2: '🚀 Tap here to login or create a free account to unlock full functionality.',
+        position: 'top',
+        visibilityTime: 2000,
+        onPress: () => { Toast.hide(); router.navigate("/auth/login") }
+      });
+
+      return;
+    }
+
     setCategoriesModalVisible(!isCategoriesModalVisible);
   };
 
@@ -267,9 +363,6 @@ export default function App() {
     setSelectedItems(items);
   };
 
-  const toggleModal = () => {
-    setRadiusModalVisible(!isRadiusModalVisible);
-  };
 
   const handleBudgetChange = (value: number) => {
     setBudget(value);
@@ -292,12 +385,12 @@ export default function App() {
     return (
       <View style={styles.errorContainer}>
         <Text>Server Error</Text>
-        <TouchableOpacity onPress={()=>{setError(null); fetchData(); }} style={styles.buttonContainer}>
+        <TouchableOpacity onPress={() => { setError(null); fetchData(); }} style={styles.buttonContainer}>
           <Text>Reload</Text>
         </TouchableOpacity>
       </View>
     );
-  } 
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -306,11 +399,11 @@ export default function App() {
         <View style={styles.header1}>
           {/* <TouchableOpacity  > */}
           {(data.length > 0) ?
-            (<TouchableOpacity style={[styles.buttonContainer]} onPress={()=>{setModalBlockVisible(true)}}>
-              <FontAwesome6 name="ban" style={{color:'red'}} size={normalize(12)} />
+            (<TouchableOpacity style={[styles.buttonContainer]} onPress={handleBanClick}>
+              <FontAwesome6 name="ban" style={{ color: 'red' }} size={normalize(12)} />
             </TouchableOpacity>) : null
           }
-          
+
 
           <TouchableOpacity onPress={handleCategoryButtonClick} >
             <View style={[styles.buttonContainer]}>
@@ -340,18 +433,18 @@ export default function App() {
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text style={{ fontSize: normalize(14), }}>By {data[0].userName}</Text>
             {(data[0].userType == "professional") &&
-            <MaterialCommunityIcons name="professional-hexagon" size={normalize(30)} color="#B87333" />
+              <MaterialCommunityIcons name="professional-hexagon" size={normalize(30)} color="#B87333" />
             }
+          </View>
+          {(data[0].userType == "professional") &&
+            (<View style={{ flexDirection: 'row', justifyContent: 'space-between', marginRight: normalize(20) }}>
+              <Text>{data[0].phoneNumber}</Text>
+              <Text>
+                <Text style={{ fontWeight: '500' }}>License#</Text> <Text>{data[0].licenseNumber}</Text>
+              </Text>
             </View>
-            {(data[0].userType == "professional") &&
-              (<View style={{ flexDirection: 'row', justifyContent:'space-between', marginRight:normalize(20)}}>
-                <Text>{data[0].phoneNumber}</Text>
-                <Text>
-                <Text style={{fontWeight:'500'}}>License#</Text> <Text>{data[0].licenseNumber}</Text>
-                </Text>
-                </View>
-              )
-            }
+            )
+          }
 
           <View style={styles.header2}>
             <View style={styles.header2heart}>
@@ -391,16 +484,20 @@ export default function App() {
           viewabilityConfig={viewabilityConfig}
         />)}
       {(data.length > 0) ? (<>
-        <TouchableOpacity style={styles.floatingButtonLeft} onPress={handleLeftButtonClick}   >
+        <TouchableOpacity style={styles.floatingButtonLeft} onPress={handLikeButtonClick}   >
           <FontAwesome5 name="heart" size={30} color="black" />
         </TouchableOpacity>
+         {userType === 'guest' && 
+          <TouchableOpacity style={styles.floatingGuestButton} onPress={() => likeProject(null, false, false)} >
+            <FontAwesome5 name="long-arrow-alt-right" size={30} color="#000" />
+          </TouchableOpacity>
+          }
+
         <TouchableOpacity style={styles.floatingButtonRight} onPress={() => likeProject(null, false, false)} >
           <FontAwesome5 name="heart-broken" size={30} color="#000" />
-        </TouchableOpacity>        
-        </>
+        </TouchableOpacity>
+      </>
       ) : (<></>)}
-
-
 
 
       <LikeModal
@@ -450,20 +547,20 @@ const styles = StyleSheet.create({
   header: {
     // padding: 25,
     justifyContent: 'space-evenly',
-   // marginTop: 0,
+    // marginTop: 0,
     marginLeft: normalize(15),
   },
   headerFilters: {
     // padding: 25,
     justifyContent: 'space-evenly',
-   // marginTop: 0,
+    // marginTop: 0,
     margin: normalize(15),
   },
-    horizontalRule: {
-      borderBottomColor: '#ccc',
-      borderBottomWidth: 1,
-      marginVertical: normalize(10),
-    },
+  horizontalRule: {
+    borderBottomColor: '#ccc',
+    borderBottomWidth: 1,
+    marginVertical: normalize(10),
+  },
   projectTitle: {
 
   },
@@ -563,6 +660,23 @@ const styles = StyleSheet.create({
     elevation: 5,
     flex: 1,
   },
+  floatingGuestButton: {
+    position: 'absolute',
+    bottom: 20,  
+   left : '50%',  
+    transform: [{ translateX: - 25 }],
+    backgroundColor: '#f0f0f0',
+    borderColor: '#B87333',
+    borderWidth: 3,
+    // backgroundColor: '#c456bb',
+    borderRadius: 50,
+    width: 60,
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+    flex: 1,
+  },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -583,9 +697,9 @@ const styles = StyleSheet.create({
     borderRadius: 15, // Rounded edges
     paddingHorizontal: normalize(15),
     paddingVertical: normalize(8),
-     alignItems: 'center',
-     justifyContent: 'space-evenly',
-    shadowColor: '#000', 
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 0,
@@ -601,8 +715,3 @@ const styles = StyleSheet.create({
   }
 
 });
-
-
-
-
-

@@ -111,11 +111,10 @@ const Leads: React.FC = () => {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         {leads.length > 0 ? (
-          <FlatList
+          <><Text style={{ fontWeight: 400, margin: 10, fontSize: normalize(16) }}>Your Leads{'\n'}</Text><FlatList
             data={leads}
             keyExtractor={(lead) => lead.id.toString()}
-            renderItem={renderItem}
-          />
+            renderItem={renderItem} /></>
         ) : (
           <ImageBackground
             source={require('../../../../assets/images/projects.jpg')}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet,  TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet,  TouchableOpacity, TextInput, KeyboardAvoidingView } from 'react-native';
 import Slider from '@react-native-community/slider';
 import Modal from 'react-native-modal';
 import { BASE_URL } from '@/constants/Endpoints';
@@ -11,7 +11,7 @@ import { normalize } from 'react-native-elements';
       visible: boolean;
       userradius:number;
       onClose: () => void;
-      onValueChange: (value: number) => void;
+      onValueChange: (value: number, zip:string) => void;
     }
 
   const formatNumber = (num: number) => {
@@ -20,10 +20,11 @@ import { normalize } from 'react-native-elements';
   
   const SliderModal: React.FC<SliderModalProps> = ({ visible, userradius, onClose, onValueChange, type = "radius" }) => {
     const [radius, setValue] = useState(5);
+    const [zip, setZip] = useState('');
 
     const handleValueChange = (value: number) => {
       setValue(value);
-      onValueChange(value); // Call the parent's callback function
+      onValueChange(value, zip); // Call the parent's callback function
     };
 
     useEffect(() => {
@@ -40,7 +41,16 @@ import { normalize } from 'react-native-elements';
       style={styles.modal}
       
   >
-    <View style={styles.modalContent}>
+    <KeyboardAvoidingView style={styles.modalContent}  behavior="padding">
+      <TextInput 
+                        placeholder="Zip"
+                        value={zip?.toString()}
+                        onChangeText={setZip}
+                        multiline={false} 
+                        maxLength={5}
+                        keyboardType='number-pad'
+                        />
+
       {(type=="radius") ?
       <Text style={styles.text}>Radius: {formatNumber(radius)} Miles</Text>
       :
@@ -57,7 +67,7 @@ import { normalize } from 'react-native-elements';
         maximumTrackTintColor="#000000"
         thumbTintColor="#B87333"
       />
-    </View>
+    </KeyboardAvoidingView>
     </Modal>
   );
 };
@@ -75,6 +85,8 @@ const styles = StyleSheet.create({
   slider: {
     width: normalize(300),
     height: normalize(40),
+//    marginBottom:normalize(20)
+
   },
   modal: {
     justifyContent: 'flex-end',

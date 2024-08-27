@@ -342,7 +342,9 @@ const MediaPicker: React.FC<MediaComponentProps> = ({ data = [], onValueChange, 
                   placeholder="Enter description"
                   value={description?.toString()}
                   onChangeText={setDescription}
-                  multiline={true} />
+                  multiline={true} 
+                  maxLength={500}
+                  />
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
                   <TouchableOpacity onPress={saveDescription}>
                     <Text style={[styles.buttonText, { marginLeft: 10 }]}>Save</Text>

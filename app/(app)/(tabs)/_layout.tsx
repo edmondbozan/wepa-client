@@ -1,9 +1,7 @@
 import { Slot, Stack, Tabs } from 'expo-router'
-import LogoutButton from '@/components/LogoutButton'
 import { FontAwesome } from '@expo/vector-icons'
 import { useColorScheme } from 'react-native';
 import { useSession } from '@/context/ctx';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import React from 'react';
 
 const TabsLayout = () => {
@@ -34,21 +32,20 @@ const TabsLayout = () => {
          <Tabs.Screen
             name="home/index"
             options={{
-              title:'home',
-                headerShown:false,
+            title:'home',
+            headerShown:false,
                 tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} /> }}
         />  
             <Tabs.Screen
                 name="projects"
                 options={{
-                    headerShown:false,
-                    tabBarIcon: ({ color }) => <FontAwesome size={28} name="briefcase" color={color} /> }}
+                  headerShown:false,
+                  tabBarIcon: ({ color }) => <FontAwesome size={28} name="briefcase" color={color} /> }}
                  />
              <Tabs.Screen
                 name="leads/leads"
                 options={{
-                    href: (userType?.toString() != "professional") ? null : 'leads/leads',
-                    headerShown:false,
+                  headerShown:false,
                     title:'leads',
                     tabBarIcon: ({ color }) => <FontAwesome size={28} name="phone" color={color} /> }}    
                  /> 

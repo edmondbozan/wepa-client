@@ -5,6 +5,7 @@ import { useSession } from '@/context/ctx';
 import { BASE_URL } from '@/constants/Endpoints';
 import { normalize } from 'react-native-elements';
 import { router } from 'expo-router';
+import AuthLoginButton from '@/components/AuthLoginButton';
 
 export default function SignIn() {
   const { signIn } = useSession();
@@ -62,11 +63,15 @@ export default function SignIn() {
           source={require('../../assets/images/backgrounds/login.jpg')}
         >
           <View style={styles.header}>
+          <TouchableOpacity style={styles.signUpButton} onPress={() => {router.navigate("/");}}>
+        <Text style={styles.signUpText}>Browse as Guest</Text>
+      </TouchableOpacity>
+
             <TouchableOpacity onPress={handleRegister} disabled={isLoading} style={styles.signUpButton}>
               <Text style={styles.signUpText}>sign up →</Text>
             </TouchableOpacity>
           </View>
-          <View style={{ marginTop: normalize(100), marginStart: normalize(20), backgroundColor: 'rgba(0,0,0,.15)' }}>
+          <View style={{ marginTop: normalize(20), marginStart: normalize(10), backgroundColor: 'rgba(0,0,0,.15)' }}>
             <Text style={styles.headerText}>find your{'\n'}forever pro{'\n'}</Text>
           </View>
           <View style={styles.formContainer}>
@@ -105,6 +110,11 @@ export default function SignIn() {
               <TouchableOpacity style={styles.forgotButton} onPress={handleForgot} disabled={isLoading}>
                 <Text style={styles.forgotText}>forgot password</Text>
               </TouchableOpacity>
+                <AuthLoginButton onLoginSuccess={function (data: UserAuthData): void {
+                throw new Error('Function not implemented.');
+              } } onLoginFailure={function (error: any): void {
+                throw new Error('Function not implemented.');
+              } }></AuthLoginButton>
             </View>
           </View>
         </ImageBackground>
@@ -121,9 +131,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    position: "absolute",
-    right: 0,
-    margin: 20,
+    flexDirection:'row',
+    justifyContent:'space-between',
+    margin:20
   },
   signUpButton: {
     borderColor: '#B87333',
@@ -190,6 +200,7 @@ const styles = StyleSheet.create({
   },
   forgotButton: {
     marginTop: 10,
+    marginBottom: 10,
     alignItems: 'center',
   },
   forgotText: {
@@ -207,4 +218,5 @@ const styles = StyleSheet.create({
     fontSize: normalize(60),
     fontWeight:'300'
   },
+
 });

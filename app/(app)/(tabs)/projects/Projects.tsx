@@ -13,21 +13,17 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
-  Easing,
-  withDelay,
-  withRepeat,
 } from 'react-native-reanimated';
+import Toast from 'react-native-toast-message';
 
 const Projects: React.FC = () => {
   const [data, setData] = useState<Project[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const { userId } = useSession();
+  const { userId, userType } = useSession();
   const [isProjectModalVisible, setProjectModalVisible] = useState(false);
   const [projectId, setProjectId] = useState(0);
   const [refreshKey, setRefreshKey] = useState(0);
-  const {userType } = useSession();
-
 
 
   const translateX = useSharedValue(500); // Start off-screen to the right
@@ -38,29 +34,9 @@ const Projects: React.FC = () => {
     opacity: opacity.value,
   }));
 
-  // const translateY = useSharedValue(100);
-  // const opacity = useSharedValue(0);
-
-
-
-
-  // // Animated style
-  // const animatedStyle = useAnimatedStyle(() => ({
-  //   transform: [{ translateY: translateY.value }],
-  //   opacity: opacity.value,
-  // }));
-
-  // Trigger the animation
-  // useEffect(() => {
-  //   translateY.value = withTiming(0, { duration: 800 });
-  //   opacity.value = withTiming(1, { duration: 800 });
-  // }, []);
-
-
-
   const fetchData = async () => {
     try {
-      const response = await fetchWithAuth(BASE_URL + '/api/Projects/user/' + userId);
+      const response = await fetchWithAuth(`${BASE_URL}/api/Projects/user/${(userType?.toString() === 'guest') ? "0" : userId}`);
       const result: Project[] = await response.json();
       if (response.ok) {
         setData(result);
@@ -119,7 +95,20 @@ const Projects: React.FC = () => {
 
 
   const handleDeleteProject = (projectId: number) => {
-    Alert.alert(
+    if (userType === 'guest') {
+
+      Toast.show({
+        type: 'success',
+        text1: 'Guest Mode.  Feature Locked',
+        text2: '🚀 Tap here to login or create a free account to unlock full functionality.',
+        position: 'top',
+        visibilityTime: 2000,
+        onPress: () => { Toast.hide(); router.navigate("/auth/login") }
+      });
+
+      // setPleaseLoginModalVisisble(true);
+      return;
+    }    Alert.alert(
       "Are you sure you want to delete this project?",
       "All data including leads and likes will be permantly deleted.",
       [
@@ -225,7 +214,6 @@ const Projects: React.FC = () => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
-
         {(data.length > 0) ? (
           <><Text style={{ fontWeight: 400, margin: 10, fontSize: normalize(16) }}>Your Projects {'\n'}</Text>
             <FlatList

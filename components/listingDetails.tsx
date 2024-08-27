@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, View, Text, ScrollView, ImageSourcePropType, TouchableOpacity, Alert, FlatList, Image, Dimensions } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons'
+import { FontAwesome, FontAwesome5 } from '@expo/vector-icons'
 import { GestureHandlerRootView, TapGestureHandler, State, TapGestureHandlerStateChangeEvent } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
 import {normalize} from 'react-native-elements';
@@ -140,10 +140,7 @@ interface DetailProps {
 
         {isNullOrEmpty(child.description) ? null : (
             <View style={styles.card}>
-                {/* <FontAwesome name="quote-left" size={10} color="#000" /> */}
-                <Text style={styles.cardDescription}> {child.description}</Text>
-                {/* Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum et ligula in nunc bibendum fringilla a eu lectus. Aliquam erat volutpat. Integer in gravida sem, et dictum libero. Morbi auctor malesuada mauris, non dignissim odio commodo eget. Proin dignissim, felis ut suscipit pretium, eros purus auctor odio, ac vehicula sem metus et mauris. Integer fermentum, arcu eget aliquet fermentum, eros quam gravida odio, et pulvinar lorem dui nec neque. Donec vitae sapien ut libero venenatis faucibus.</Text> */}
-                {/* <FontAwesome name="quote-right" size={10} color="#000" /> */}
+                <Text style={styles.cardDescription}>{child.description}</Text>
             </View>)}
 
 

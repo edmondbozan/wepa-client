@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 type AuthContextType = {
   signIn: (token: string, userId: string, userType: string) => void;
   signOut: () => void;
+  setGuest: () => void;
   session?: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
@@ -14,6 +15,7 @@ type AuthContextType = {
 const AuthContext = React.createContext<AuthContextType>({
   signIn: (token: string, userId: string, userType:string) => null,
   signOut: () => null,
+  setGuest: () => null,
   session: null,
   isLoading: false,
   isAuthenticated: false,
@@ -43,8 +45,12 @@ export function SessionProvider(props: React.PropsWithChildren<{}>): JSX.Element
       try {
         const token = await AsyncStorage.getItem('token');
         const storedUserId = await AsyncStorage.getItem('userId');
-        const storedUserType = await AsyncStorage.getItem('userType');
-        if (token && storedUserId) {
+        const storedUserType = await AsyncStorage.getItem('userType');        
+        if(storedUserType == "guest"){
+          setSession(null);
+          setUserId(null);
+          setIsAuthenticated(false); 
+        }else if (token && storedUserId) {
           setSession(token);
           setUserId(storedUserId);
           setUserType(storedUserType);
@@ -82,7 +88,20 @@ export function SessionProvider(props: React.PropsWithChildren<{}>): JSX.Element
             await AsyncStorage.removeItem('userType');
             setSession(null);
             setUserId(null);
-            setUserType(null);
+            setIsAuthenticated(false);
+          } catch (error) {
+            console.error('Failed to sign out', error);
+          }
+        },
+        setGuest: async () => {
+          try {
+            await AsyncStorage.removeItem('token');
+            await AsyncStorage.removeItem('userId');
+            await AsyncStorage.removeItem('userType');
+            await AsyncStorage.setItem('userType', 'guest');
+            setSession(null);
+            setUserId(null);
+            setUserType('guest');
             setIsAuthenticated(false);
           } catch (error) {
             console.error('Failed to sign out', error);

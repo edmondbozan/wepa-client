@@ -7,9 +7,10 @@ import ProjectEditComponent from '@/components/ProjectEdit';
 import ProjectModal from '@/components/ProjectModal';
 import { ScrollView } from 'react-native-gesture-handler';
 import { fetchUserData } from '@/http/apiUser';
-import { useSession } from '@/context/ctx';
+import { SessionProvider, useSession } from '@/context/ctx';
 import fetchWithAuth from '@/context/FetchWithAuth';
 import { BASE_URL } from '@/constants/Endpoints';
+import Toast from 'react-native-toast-message';
 
 
 export default function ProjectComponent() {
@@ -17,7 +18,7 @@ export default function ProjectComponent() {
   const initialData = data ? JSON.parse(data as string) : null;
   const [projectData, setProjectData] = useState<Project>(initialData);
   const [isProjectModalVisible, setProjectModeVisible] = useState<boolean>();
-  const { userId } = useSession();
+  const { userId, userType } = useSession();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,6 +34,22 @@ export default function ProjectComponent() {
 
   const handleSaveProject = async () => {
     try { 
+      if (userType === 'guest') {
+
+        Toast.show({
+          type: 'success',
+          text1: 'Guest Mode.  Feature Locked',
+          text2: '🚀 Tap here to login or create a free account to unlock full functionality.',
+          position: 'top',
+          visibilityTime: 2000,
+          onPress: () => { Toast.hide(); router.navigate("/auth/login") }
+        });
+  
+        // setPleaseLoginModalVisisble(true);
+        return;
+      }   
+
+
     setIsLoading(true);
     const formData = new FormData();
     formData.append("id", (projectData.projectId) ? projectData.projectId.toString() : "0");
@@ -127,9 +144,20 @@ export default function ProjectComponent() {
 
             // if (projectData.phoneNumber == null) {
               try {
+                let user:User;
+                user = {
+                  email: 'edmond.bozan@gmail.com',
+                  licenseNumber: '9876543210',
+                  userId:0,
+                  phoneNumber: '917-804-5804',
+                  userType:'professional',
+                  userName:'Finely Crafted LLC'                  
+                  // other properties depending on your User type/interface
+                };
                 // Fetch user data
-                const user: User = await fetchUserData(userId);
-
+                if (userType !== 'guest'){
+                user = await fetchUserData(userId);
+                }
                 // Decorate projectData with user details
                 setProjectData((prevProjectData) => ({
                   ...prevProjectData,
