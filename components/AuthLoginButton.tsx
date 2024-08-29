@@ -5,6 +5,7 @@ import * as Google from 'expo-auth-session/providers/google';
 import * as SecureStore from 'expo-secure-store';
 import * as WebBrowser from 'expo-web-browser';
 import { router } from 'expo-router';
+import { normalize } from 'react-native-elements';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -49,7 +50,6 @@ const AuthLoginButton: React.FC<AuthLoginButtonProps> = ({ onLoginSuccess, onLog
         provider: 'google',
       };
 
-      SecureStore.setItemAsync('userToken', idToken);
       onLoginSuccess(userAuthData);
     } else if (response?.type === 'error') {
       onLoginFailure(response.error);
@@ -80,7 +80,6 @@ const AuthLoginButton: React.FC<AuthLoginButtonProps> = ({ onLoginSuccess, onLog
         provider: 'apple',
       };
 
-      await SecureStore.setItemAsync('userToken', credential.identityToken!);
       onLoginSuccess(userAuthData);
     } catch (error) {
       onLoginFailure(error);
@@ -110,9 +109,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   appleButton: {
-    width: 200,
-    height: 44,
-    marginBottom: 20,
+    width: normalize(200),
+    height: normalize(44),
+    marginBottom: normalize(20),
+    marginTop: normalize(20),
   },
   googleButton: {
     width: 200,

@@ -15,9 +15,11 @@ export default function Index() {
       try {
         const response = await fetchWithAuth(BASE_URL + '/api/Auth');
         if (!response.ok) {
+          console.log("1");
           setGuest();
         } 
       } catch (err) {
+        console.log("2");
         setGuest();
       }
     };

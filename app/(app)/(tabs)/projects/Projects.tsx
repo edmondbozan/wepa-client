@@ -36,6 +36,7 @@ const Projects: React.FC = () => {
 
   const fetchData = async () => {
     try {
+      console.log('userId:' + userId);
       const response = await fetchWithAuth(`${BASE_URL}/api/Projects/user/${(userType?.toString() === 'guest') ? "0" : userId}`);
       const result: Project[] = await response.json();
       if (response.ok) {

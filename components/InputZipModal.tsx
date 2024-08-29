@@ -1,4 +1,6 @@
 import { isNullOrEmpty } from '@/functions/stringfunctions';
+import { validateZip } from '@/http/validateZip';
+import { isValid } from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -14,16 +16,14 @@ import { normalize } from 'react-native-elements';
 
 interface InputProps {
   title: string;
-  maxLength: number;
   initialValue: string;
   isVisible: boolean;
   isRequired: boolean;
   onSave: (value: string) => void;
   onClose: () => void;
-  validate?: (value: string) => boolean;
 }
 
-const InputModal: React.FC<InputProps> = ({
+const InputZipModal: React.FC<InputProps> = ({
   title,
   maxLength,
   initialValue,
@@ -31,7 +31,6 @@ const InputModal: React.FC<InputProps> = ({
   onClose,
   isVisible,
   isRequired,
-  validate
 }) => {
   const [text, setTextValue] = useState<string>(initialValue);
   const [valid, setValid] = useState<boolean>(true);
@@ -41,23 +40,18 @@ const InputModal: React.FC<InputProps> = ({
     setTextValue(initialValue);
   }, [initialValue]);
 
-  const save=()=>{
-    if (isRequired)
-      {
-        if (isNullOrEmpty(text)){
-          setValid(false);
-          return;
-        }
-      }
-      if (title.toLowerCase() === "email"){
-          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          if (emailRegex.test(text)) {
-            setValid(true);
-          } else {
-            setValid(false);
-            return;
-          }
-      }
+  const save=async ()=>{
+
+        if (!isNullOrEmpty(text)){
+          const isValid = await validateZip(text);
+          if (isValid) {
+           setValid(true);
+         } else {
+           setValid(false);
+           return;
+         }
+        }      
+
     onSave(text);
   }
 
@@ -80,18 +74,17 @@ const InputModal: React.FC<InputProps> = ({
             <TextInput
               value={text}
               multiline={true}
-              maxLength={maxLength} 
-              keyboardType={(title.toLowerCase() === "email") ? "email-address" : "default"}
+              maxLength={5}
               style={[styles.input, !valid && {borderColor:"red"}]}
-              autoCapitalize="none"
+              keyboardType="number-pad"              
               onChangeText={setTextValue} // Update state on text change
             />
-            <Text>{`${text.length}/${maxLength}`}</Text> 
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
             <TouchableOpacity onPress={save}>
               <Text>Save</Text>
             </TouchableOpacity>
+             {!valid && <Text style={{color:"red"}}>Invalid Zip</Text>}
             <TouchableOpacity onPress={()=> {setTextValue(''); onClose()}}>
               <Text>Close</Text>
             </TouchableOpacity>
@@ -109,7 +102,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,.3)',
     borderRadius:8,
-    height:normalize(250)
+    height:normalize(50)
   },
   modalContainer: {
     flex: 1,
@@ -156,4 +149,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default InputModal;
+export default InputZipModal;

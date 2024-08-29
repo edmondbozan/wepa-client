@@ -70,7 +70,6 @@ export default function ProjectComponent() {
 
         // Append each file associated with this detail
         detail.files?.forEach((file, fileIndex) => {
-          console.log(file);
           formData.append(`details[${index}].files`, {
             uri: file.uri,  // The local file URI
             type: file.type, // MIME type, e.g., 'image/jpeg'
@@ -92,13 +91,10 @@ export default function ProjectComponent() {
       setIsLoading(false);
 
     } else {
-      console.log(response);
-      console.error("Failed to save project:", response.statusText);
       setIsLoading(false);  
 
     }
   }catch (err) {
-    console.error(err);
     setError(JSON.stringify(err));
   } finally {
     setIsLoading(false);

@@ -55,7 +55,8 @@ export  interface Project {
         email: string,
         userType: string
         licenseNumber: string,
-        phoneNumber: string 
+        phoneNumber: string,
+        authProvider:string,
       }
     
 

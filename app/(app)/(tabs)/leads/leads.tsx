@@ -59,7 +59,8 @@ const Leads: React.FC = () => {
   const { userId } = useSession();
   const fetchData = async () => {
     try {
-      const url = BASE_URL + '/api/ProjectLeads/users/' + userId;
+
+      const url = `${BASE_URL}/api/ProjectLeads/users/${(userId) ? userId: "0"}`;
       const response = await fetchWithAuth(url);
       const result: ProjectLeads[] = await response.json();
       if (response.ok) {

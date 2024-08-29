@@ -24,8 +24,8 @@ const ProjectEditComponent: React.FC<ProjectProps> = ({ data, onValueChange }) =
   const [categories, setCategories] = useState<DropdownItem[]>([]);
   const [projectData, setProjectData] = useState<Project>(data);
   const [projectVisible, setProjectEnabled] = useState<boolean>(projectData?.enabled);
-  const [cost, setProjectCost] = useState<number>(0);
-  const [title, setProjectTitle] = useState('');
+  const [cost, setProjectCost] = useState<number>(5000);
+  const [title, setProjectTitle] = useState("My Kitchen Remodel");
   const [selectedCategory, setSelectedCategory] = useState<DropdownItem>();
   const { userId, userType } = useSession();
   const [isBudgetModalVisible, setBudgetModalVisible] = useState(false);
@@ -111,7 +111,7 @@ const ProjectEditComponent: React.FC<ProjectProps> = ({ data, onValueChange }) =
       if (projectData.cost !== undefined) {
         setProjectCost(parseInt(projectData.cost));
       }
-      setProjectTitle(projectData.title);
+      setProjectTitle((projectData.title) ? projectData.title : "My Kitchen Remodel" );
       setProjectId(projectData.projectId);
     }
   }, []);
@@ -125,10 +125,12 @@ const ProjectEditComponent: React.FC<ProjectProps> = ({ data, onValueChange }) =
 
         if (projectData) {
           const initialCategory = {
-            description: projectData.categoryName,
-            id: projectData.categoryId,
+            description: data[0].description,
+            id: data[0].id,
           };
           setSelectedCategory(initialCategory);
+          setProjectData(prevdata => ({ ...prevdata, categoryName: initialCategory.description, categoryId: parseInt(initialCategory.id) }));
+
         }
       } catch (error) {
         Alert.alert('Error fetching categories.');
@@ -208,7 +210,6 @@ const ProjectEditComponent: React.FC<ProjectProps> = ({ data, onValueChange }) =
           <View style={styles.container}>
             <Text style={styles.label}>Category:  </Text>
             <Text>{selectedCategory?.description} <FontAwesome6 name="chevron-right" /></Text>
-
           </View>
         </TouchableOpacity>
         <View style={styles.horizontalRule}></View>
@@ -239,7 +240,7 @@ const ProjectEditComponent: React.FC<ProjectProps> = ({ data, onValueChange }) =
           setModalVisible(false)
         }} />
         {isInputModeVisible &&
-          <InputModal isVisible={isInputModeVisible} title="Project Title" initialValue={title} onClose={() => setInputModeVisible(false)} onSave={(text) => {
+          <InputModal isRequired={true} isVisible={isInputModeVisible} title="Project Title" initialValue={title} onClose={() => setInputModeVisible(false)} onSave={(text) => {
             setProjectTitle(text);
             setProjectData(prevdata => ({ ...prevdata, title: text }));
             setInputModeVisible(false)
@@ -251,10 +252,10 @@ const ProjectEditComponent: React.FC<ProjectProps> = ({ data, onValueChange }) =
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    margin: 20
-  },
+    safeArea: {
+      flex: 1,
+      margin: 20
+    },
   horizontalRule: {
     borderBottomColor: 'rgba(0,0,0,.1)',
     borderBottomWidth: 1,
@@ -283,6 +284,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between'
     //    alignItems:'flex-start'
+  },
+  separator: {
+    borderBottomColor: '#ccc',
+    borderBottomWidth: 1,
+    marginVertical: 10,
   },
 
 

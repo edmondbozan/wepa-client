@@ -23,16 +23,13 @@ const fetchWithAuth = async (url: string, options: FetchOptions = {}): Promise<R
     // Make the fetch request
     const response = await fetch(url, options);
 
-    // Handle the response
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
-    }
+    // If you want to log the response status for debugging
+    console.log('Response status:', response.status);
 
-    return response;
+    return response; // Return the response, even if it's not "ok"
   } catch (error) {
     console.error('Fetch with auth failed:', error);
-    throw error;
+    throw error; // Re-throw the error for the calling code to handle
   }
 };
 

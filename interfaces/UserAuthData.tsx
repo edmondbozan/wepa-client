@@ -9,4 +9,9 @@ interface UserAuthData {
     idToken: string;
     provider: 'apple' | 'google';
   }
+
+  interface PatchModel {
+    key: string;
+    value: any;
+  }
   

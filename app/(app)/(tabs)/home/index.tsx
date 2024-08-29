@@ -21,6 +21,8 @@ import Constants from 'expo-constants';
 import BlockModal from '@/components/BlockModal';
 import PleaseLoginModal from '@/components/PleaseLogin';
 import Toast from 'react-native-toast-message';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { validateZip } from '@/http/validateZip';
 
 
 interface QueryParams {
@@ -38,7 +40,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedItems, setSelectedItems] = useState<Item[]>([]);
-  const { signOut, userId, userType } = useSession();
+  const { signOut, userId, userType, zip, setNewZip } = useSession();
   const flatListRef = React.useRef<FlatList>(null)
   const [visibleItems, setVisibleItems] = useState([]);
   const isFocused = useIsFocused();
@@ -140,7 +142,7 @@ export default function App() {
 
       const categoryIds = selectedItems.map((item: { id: number }) => item.id.toString());
 
-      const queryParams = buildQueryString({ categoryIds, radius, budget });
+      const queryParams = buildQueryString({ categoryIds, radius, budget, zip });
       const url = BASE_URL + '/api/Projects?' + queryParams;
 
       const response = await fetchWithAuth(url);
@@ -167,7 +169,6 @@ export default function App() {
   }, [expoPushToken]);
 
   useEffect(() => {
-    console.log("use effect")
     fetchData();
   }, [selectedItems, bind]);
 
@@ -511,8 +512,8 @@ export default function App() {
       //        onSubmit={(feedback) => likeProject(feedback, true)} // Pass the callback function with additional parameter
 
       />
-      <SliderModal type="radius" onValueChange={handleRadiusChange} visible={isRadiusModalVisible} userradius={4000} onClose={() => { setRadiusModalVisible(false); setBind(!bind); }} />
-      <SliderModal type="dollars" onValueChange={handleBudgetChange} visible={isBudgetModalVisible} userradius={250000} onClose={() => { setBudgetModalVisible(false); setBind(!bind); }} />
+      <SliderModal type="radius" onValueChange={handleRadiusChange} visible={isRadiusModalVisible} userradius={4000} zip={zip} onClose={async (zip) => {  if(zip){ await setNewZip(zip); setRadiusModalVisible(false); setBind(!bind); }   }} />
+      <SliderModal type="dollars" onValueChange={handleBudgetChange} visible={isBudgetModalVisible} userradius={250000} zip={zip} onClose={() => { setBudgetModalVisible(false); setBind(!bind); }} />
       <CheckboxList
         isVisible={isCategoriesModalVisible}
         onClose={handleCategoryButtonClick}

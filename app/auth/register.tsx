@@ -10,11 +10,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { TextInputMask } from 'react-native-masked-text';
 import { normalize } from 'react-native-elements';
 import { ExternalLink } from '@/components/ExternalLink';
+import { fetchUserData } from '@/http/apiUser';
+import fetchWithAuth from '@/context/FetchWithAuth';
+import { isNullOrEmpty } from '@/functions/stringfunctions';
+
+
+
 
 const Register: React.FC = () => {
-  const { signIn } = useSession();
+  const { signIn, userId, setNewZip, setNewUserType } = useSession();
   const [userType, setUserType] = useState<'professional' | 'consumer' | null>('consumer');
-  const [license, setLicense] = useState<string>('');  
+  const [license, setLicense] = useState<string>('');
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [phone, setPhone] = useState<string>('');
@@ -31,6 +37,7 @@ const Register: React.FC = () => {
   const [errors, setErrors] = useState<string[]>([]);
   const [isProfessional, setIsEnabled] = React.useState(false);
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+  const [authProvider, setAuthProvider] = useState<boolean>(false);
 
   const validateUserName = (): boolean => {
     if (username.length > 0) {
@@ -43,7 +50,7 @@ const Register: React.FC = () => {
   }
 
   const validateLicense = (): boolean => {
-    if (!isProfessional){
+    if (!isProfessional) {
       setLicenseValid(true);
       return true;
     }
@@ -58,6 +65,7 @@ const Register: React.FC = () => {
 
 
   const validatePassword = (): boolean => {
+    if (authProvider){return true;}
     if (password.length > 5) {
       setPasswordValid(true);
       return true;
@@ -68,6 +76,9 @@ const Register: React.FC = () => {
   }
 
   const validatePhone = (): boolean => {
+    if (isNullOrEmpty(phone)){
+      return true;
+    }
     const phoneRegex = /^\+1 \(\d{3}\) \d{3}-\d{4}$/; // US phone number format: +1 (123) 456-7890
     if (phoneRegex.test(phone)) {
       setPhoneValid(true);
@@ -90,6 +101,7 @@ const Register: React.FC = () => {
   };
 
   const validateZip = (): boolean => {
+    if (isNullOrEmpty(zipcode)){setZipValid(true);return true;}
     if (zipcode.length == 5) {
       setZipValid(true);
       return true;
@@ -115,11 +127,29 @@ const Register: React.FC = () => {
     return validationErrors.length === 0;
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      if (userId) {
+        try {
+          const usr = await fetchUserData(userId);
+          setUsername(usr.userName);
+          setEmail(usr.email);
+          setAuthProvider(true);
+        } catch (error) {
+          console.error('Failed to fetch user data:', error);
+        }
+      }
+    };
+
+    fetchData();
+  }, []);
+
+
 
   const handleRegister = async () => {
     const isValid = handleValidation();
     if (isValid) {
-      try {
+      try {        
         const response = await fetch(BASE_URL + '/api/Auth/register', {
           method: 'POST',
           headers: {
@@ -138,7 +168,7 @@ const Register: React.FC = () => {
 
         const data = await response.json();
         if (response.ok) {
-          await signIn(data.token, JSON.stringify(data.userId), data.userType);
+          await signIn(data.token, JSON.stringify(data.userId), data.userType, (zipcode) ? zipcode : "07302");
           router.replace('/');
         } else {
           Alert.alert('Error', data.message || 'Registration failed');
@@ -146,21 +176,63 @@ const Register: React.FC = () => {
       } catch (error) {
         Alert.alert('Error', 'An error occurred while registering. Please try again.');
       }
-    }
+    }    
   }
 
+  const handleUpdateUser = async () => {
+    const isValid = handleValidation();
+    if (isValid) {
+      try {
+        const response = await fetchWithAuth(BASE_URL + '/api/Auth/users/' + userId, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userType: (isProfessional) ? 'professional' : 'user',
+            Username: username,
+            Email: email,
+            Password: password,
+            ZipCode: zipcode,
+            PhoneNumber: phone,
+            LicenseNumber: license
+          }),
+        });
+        const data = await response.json();
+        
+        if (response.ok) {
+          await setNewZip(zipcode ? zipcode : "07302");
+          await setUserType(userType);
+          // await signIn(data.token, JSON.stringify(data.userId), data.userType, zipcode ? zipcode : "07302" );
+          router.replace('/');
+        } else {
+          Alert.alert('Error', data.message || 'Registration failed');
+        }
+      } catch (error) {
+        console.log("Caught error:", error);
+        Alert.alert('Error', 'An error occurred while registering. Please try again.');
+      }
+    }
+  }
+  
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={{ flexGrow: 1, backgroundColor: "rgba(0, 0, 0, 0.1)",}} automaticallyAdjustKeyboardInsets={true}>
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.signUpButton} onPress={() => { router.replace('/auth/login'); }}>
-            <Text style={styles.signUpText}>
-              <FontAwesome name="arrow-left" /> login
-            </Text>
-          </TouchableOpacity>
-        </View>
+      <ScrollView contentContainerStyle={{ flexGrow: 1, backgroundColor: "rgba(0, 0, 0, 0.1)", }} automaticallyAdjustKeyboardInsets={true}>
         <View style={styles.container}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: normalize(20) }}>
+
+        {!authProvider &&
+        (
+          <View style={styles.header}>
+            <TouchableOpacity  onPress={() => { router.replace('/auth/login'); }}>
+              <Text style={styles.signUpText}>
+                <FontAwesome name="arrow-left" /> login
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )
+        }
+
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: normalize(20) }}>            
             <Switch
               trackColor={{ false: "#C0C0C0", true: "#C0C0C0" }}
               thumbColor={isProfessional ? "#B87333" : "#000"}
@@ -169,25 +241,23 @@ const Register: React.FC = () => {
               value={isProfessional}
             />
             <Text>
-              <Text style={{ fontWeight: 'bold', fontSize:normalize(12), color: '#000' }}>{isProfessional ? ' I am a professional.' : ' I am not a professional.'}</Text>
-              <Text style={{ fontWeight: 'bold', fontSize:normalize(12), color: 'red' }}>{isProfessional && `${'\n'} Your phone number will be displayed.`}</Text>
+              <Text style={{ fontWeight: 'bold', fontSize: normalize(12), color: '#000' }}>{isProfessional ? ' I am a professional.' : ' I am not a professional.'}</Text>
+              {/* <Text style={{ fontWeight: 'bold', fontSize:normalize(12), color: 'red' }}>{isProfessional && `${'\n'} Your phone number will be displayed.`}</Text> */}
             </Text>
           </View>
-          {isProfessional && 
-          <>
-          <Text style={styles.label}>License Number:</Text>
+          <Text style={styles.label}>Email:</Text>
           <TextInput
-            value={license}
-            onChangeText={setLicense}
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
             placeholderTextColor="#000"
-            style={[styles.input]}
-             onBlur={validateLicense}
+            onBlur={validateEmail}
+            style={[styles.input, !isEmailValid && styles.inputError]}
+            autoCapitalize="none"
+            autoCorrect={false}
           />
-            {!isLicenseValid &&
-            (<Text style={{ color: 'red' }}>license is required</Text>)}
-          </>
-          }
-
+          {!isEmailValid &&
+            (<Text style={{ color: 'red' }}>Email is required.</Text>)}
 
           <Text style={styles.label}>Display Name:</Text>
           <TextInput
@@ -198,29 +268,34 @@ const Register: React.FC = () => {
             onBlur={validateUserName}
           />
           {!isUserNameValid &&
-            (<Text style={{ color: 'red' }}>display name is required</Text>)}
-          <Text style={styles.label}>Password:</Text>
-          <TextInput
-            value={password}
-            onChangeText={setPassword}
-            placeholderTextColor="#000"
-            secureTextEntry
-            onBlur={validatePassword}
-            style={[styles.input, !isPasswordValid && styles.inputError]}
-          />
+            (<Text style={{ color: 'red' }}>Display name is required</Text>)}
+          {isProfessional &&
+            <>
+              <Text style={styles.label}>License Number:</Text>
+              <TextInput
+                value={license}
+                onChangeText={setLicense}
+                placeholderTextColor="#000"
+                style={[styles.input]}
+                onBlur={validateLicense}
+              />
+              {!isLicenseValid &&
+                (<Text style={{ color: 'red' }}>Valid license is required</Text>)}
+            </>
+          }
+          {!authProvider&&
+          <><Text style={styles.label}>Password:</Text><TextInput
+              value={password}
+              onChangeText={setPassword}
+              placeholderTextColor="#000"
+              secureTextEntry
+              onBlur={validatePassword}
+              style={[styles.input, !isPasswordValid && styles.inputError]} /></>
+          }
           {!isPasswordValid &&
             (<Text style={{ color: 'red' }}>password is required and must be {'>'} 5 charchters </Text>)}
-
-          {/* <Text style={styles.label}>Verify Password:</Text>
-          <TextInput
-            value={verifyPassword}
-            onChangeText={setVerifyPassword}
-            placeholder="Verify password"
-            placeholderTextColor="#fff"
-            secureTextEntry
-            style={[styles.input, validationErrors.verifyPassword && styles.inputError]}
-          /> */}
-          <Text style={styles.label}>Phone:</Text>
+          
+          <Text style={styles.label}>Phone: {isProfessional ? (<Text>(optional, used to advertise your business.)</Text>) : (<Text>(optional,makes connecting easier)</Text>)}</Text>
           <TextInputMask
             type={'custom'}
             options={{
@@ -232,44 +307,37 @@ const Register: React.FC = () => {
             placeholderTextColor="#000"
             returnKeyType="done"
             onBlur={validatePhone}
-            style={[styles.input, !isPhoneValid && styles.inputError]}
+            style={[styles.input, (!isPhoneValid && isProfessional) && styles.inputError]}
           />
           {!isPhoneValid &&
-            (<Text style={{ color: 'red' }}>proper phone number is required.</Text>)}
+            (<Text style={{ color: 'red' }}>Invalid Phone.</Text>)}
 
-          <Text style={styles.label}>Email:</Text>
-          <TextInput
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            placeholderTextColor="#000"
-            onBlur={validateEmail}
-            style={[styles.input, !isEmailValid && styles.inputError]}
-            autoCapitalize="none"
-            autoCorrect={false}
-
-          />
-          {!isEmailValid &&
-            (<Text style={{ color: 'red' }}>proper email is required.</Text>)}
-
-          <Text style={styles.label}>Zip code:</Text>
+          <Text style={styles.label}>Zip: <Text>(optional, needed for search visibility)</Text></Text>
           <TextInput
             value={zipcode}
             onChangeText={setZipcode}
             keyboardType="number-pad"
             placeholderTextColor="#000"
             onBlur={validateZip}
+            maxLength={5}
             style={[styles.input, !isZipValid && styles.inputError]}
           />
           {!isZipValid &&
-            (<Text style={{ color: 'red' }}>Proper zip is required.</Text>)}
+            (<Text style={{ color: 'red' }}>Invalid zip.</Text>)}
 
           <View style={{ marginVertical: 10 }}>
-            <Text>by tapping 'register', you confirm that you have read and agree to our <ExternalLink style={{ color: '#007bff', textDecorationLine: 'underline' }} href={'https://app.termly.io/policy-viewer/policy.html?policyUUID=92b8a492-eea6-4e68-9727-7430bc07dac5'}>privacy policy</ExternalLink> and <ExternalLink href={'https://app.termly.io/policy-viewer/policy.html?policyUUID=e7fd608a-64a0-4e12-91b9-e154a15eb707'} style={{ color: '#007bff', textDecorationLine: 'underline' }} >terms and conditions</ExternalLink>.</Text>
+            <Text>By tapping 'register', you confirm that you have read and agree to our <ExternalLink style={{ color: '#007bff', textDecorationLine: 'underline' }} href={'https://app.termly.io/policy-viewer/policy.html?policyUUID=92b8a492-eea6-4e68-9727-7430bc07dac5'}>privacy policy</ExternalLink> and <ExternalLink href={'https://app.termly.io/policy-viewer/policy.html?policyUUID=e7fd608a-64a0-4e12-91b9-e154a15eb707'} style={{ color: '#007bff', textDecorationLine: 'underline' }} >terms and conditions</ExternalLink>.</Text>
           </View>
-          <TouchableOpacity onPress={handleRegister} style={styles.button}>
-            <Text style={styles.buttonText}>register</Text>
+          {authProvider ?
+                    (<TouchableOpacity onPress={handleUpdateUser} style={styles.button}>
+                      <Text style={styles.buttonText}>Continue</Text>
+                    </TouchableOpacity>
+                    )
+          :
+          (<TouchableOpacity onPress={handleRegister} style={styles.button}>
+            <Text style={styles.buttonText}>Register</Text>
           </TouchableOpacity>
+          )}
         </View>
         {/* </ImageBackground> */}
       </ScrollView>

@@ -44,9 +44,12 @@ const TabsLayout = () => {
                  />
              <Tabs.Screen
                 name="leads/leads"
+                
                 options={{
+
                   headerShown:false,
                     title:'leads',
+                    href: userType === "user" ? null : undefined,                            
                     tabBarIcon: ({ color }) => <FontAwesome size={28} name="phone" color={color} /> }}    
                  /> 
             <Tabs.Screen

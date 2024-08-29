@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Alert, Text, TextInput, View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSession } from '@/context/ctx';
@@ -6,12 +6,14 @@ import { BASE_URL } from '@/constants/Endpoints';
 import { normalize } from 'react-native-elements';
 import { router } from 'expo-router';
 import AuthLoginButton from '@/components/AuthLoginButton';
+import { ExternalLink } from '@/components/ExternalLink';
 
 export default function SignIn() {
-  const { signIn } = useSession();
+  const { signIn, zip, setNewZip } = useSession();
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  
 
   const usernameInputRef = useRef<TextInput>(null);
 
@@ -22,6 +24,43 @@ export default function SignIn() {
   const handleForgot = () => {
     router.push('/auth/reset');
   };
+
+  const oAuthLogin = async (userData: UserAuthData) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(BASE_URL + '/api/auth/login/oauth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: userData.fullName?.givenName,
+          email: userData.email,
+          userId: userData.userId
+        }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        await signIn(data.token, JSON.stringify(data.userId), data.userType, (zip) ? zip : "07657");
+        if (data.newRecord) {
+          router.replace('/auth/register');
+        } else {
+          router.replace('/');
+        }
+      } else {
+        Alert.alert('Login failed', 'Network error.  Please try again');
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        Alert.alert('Login failed', 'Network error.  Please try again');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
+
 
   const handleLogin = async () => {
     setIsLoading(true);
@@ -39,7 +78,7 @@ export default function SignIn() {
 
       if (response.ok) {
         const data = await response.json();
-        await signIn(data.token, JSON.stringify(data.userId), data.userType);
+        await signIn(data.token, JSON.stringify(data.userId), data.userType, (zip) ? zip : "07657");
         router.replace('/');
       } else {
         Alert.alert('Login failed', 'Invalid credentials');
@@ -63,20 +102,20 @@ export default function SignIn() {
           source={require('../../assets/images/backgrounds/login.jpg')}
         >
           <View style={styles.header}>
-          <TouchableOpacity style={styles.signUpButton} onPress={() => {router.navigate("/");}}>
-        <Text style={styles.signUpText}>Browse as Guest</Text>
-      </TouchableOpacity>
+            <TouchableOpacity style={styles.signUpButton} onPress={() => { router.navigate("/"); }}>
+              <Text style={styles.signUpText}>browse as guest</Text>
+            </TouchableOpacity>
 
             <TouchableOpacity onPress={handleRegister} disabled={isLoading} style={styles.signUpButton}>
-              <Text style={styles.signUpText}>sign up →</Text>
+              <Text style={styles.signUpText}>register</Text>
             </TouchableOpacity>
           </View>
           <View style={{ marginTop: normalize(20), marginStart: normalize(10), backgroundColor: 'rgba(0,0,0,.15)' }}>
-            <Text style={styles.headerText}>find your{'\n'}forever pro{'\n'}</Text>
+            <Text style={styles.headerText}>find your{'\n'}forever pro</Text>
           </View>
           <View style={styles.formContainer}>
             <View style={styles.itemContainer}>
-              <Text style={styles.label}>e-mail</Text>
+              <Text style={styles.label}>email</Text>
               <TextInput
                 value={username}
                 onChangeText={setUsername}
@@ -107,14 +146,20 @@ export default function SignIn() {
                   <Text style={styles.buttonText}>sign in</Text>
                 )}
               </TouchableOpacity>
-              <TouchableOpacity style={styles.forgotButton} onPress={handleForgot} disabled={isLoading}>
+
+              <AuthLoginButton onLoginSuccess={oAuthLogin} onLoginFailure={function (error: any): void {
+                console.log(JSON.stringify(error));
+              }}></AuthLoginButton>
+                            <TouchableOpacity style={styles.forgotButton} onPress={handleForgot} disabled={isLoading}>
                 <Text style={styles.forgotText}>forgot password</Text>
               </TouchableOpacity>
-                <AuthLoginButton onLoginSuccess={function (data: UserAuthData): void {
-                throw new Error('Function not implemented.');
-              } } onLoginFailure={function (error: any): void {
-                throw new Error('Function not implemented.');
-              } }></AuthLoginButton>
+          <View style={{ marginVertical: 10 }}>
+            <Text>By authenticating, you confirm that you have read and agree to our <ExternalLink style={{ color: '#007bff', textDecorationLine: 'underline' }} href={'https://app.termly.io/policy-viewer/policy.html?policyUUID=92b8a492-eea6-4e68-9727-7430bc07dac5'}>privacy policy</ExternalLink> and <ExternalLink href={'https://app.termly.io/policy-viewer/policy.html?policyUUID=e7fd608a-64a0-4e12-91b9-e154a15eb707'} style={{ color: '#007bff', textDecorationLine: 'underline' }} >terms and conditions</ExternalLink>.</Text>
+          </View>
+
+
+
+
             </View>
           </View>
         </ImageBackground>
@@ -131,9 +176,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection:'row',
-    justifyContent:'space-between',
-    margin:20
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    margin: 20
   },
   signUpButton: {
     borderColor: '#B87333',
@@ -199,7 +244,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   forgotButton: {
-    marginTop: 10,
+    marginTop: 0,
     marginBottom: 10,
     alignItems: 'center',
   },
@@ -216,7 +261,7 @@ const styles = StyleSheet.create({
   headerText: {
     color: "white",
     fontSize: normalize(60),
-    fontWeight:'300'
+    fontWeight: '300'
   },
 
 });

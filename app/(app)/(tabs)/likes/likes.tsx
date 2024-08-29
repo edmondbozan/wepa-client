@@ -27,7 +27,7 @@ const Likes: React.FC = () => {
   const [data, setData] = useState<Project[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const { userId } = useSession();
+  const { userId, userType } = useSession();
   const [isProjectModalVisible, setProjectModalVisible] = useState(false);
   const [projectId, setProjectId] = useState(0);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -42,7 +42,7 @@ const Likes: React.FC = () => {
 
   const fetchData = async () => {
     try {
-      const response = await fetchWithAuth(BASE_URL + '/api/Projects/user/' + userId + '/likes');
+      const response = await fetchWithAuth(`${BASE_URL}/api/Projects/user/${(userType?.toString() === 'guest') ? "0" : userId}/likes`)
       const result: Project[] = await response.json();
       if (response.ok) {
         setData(result);
