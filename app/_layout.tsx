@@ -9,7 +9,7 @@ import { MyCustomErrorToast, MyCustomToast } from '@/components/CustomToast';
 
 const loadFonts = async () => {
   await Font.loadAsync({
-    'Pacifico-Regular': require('../assets/fonts/Pacifico-Regular.ttf'),
+    'Italianno-Regular': require('../assets/fonts/Italianno-Regular.ttf'),
     // 'Playwrite-AUVIC-Bold': require('../assets/fonts/wepaClient/assets/fonts/PlaywriteAUVIC-Regular.ttf'),
   });
 };

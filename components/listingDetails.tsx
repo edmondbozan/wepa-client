@@ -233,6 +233,7 @@ const styles = StyleSheet.create({
         borderColor: '#ddd',
         overflow: 'hidden',
         backgroundColor: '#fff',
+        //backgroundColor: 'rgba(181, 175, 250, .2)',
         margin: 10,
         padding: 15,
         fontWeight: 900

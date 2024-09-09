@@ -25,7 +25,7 @@ const ProjectEditComponent: React.FC<ProjectProps> = ({ data, onValueChange }) =
   const [projectData, setProjectData] = useState<Project>(data);
   const [projectVisible, setProjectEnabled] = useState<boolean>(projectData?.enabled);
   const [cost, setProjectCost] = useState<number>(5000);
-  const [title, setProjectTitle] = useState("My Kitchen Remodel");
+  const [title, setProjectTitle] = useState("My Bathroom Remodel");
   const [selectedCategory, setSelectedCategory] = useState<DropdownItem>();
   const { userId, userType } = useSession();
   const [isBudgetModalVisible, setBudgetModalVisible] = useState(false);
@@ -78,6 +78,7 @@ const ProjectEditComponent: React.FC<ProjectProps> = ({ data, onValueChange }) =
   };
 
   const validateCost = (): boolean => {
+    // console.log(cost);
     if (cost > 0) {
       setCostValid(true);
       return true;
@@ -111,7 +112,7 @@ const ProjectEditComponent: React.FC<ProjectProps> = ({ data, onValueChange }) =
       if (projectData.cost !== undefined) {
         setProjectCost(parseInt(projectData.cost));
       }
-      setProjectTitle((projectData.title) ? projectData.title : "My Kitchen Remodel" );
+      setProjectTitle((projectData.title) ? projectData.title : "My Bathroom Remodel" );
       setProjectId(projectData.projectId);
     }
   }, []);

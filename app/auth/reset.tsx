@@ -11,7 +11,7 @@ import SignIn from './login';
 import { useSession } from '@/context/ctx';
 
 const ResetPassword: React.FC = () => {
-  const [phoneNumber, setPhoneNumber] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
   const [code, setCode] = useState<string>('');
   const [newPassword, setNewPassword] = useState<string>('');
   const [step, setStep] = useState<number>(1);
@@ -34,7 +34,7 @@ const ResetPassword: React.FC = () => {
       const response = await fetch(BASE_URL + '/api/Auth/sendcode', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: phoneNumber })
+        body: JSON.stringify({ email: email })
       },
       );
 
@@ -56,7 +56,7 @@ const ResetPassword: React.FC = () => {
       const response = await fetch(BASE_URL + '/api/Auth/verifycode', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: phoneNumber, code }),
+        body: JSON.stringify({ email: email, code }),
       });
 
       if (!response.ok) {
@@ -64,7 +64,6 @@ const ResetPassword: React.FC = () => {
         Alert.alert('Cannot verify Code', data.message || 'sms failed.');
         return;
       }
-      console.log("pass");
       setStep(3);
     } catch (error) {
       console.error(error);
@@ -78,12 +77,12 @@ const ResetPassword: React.FC = () => {
         const response = await fetch(BASE_URL + '/api/Auth/resetPassword', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone: phoneNumber, password: newPassword })
+          body: JSON.stringify({ email: email, password: newPassword })
         });
 
         const data = await response.json();
         if (response.ok) {
-          await signIn(data.token, JSON.stringify(data.userId), data.userType);
+          await signIn(data.token, JSON.stringify(data.userId), data.userType, "07302");
           router.replace('/');
         }
         else {
@@ -113,17 +112,13 @@ const ResetPassword: React.FC = () => {
               <View style={styles.inputContainer}>
                 {step === 1 && (
                   <>
-                    <Text style={{ color: "#000", fontSize: normalize(17), fontWeight: '600', lineHeight: 30 }}>Enter your phone number</Text>
-                    <TextInputMask
-                      type={'custom'}
-                      options={{
-                        mask: '+1 (999) 999-9999',
-                      }}
+                    <Text style={{ color: "#000", fontSize: normalize(17), fontWeight: '600', lineHeight: 30 }}>Enter your email</Text>
+                    <TextInput
                       style={styles.input}
-                      value={phoneNumber}
-                      onChangeText={setPhoneNumber}
-                      placeholder="Phone Number"
-                      keyboardType="phone-pad"
+                      value={email}
+                      onChangeText={setEmail}
+                      placeholder="Email"
+                      keyboardType="email-address"
                     />
                     <View>
                       <TouchableOpacity onPress={sendCode} style={styles.button}>

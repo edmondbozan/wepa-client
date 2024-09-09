@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { SafeAreaView, StyleSheet, View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator, FlatList, Platform } from 'react-native';
+import { SafeAreaView, StyleSheet, View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator, FlatList, Platform, Animated, Easing } from 'react-native';
 import { FontAwesome, FontAwesome5, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons'
 import { useSharedValue, useAnimatedStyle, } from 'react-native-reanimated';
 import LikeModal from '@/components/LikeModal';
@@ -23,6 +23,7 @@ import PleaseLoginModal from '@/components/PleaseLogin';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { validateZip } from '@/http/validateZip';
+import * as Haptics from 'expo-haptics';
 
 
 interface QueryParams {
@@ -32,6 +33,7 @@ interface QueryParams {
 // import Icon from 'react-native-vector-icons/FontAwesome';
 export default function App() {
   // const [scrollY, setScrollY] = useState(0);
+  const { signOut, userId, userType, zip, setNewZip } = useSession();
   const [isLeftModalVisible, setLeftModalVisible] = useState(false);
   const [isCategoriesModalVisible, setCategoriesModalVisible] = useState(false);
   const [isRadiusModalVisible, setRadiusModalVisible] = useState(false);
@@ -40,7 +42,6 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedItems, setSelectedItems] = useState<Item[]>([]);
-  const { signOut, userId, userType, zip, setNewZip } = useSession();
   const flatListRef = React.useRef<FlatList>(null)
   const [visibleItems, setVisibleItems] = useState([]);
   const isFocused = useIsFocused();
@@ -56,7 +57,31 @@ export default function App() {
   const notificationListener = useRef<Notifications.Subscription>();
   const responseListener = useRef<Notifications.Subscription>();
   const [refreshKey, setRefreshKey] = useState(0);
+  const scaleValue = useRef(new Animated.Value(1)).current;
+  const initialRender = useRef(true);
 
+  useEffect(() => {
+    const pulseAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(scaleValue, {
+          toValue: 1.1, // Scale up slightly (not too much to keep it subtle)
+          duration: 800, // Slow down the scaling up
+          easing: Easing.inOut(Easing.ease), // Smooth easing function
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleValue, {
+          toValue: 1, // Scale back to the original size
+          duration: 800, // Slow down the scaling down to match
+          easing: Easing.inOut(Easing.ease), // Smooth easing function
+          useNativeDriver: true,
+        }),
+      ])
+    );
+
+    pulseAnimation.start();
+
+    return () => pulseAnimation.stop(); // Clean up the animation on unmount
+  }, [scaleValue]);
 
 
   const buildQueryString = (params: { [key: string]: any }): string => {
@@ -135,11 +160,31 @@ export default function App() {
     return new Intl.NumberFormat('en-US').format(num);
   };
 
+  const fetchSampleData = async () => {
+    try {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      const url = BASE_URL + '/api/Projects/getsample/' + data[0].projectId;
+      const response = await fetchWithAuth(url);
+      const result: Project[] = await response.json();
+      if (response.ok) {
+        setData(result);
+        flatListRef.current?.scrollToOffset({ animated: true, offset: 0 })
+
+      } else {
+        Alert.alert('Page Load Error', 'Page Load');
+      }
+    } catch (err) {
+      setError(JSON.stringify(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
 
   // const { isAuthenticated, user, logout } = useAuth();
   const fetchData = async () => {
     try {
-
       const categoryIds = selectedItems.map((item: { id: number }) => item.id.toString());
 
       const queryParams = buildQueryString({ categoryIds, radius, budget, zip });
@@ -169,8 +214,13 @@ export default function App() {
   }, [expoPushToken]);
 
   useEffect(() => {
-    fetchData();
-  }, [selectedItems, bind]);
+    if (initialRender.current) {
+      initialRender.current = false;
+    } else {
+      fetchData();
+    }
+  }, [selectedItems, bind, zip]);
+
 
 
   useFocusEffect(
@@ -297,6 +347,7 @@ export default function App() {
   };
 
   const handLikeButtonClick = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     if (userType === 'guest') {
       Toast.show({
         type: 'success',
@@ -386,7 +437,7 @@ export default function App() {
     return (
       <View style={styles.errorContainer}>
         <Text>Server Error</Text>
-        <TouchableOpacity onPress={() => { setError(null); fetchData(); }} style={styles.buttonContainer}>
+        <TouchableOpacity onPress={() => { setError(null);  fetchData(); }} style={styles.buttonContainer}>
           <Text>Reload</Text>
         </TouchableOpacity>
       </View>
@@ -461,12 +512,12 @@ export default function App() {
           </View>
 
         </View>
-      ) : (<EmptyHome onUnlike={fetchData}></EmptyHome>)
+      ) : (<EmptyHome onUnlike={()=>{fetchData();}}></EmptyHome>)
       }
+      {(data.length > 0) && ( 
 
-      {(data.length > 0) && (
-
-        <FlatList
+        <><FlatList          
+          showsVerticalScrollIndicator={false}
           data={data[0].details.map((item, index) => ({
             id: `${item.projectDetailId}-${index}`, // Ensuring unique key
             images: {
@@ -480,21 +531,23 @@ export default function App() {
           keyExtractor={item => item.id.toString()}
           renderItem={({ item }) => <ListingDetails
             isVisible={isFocused && visibleItems.includes(item.id.toString())}
-            key={item.id} child={item} ></ListingDetails>}
+            key={item.id} child={item}></ListingDetails>}
           onViewableItemsChanged={onViewableItemsChanged}
-          viewabilityConfig={viewabilityConfig}
-        />)}
+          viewabilityConfig={viewabilityConfig} /><Text></Text></>)}
       {(data.length > 0) ? (<>
         <TouchableOpacity style={styles.floatingButtonLeft} onPress={handLikeButtonClick}   >
           <FontAwesome5 name="heart" size={30} color="black" />
         </TouchableOpacity>
          {userType === 'guest' && 
-          <TouchableOpacity style={styles.floatingGuestButton} onPress={() => likeProject(null, false, false)} >
+         <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+          <TouchableOpacity style={styles.floatingGuestButton} onPress={fetchSampleData} >
             <FontAwesome5 name="long-arrow-alt-right" size={30} color="#000" />
           </TouchableOpacity>
+          </Animated.View>
+          
           }
 
-        <TouchableOpacity style={styles.floatingButtonRight} onPress={() => likeProject(null, false, false)} >
+        <TouchableOpacity style={styles.floatingButtonRight} onPress={() => {Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);likeProject(null, false, false)}} >
           <FontAwesome5 name="heart-broken" size={30} color="#000" />
         </TouchableOpacity>
       </>

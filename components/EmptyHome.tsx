@@ -15,6 +15,7 @@ import Animated, {
   withDelay,
   withRepeat,
 } from 'react-native-reanimated';
+import { router } from 'expo-router';
 
 interface EmptyHomeProps {
   onUnlike: () => void;
@@ -22,7 +23,7 @@ interface EmptyHomeProps {
 
 
 const EmptyHome: React.FC<EmptyHomeProps> = ({ onUnlike }) => {
-  const { userId } = useSession();
+  const { userId, userType } = useSession();
   const translateX = useSharedValue(500); // Start off-screen to the right
   const opacity = useSharedValue(0);
 
@@ -40,6 +41,11 @@ const EmptyHome: React.FC<EmptyHomeProps> = ({ onUnlike }) => {
 
 
   const unlikeProjects = async () => {
+    if (userType == "guest"){
+      onUnlike();
+      return;
+    }
+
     try {
       const response = await fetchWithAuth(`${BASE_URL}/api/projects/users/${userId}/unlike`, {
         method: 'PUT',
@@ -62,6 +68,7 @@ const EmptyHome: React.FC<EmptyHomeProps> = ({ onUnlike }) => {
   return (
 
       <ImageBackground style={{ flex: 1 }} source={require('../assets/images/backgrounds/login.jpg')} imageStyle={{ opacity: 1, height: '100%' }}>
+              {userType != "guest" &&
       <Animated.View style={[styles.itemContainer, animatedStyle]}>
           <Text style={{ color: "#000", fontSize: normalize(30), fontWeight: '200', lineHeight: normalize(30) }}>
             You have viewed all projects.
@@ -72,7 +79,21 @@ const EmptyHome: React.FC<EmptyHomeProps> = ({ onUnlike }) => {
               <Text style={styles.skippedButtonText}>review skipped projects</Text>
             </TouchableOpacity>
           </View>
-        </Animated.View>
+        </Animated.View>}
+
+      {userType == "guest" &&
+      <Animated.View style={[styles.itemContainer, animatedStyle]}>
+          <Text style={{ color: "#000", fontSize: normalize(30), fontWeight: '200', lineHeight: normalize(30) }}>
+          🏠 Weather you are looking for a pro or just inspiration. Signing up with Wepa is fast easy and free.  
+          </Text>
+          <View style={{ alignItems: 'center' }}>
+            <TouchableOpacity style={styles.skippedButton} onPress={()=>{
+              router.navigate("/auth/login");
+            }}>
+              <Text style={styles.skippedButtonText}>Join Today</Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>}
               </ImageBackground>
   );
 };

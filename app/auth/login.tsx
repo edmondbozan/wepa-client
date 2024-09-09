@@ -17,8 +17,13 @@ export default function SignIn() {
 
   const usernameInputRef = useRef<TextInput>(null);
 
-  const handleRegister = () => {
+  const handleRegister =  () => {
     router.push('/auth/register');
+  };
+
+
+  const handleGuest = () => {
+    router.push('/');
   };
 
   const handleForgot = () => {
@@ -102,24 +107,20 @@ export default function SignIn() {
           source={require('../../assets/images/backgrounds/login.jpg')}
         >
           <View style={styles.header}>
-            <TouchableOpacity style={styles.signUpButton} onPress={() => { router.navigate("/"); }}>
-              <Text style={styles.signUpText}>browse as guest</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={handleRegister} disabled={isLoading} style={styles.signUpButton}>
-              <Text style={styles.signUpText}>register</Text>
+            <TouchableOpacity onPress={handleRegister} style={styles.signUpButton}>
+              <Text style={styles.signUpText}>Register</Text>
             </TouchableOpacity>
           </View>
           <View style={{ marginTop: normalize(20), marginStart: normalize(10), backgroundColor: 'rgba(0,0,0,.15)' }}>
-            <Text style={styles.headerText}>find your{'\n'}forever pro</Text>
+            <Text style={[styles.headerText, {fontFamily:'Italianno-Regular'}]}>Find your{'\n'}<View style={{width:normalize(25)}}></View>forever Pro</Text>
           </View>
           <View style={styles.formContainer}>
             <View style={styles.itemContainer}>
-              <Text style={styles.label}>email</Text>
+              <Text style={styles.label}>Email</Text>
               <TextInput
                 value={username}
                 onChangeText={setUsername}
-                placeholder="e-mail"
+                placeholder="email"
                 placeholderTextColor="#000000"
                 style={styles.input}
                 keyboardType="email-address"
@@ -128,7 +129,7 @@ export default function SignIn() {
                 editable={!isLoading}
                 onBlur={() => { usernameInputRef.current?.focus(); }}
               />
-              <Text style={styles.label}>password</Text>
+              <Text style={styles.label}>Password</Text>
               <TextInput
                 value={password}
                 onChangeText={setPassword}
@@ -139,21 +140,31 @@ export default function SignIn() {
                 editable={!isLoading}
                 ref={usernameInputRef}
               />
-              <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={isLoading}>
+              <View style={{flexDirection:'row', justifyContent:'space-evenly'}}>
+              <TouchableOpacity style={[styles.button, {flex:1}]} onPress={handleLogin} disabled={isLoading}>
                 {isLoading ? (
                   <ActivityIndicator color="#000" />
                 ) : (
-                  <Text style={styles.buttonText}>sign in</Text>
+                  <Text style={styles.buttonText}>Sign in</Text>
                 )}
               </TouchableOpacity>
+              <View style={{width: normalize(10)}}></View>
+              <TouchableOpacity style={[styles.button, {flex:1}]} onPress={handleGuest} disabled={isLoading}>
+                {isLoading ? (
+                  <ActivityIndicator color="#000" />
+                ) : (
+                  <Text style={styles.buttonText}>Guest Mode</Text>
+                )}
+              </TouchableOpacity>
+              </View>
 
               <AuthLoginButton onLoginSuccess={oAuthLogin} onLoginFailure={function (error: any): void {
                 console.log(JSON.stringify(error));
               }}></AuthLoginButton>
                             <TouchableOpacity style={styles.forgotButton} onPress={handleForgot} disabled={isLoading}>
-                <Text style={styles.forgotText}>forgot password</Text>
+                <Text style={styles.forgotText}>Forgot password?</Text>
               </TouchableOpacity>
-          <View style={{ marginVertical: 10 }}>
+          <View style={{ marginVertical: normalize(10) }}>
             <Text>By authenticating, you confirm that you have read and agree to our <ExternalLink style={{ color: '#007bff', textDecorationLine: 'underline' }} href={'https://app.termly.io/policy-viewer/policy.html?policyUUID=92b8a492-eea6-4e68-9727-7430bc07dac5'}>privacy policy</ExternalLink> and <ExternalLink href={'https://app.termly.io/policy-viewer/policy.html?policyUUID=e7fd608a-64a0-4e12-91b9-e154a15eb707'} style={{ color: '#007bff', textDecorationLine: 'underline' }} >terms and conditions</ExternalLink>.</Text>
           </View>
 
@@ -176,23 +187,25 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    margin: 20
+//    flexDirection: 'column',
+    position:'absolute',
+    right:10,
+    margin: 10,
+    zIndex:999
   },
   signUpButton: {
     borderColor: '#B87333',
     borderWidth: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Light background for better contrast
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Light background for better contrast
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 8,
   },
   signUpText: {
-    color: '#000',
+    color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
-    textShadowColor: 'rgba(255, 255, 255, 0.8)', // Text shadow for better readability
+    textShadowColor: 'rgba(0, 0, 0, 0.8)', // Text shadow for better readability
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 1,
   },
@@ -260,8 +273,11 @@ const styles = StyleSheet.create({
   },
   headerText: {
     color: "white",
-    fontSize: normalize(60),
-    fontWeight: '300'
+    fontSize: normalize(85),
+    fontWeight: '300',
+    textShadowColor: 'rgba(0, 0, 0, 1)', // Text shadow for better readability
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 1,
   },
 
 });

@@ -42,6 +42,8 @@ const BlockModal: React.FC<BlockModalProps> = ({ onClose, userId, projectId, blo
 
 
   const handleReport = (action:string) => {
+    // console.log("enter");
+    // console.log(projectId);
     Alert.alert(
       "Are you sure you want to " + action + " this account?",
       "This action cannot be undone.",

@@ -5,9 +5,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import fetchWithAuth from '@/context/FetchWithAuth';
 import { BASE_URL } from '@/constants/Endpoints';
 import { useSession } from '@/context/ctx';
+import { isLoaded } from 'expo-font';
 
 export default function Index() {
   const { setGuest } = useSession();
+  const [loaded, setloaded] = useState(false);
   // const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // null for loading state
 
   useEffect(() => {
@@ -15,26 +17,25 @@ export default function Index() {
       try {
         const response = await fetchWithAuth(BASE_URL + '/api/Auth');
         if (!response.ok) {
-          console.log("1");
           setGuest();
         } 
       } catch (err) {
-        console.log("2");
         setGuest();
+      }
+      finally{
+        setloaded(true);
       }
     };
 
     fetchData();
   }, []);
 
-  // if (isAuthenticated === null) {
-  //   // While loading, you can return a loading indicator or nothing
-  //   return <View></View>;
-  // }
 
   return (
     <>
+    {loaded &&
         <Redirect href="/(tabs)/home" />      
+    }
     </>
   );
 }

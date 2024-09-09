@@ -128,7 +128,7 @@ const MediaPicker: React.FC<MediaComponentProps> = ({ data = [], onValueChange, 
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (!permissionResult.granted) {
-      Alert.alert('Permission required', 'Please grant media library permissions to select media.');
+      Alert.alert('Permission required', 'We need access to your photo library to allow you to select photos for creating projects that can be shared and viewed by other users in the app. Your photos will only be uploaded and used with your permission.');
       return;
     }
 

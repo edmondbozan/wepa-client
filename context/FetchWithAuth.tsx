@@ -24,7 +24,8 @@ const fetchWithAuth = async (url: string, options: FetchOptions = {}): Promise<R
     const response = await fetch(url, options);
 
     // If you want to log the response status for debugging
-    console.log('Response status:', response.status);
+    // console.log(url);
+    // console.log('Response status:', response.status);
 
     return response; // Return the response, even if it's not "ok"
   } catch (error) {

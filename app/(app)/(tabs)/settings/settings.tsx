@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, Alert, StyleSheet, Linking, Switch, ScrollView } from 'react-native';
+import { View, Text, Alert, StyleSheet, Linking, Switch, ScrollView, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useFocusEffect } from 'expo-router';
 import { useSession } from '@/context/ctx';
@@ -17,16 +17,17 @@ import InputPhoneModal from '@/components/InputPhoneModal';
 import { validateZip } from '@/http/validateZip';
 import InputZipModal from '@/components/InputZipModal';
 import { isNullOrEmpty } from '@/functions/stringfunctions';
+import Toast from 'react-native-toast-message';
 
 const UserSettings: React.FC = () => {
-  const { signOut, userId, setNewZip, setNewUserType } = useSession();
+  const { signOut, userId, setNewZip, setNewUserType, userType } = useSession();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isTextModalVisible, setTextInputModeVisible] = useState(false);
   const [modalValue, setModalValue] = useState('');
   const [modalTitle, setModalTitle] = useState("");
   const [modalRequired, setModalRequired] = useState(false);
   const [modalValidate, setModalValidate] = useState(null);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User>();
   const [proModalVisible, setProModalVisible] = useState(false);
   const [phoneModalVisible, setPhoneModalVisible] = useState(false);
   const [zipModalVisible, setZipModalVisible] = useState(false);
@@ -37,6 +38,7 @@ const UserSettings: React.FC = () => {
   const [phone, setPhone] = useState(user?.phoneNumber);
   const [zip, setZip] = useState(user?.zip);  
   const [refreshKey, setRefreshKey] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   const patchUser = async (patches: PatchModel[]) => {
     try {
@@ -70,23 +72,83 @@ const UserSettings: React.FC = () => {
   };
 
   const handleDisplay = () => {
+    if (userType === 'guest') {
+
+      Toast.show({
+        type: 'success',
+        text1: 'Guest Mode.  Feature Locked',
+        text2: '🚀 Tap here to login or create a free account to unlock full functionality.',
+        position: 'top',
+        visibilityTime: 2000,
+        onPress: () => { Toast.hide(); router.navigate("/auth/login") }
+      });
+
+      // setPleaseLoginModalVisisble(true);
+      return;
+    }
+
     setModalTitle("Display Name");
     setModalValue(userName);
     setTextInputModeVisible(true);
   };
 
   const handleEmail = () => {
+    if (userType === 'guest') {
+
+      Toast.show({
+        type: 'success',
+        text1: 'Guest Mode.  Feature Locked',
+        text2: '🚀 Tap here to login or create a free account to unlock full functionality.',
+        position: 'top',
+        visibilityTime: 2000,
+        onPress: () => { Toast.hide(); router.navigate("/auth/login") }
+      });
+
+      // setPleaseLoginModalVisisble(true);
+      return;
+    }
+
     setModalTitle("Email");
     setModalValue(email);
     setTextInputModeVisible(true);
   };
 
   const handlePhone = () => {
+    if (userType === 'guest') {
+
+      Toast.show({
+        type: 'success',
+        text1: 'Guest Mode.  Feature Locked',
+        text2: '🚀 Tap here to login or create a free account to unlock full functionality.',
+        position: 'top',
+        visibilityTime: 2000,
+        onPress: () => { Toast.hide(); router.navigate("/auth/login") }
+      });
+
+      // setPleaseLoginModalVisisble(true);
+      return;
+    }
+
     setModalTitle("Phone");
     setModalValue(phone);
     setPhoneModalVisible(true);
   };
   const handleZip = () => {
+    if (userType === 'guest') {
+
+      Toast.show({
+        type: 'success',
+        text1: 'Guest Mode.  Feature Locked',
+        text2: '🚀 Tap here to login or create a free account to unlock full functionality.',
+        position: 'top',
+        visibilityTime: 2000,
+        onPress: () => { Toast.hide(); router.navigate("/auth/login") }
+      });
+
+      // setPleaseLoginModalVisisble(true);
+      return;
+    }
+
     setModalTitle("Zip");
     setModalValue(zip);
     setModalRequired(false);
@@ -102,6 +164,21 @@ const UserSettings: React.FC = () => {
   }
 
   const handleDeleteAccount = () => {
+    if (userType === 'guest') {
+
+      Toast.show({
+        type: 'success',
+        text1: 'Guest Mode.  Feature Locked',
+        text2: '🚀 Tap here to login or create a free account to unlock full functionality.',
+        position: 'top',
+        visibilityTime: 2000,
+        onPress: () => { Toast.hide(); router.navigate("/auth/login") }
+      });
+
+      // setPleaseLoginModalVisisble(true);
+      return;
+    }
+
     Alert.alert(
       "Are you sure you want to delete your account?",
       "All data will be permanently deleted.",
@@ -153,6 +230,7 @@ const UserSettings: React.FC = () => {
     setEmail(user?.email);
     setPhone(user?.phoneNumber);
     setZip(user?.zipCode);
+    setLicense(user?.licenseNumber);
     setPro((user?.userType === "professional") ? true : false);
   }, [user]);
 
@@ -180,12 +258,19 @@ const UserSettings: React.FC = () => {
         const usr = await fetchUserData((userId) ? userId : 0);
         setUser(usr);
         setRefreshKey((prevKey) => prevKey + 1);
+        setLoading(false);
       }
       fetchData();
     }, [])
   );
 
-
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#000000" />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -203,7 +288,23 @@ const UserSettings: React.FC = () => {
             thumbColor={(isPro) ? "#B87333" : "#000"}
             ios_backgroundColor="#C0C0C0"
             value={isPro ? true : false}
-            onValueChange={() => { setProModalVisible(true) }}
+            onValueChange={() => { 
+              if (userType === 'guest') {
+
+                Toast.show({
+                  type: 'success',
+                  text1: 'Guest Mode.  Feature Locked',
+                  text2: '🚀 Tap here to login or create a free account to unlock full functionality.',
+                  position: 'top',
+                  visibilityTime: 2000,
+                  onPress: () => { Toast.hide(); router.navigate("/auth/login") }
+                });
+          
+                // setPleaseLoginModalVisisble(true);
+                return;
+              }
+          
+              setProModalVisible(true); }}
           />
         </View>
         <View style={styles.separator} />
@@ -355,6 +456,11 @@ const styles = StyleSheet.create({
     flex: 1,
     //margin: 20,
     backgroundColor: "white"
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
