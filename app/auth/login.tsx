@@ -120,7 +120,7 @@ export default function SignIn() {
               <TextInput
                 value={username}
                 onChangeText={setUsername}
-                placeholder="email"
+                placeholder="Email"
                 placeholderTextColor="#000000"
                 style={styles.input}
                 keyboardType="email-address"
@@ -133,7 +133,7 @@ export default function SignIn() {
               <TextInput
                 value={password}
                 onChangeText={setPassword}
-                placeholder="password"
+                placeholder="Password"
                 placeholderTextColor="#000000"
                 secureTextEntry
                 style={styles.input}

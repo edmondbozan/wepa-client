@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, KeyboardAvoidingView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import Slider from '@react-native-community/slider';
 import Modal from 'react-native-modal';
-import { BASE_URL } from '@/constants/Endpoints';
 import { normalize } from 'react-native-elements';
 import { validateZip } from '@/http/validateZip';
-
 
 interface SliderModalProps {
   type: string;
@@ -16,101 +14,86 @@ interface SliderModalProps {
   onValueChange: (value: number) => void;
 }
 
-const formatNumber = (num: number) => {
-  return new Intl.NumberFormat('en-US').format(num);
-};
+const formatNumber = (num: number) => new Intl.NumberFormat('en-US').format(num);
 
-const SliderModal: React.FC<SliderModalProps> = ({ visible, userradius, onClose, onValueChange, type = "radius", zip = "07302" }) => {
-  const [radius, setValue] = useState(5);
+const SliderModal: React.FC<SliderModalProps> = ({
+  visible,
+  userradius,
+  onClose,
+  onValueChange,
+  type = "radius",
+  zip = "07302",
+}) => {
+  const [radius, setValue] = useState(userradius || 5);
   const [myZip, setMyZip] = useState(zip);
   const [invalidZip, setInvalidZip] = useState(false);
 
   const handleValueChange = (value: number) => {
     setValue(value);
     onValueChange(value);
-  }
-
+  };
 
   useEffect(() => {
-    // This will run when the component mounts
     if (userradius !== undefined) {
       setValue(userradius);
     }
   }, [userradius]);
 
-  return (
-    <Modal
-      isVisible={visible}
-      onBackdropPress={async () => {
-        if (type==='radius') {
-          if (await validateZip(myZip)){            
-            setInvalidZip(false);
-            onClose(myZip);
-        } else {
-          setInvalidZip(true);
-        }
-      } else {
+  const handleClose = async () => {
+    if (type === 'radius') {
+      if (await validateZip(myZip)) {
         setInvalidZip(false);
-        onClose();
+        onClose(myZip);
+      } else {
+        setInvalidZip(true);
       }
-      
+    } else {
+      setInvalidZip(false);
+      onClose();
     }
-      }
-      style={styles.modal}
+  };
 
-    >
-      <KeyboardAvoidingView style={styles.modalContent} behavior="padding">
-        {type === "radius" &&
-          <><Text><Text>Zip: </Text> {invalidZip &&
-            (<Text style={{ color: 'red' }}>Invalid Zip.</Text>)}
+  return (
+    <Modal isVisible={visible} onBackdropPress={handleClose} style={styles.modal}>
+      <KeyboardAvoidingView style={styles.modalContent}   behavior="padding" keyboardVerticalOffset={normalize(10)}>
+        <Text style={styles.text}>
+          {type === 'radius' ? `Radius: ${formatNumber(radius)} Miles` : `$ ${formatNumber(radius)}`}
+        </Text>
+        {type === 'radius' && (
+          <>
+            <Text>
+              <Text>Zip: </Text>
+              {invalidZip && <Text style={styles.errorText}>Invalid Zip.</Text>}
             </Text>
-          <TextInput   style={[styles.textInput, invalidZip && styles.inputError]}
-            placeholder="Zip"
-            value={myZip?.toString()}
-            onChangeText={setMyZip}
-            multiline={false}
-            maxLength={5}
-            keyboardType='number-pad' />            
-            </>
-        }
-        {(type == "radius") ?
-          <Text style={styles.text}>Radius: {formatNumber(radius)} Miles</Text>
-          :
-          <Text style={styles.text}>$ {formatNumber(radius)}</Text>
-        }
+            <TextInput
+              style={[styles.textInput, invalidZip && styles.inputError]}
+              placeholder="Zip"
+              value={myZip?.toString()}
+              onChangeText={setMyZip}
+              maxLength={5}
+              keyboardType="number-pad"
+            />
+          </>
+        )}
         <Slider
           style={styles.slider}
           minimumValue={0}
-          maximumValue={(type == "radius") ? 4000 : 500000}
-          step={(type == "radius") ? 1 : 5000}
+        
+          maximumValue={type === 'radius' ? 4000 : 500000}
+          step={type === 'radius' ? 1 : 5000}
           value={radius}
           onValueChange={handleValueChange}
           minimumTrackTintColor="#B87333"
           maximumTrackTintColor="#000000"
           thumbTintColor="#B87333"
         />
+               
       </KeyboardAvoidingView>
     </Modal>
   );
 };
 
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  text: {
-    fontSize: normalize(24),
-    marginBottom: 20,
-  },
-  slider: {
-    width: normalize(300),
-    height: normalize(40),
-    marginBottom: normalize(20)
-
-  },
   modal: {
     justifyContent: 'flex-end',
     margin: 0,
@@ -121,21 +104,18 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     borderColor: 'rgba(0, 0, 0, 0.1)',
-    maxHeight: '50%',
+    maxHeight: '80%',
   },
-  button: {
-    backgroundColor: '#2196F3',
-    padding: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginTop: 20,
+  text: {
+    fontSize: normalize(24),
+    marginBottom: 20,
   },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
+  slider: {
+//    width: normalize(300),
+//    height: normalize(40),
+    marginBottom: normalize(25),
   },
   textInput: {
-    //    height: normalize(200),
     borderColor: 'gray',
     borderWidth: 1,
     marginTop: 10,
@@ -145,7 +125,9 @@ const styles = StyleSheet.create({
   inputError: {
     borderColor: 'red',
   },
-  
+  errorText: {
+    color: 'red',
+  },
 });
 
 export default SliderModal;

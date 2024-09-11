@@ -57,6 +57,7 @@ export  interface Project {
         licenseNumber: string,
         phoneNumber: string,
         authProvider:string,
+        zipCode:string;
       }
     
 

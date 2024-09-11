@@ -15,6 +15,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
+import { fetchUserData } from '@/http/apiUser';
 
 const Projects: React.FC = () => {
   const [data, setData] = useState<Project[]>([]);
@@ -65,6 +66,32 @@ const Projects: React.FC = () => {
       opacity.value = withTiming(1, { duration: 1200 });
     }, [translateX, opacity])
   );
+
+
+  useEffect(() => {
+    const checkUserData = async () => {
+      if (data.length > 0) {
+        const usr = await fetchUserData(userId ? userId : 0);
+        if (!usr.zipCode) {
+          Toast.show({
+            type: 'success',
+            text1: 'Enter your zip to increase visibility',
+            text2: 'Your project will not be shown during a radius search.  Enter your zip under settings to increase your exposure.',
+            position: 'top',
+            visibilityTime: 3000,
+            onPress: () => {
+              Toast.hide();
+            },
+          });
+        }
+      }
+    };
+  
+    checkUserData();
+  }, [data]);
+
+
+
 
 
   const deleteProject = async (projectId: number) => {
@@ -265,7 +292,7 @@ const Projects: React.FC = () => {
                     userType: '',
                     projectId: 0,
                     title: '',
-                    cost: '0',
+                    cost: '5000',
                     categoryId: 0,
                     categoryName: '',
                     likes: 0,
