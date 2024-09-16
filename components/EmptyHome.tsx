@@ -84,7 +84,7 @@ const EmptyHome: React.FC<EmptyHomeProps> = ({ onUnlike }) => {
       {userType == "guest" &&
       <Animated.View style={[styles.itemContainer, animatedStyle]}>
           <Text style={{ color: "#000", fontSize: normalize(30), fontWeight: '200', lineHeight: normalize(30) }}>
-          🏠 Weather you are looking for a pro or just inspiration. Signing up with Wepa is fast easy and free.  
+          🏠 Whether you are looking for a pro or just inspiration. Signing up with Wepa is fast easy and free.  
           </Text>
           <View style={{ alignItems: 'center' }}>
             <TouchableOpacity style={styles.skippedButton} onPress={()=>{
